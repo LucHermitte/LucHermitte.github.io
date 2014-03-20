@@ -4,7 +4,7 @@
   <title><![CDATA[Category: C++ | Luc Hermitte's Blog]]></title>
   <link href="http://LucHermitte.github.io/blog/categories/c-plus-plus/atom.xml" rel="self"/>
   <link href="http://LucHermitte.github.io/"/>
-  <updated>2014-03-20T18:16:29+01:00</updated>
+  <updated>2014-03-20T18:18:21+01:00</updated>
   <id>http://LucHermitte.github.io/</id>
   <author>
     <name><![CDATA[Luc Hermitte]]></name>
@@ -14,59 +14,37 @@
 
   
   <entry>
-    <title type="html"><![CDATA[Programmation Par Contrat -- Application Au C++]]></title>
-    <link href="http://LucHermitte.github.io/blog/2014/03/13/programmation-par-contrat-application-au-c-plus-plus/"/>
-    <updated>2014-03-13T17:47:34+01:00</updated>
-    <id>http://LucHermitte.github.io/blog/2014/03/13/programmation-par-contrat-application-au-c-plus-plus</id>
-    <content type="html"><![CDATA[<h1 id="les-erreurs">Les Erreurs</h1>
-
-<h2 id="leurs-types">Leurs types</h2>
-
-<h2 id="ce-que-lon-en-fait">Ce que l&rsquo;on en fait</h2>
-
-<h1 id="la-programmation-par-contrat">La programmation par contrat</h1>
-
-<h2 id="les-trois-contrats">Les trois contrats</h2>
-
-<h2 id="acteurs-et-responsabilits">Acteurs et responsabilités</h2>
-
-]]></content>
-  </entry>
-  
-  <entry>
     <title type="html"><![CDATA[Le C++ Moderne]]></title>
     <link href="http://LucHermitte.github.io/blog/2012/04/04/le-c-plus-plus-moderne/"/>
     <updated>2012-04-04T11:44:47+02:00</updated>
     <id>http://LucHermitte.github.io/blog/2012/04/04/le-c-plus-plus-moderne</id>
     <content type="html"><![CDATA[<p><em>Billet initialement posté sur <a href="https://thor.si.c-s.fr/blogs/cs2/#urn:md5:a7dc48a340cd43c09c1180dd99234483">mon blog du boulot</a></em></p>
 
-<p>Suite à la grille que j&rsquo;avais donnée dans mon <a href="https://thor.si.c-s.fr/blogs/cs2/#urn:md5:4bdf150032f41bbea81a4ee4a259d522">précédent billet</a>, deux questions fort pertinentes m&rsquo;ont été posées :</p>
+<p>Suite à la grille que j'avais donnée dans mon <a href="https://thor.si.c-s.fr/blogs/cs2/#urn:md5:4bdf150032f41bbea81a4ee4a259d522">précédent billet</a>, deux questions fort pertinentes m'ont été posées :</p>
 
-<blockquote>
-  <p>Que signifie «simple» ?
-De même «C++ moderne» concerne la syntaxe ?</p>
-</blockquote>
+<blockquote><p>Que signifie «simple» ?
+De même «C++ moderne» concerne la syntaxe ?</p></blockquote>
 
-<h2 id="de-la-simplicit">De la simplicité</h2>
+<h2>De la simplicité</h2>
 
 <p><em>Hum &hellip; est-il simple de définir la simplicité ? Voyons voir. Ah! Même la page
-wiki du <a href="http://en.wikipedia.org/wiki/KISS_principle">principe du KISS</a> n&rsquo;élabore pas sur le sujet. Bon.</em></p>
+wiki du <a href="http://en.wikipedia.org/wiki/KISS_principle">principe du KISS</a> n'élabore pas sur le sujet. Bon.</em></p>
 
-<p>J&rsquo;estime qu&rsquo;un code est simple quand il résout, correctement, un problème en
-peu de lignes, et qu&rsquo;il demande peu d&rsquo;énergie pour comprendre ce qu&rsquo;il fait des
+<p>J'estime qu'un code est simple quand il résout, correctement, un problème en
+peu de lignes, et qu'il demande peu d'énergie pour comprendre ce qu'il fait des
 mois plus tard quand on a besoin de le relire, voire de le maintenir.</p>
 
 <p>Un exemple facile serait par exemple un code C qui lit depuis un fichier un
-nombre de lignes inconnu à l&rsquo;avance et le même code en C++. La version robuste
+nombre de lignes inconnu à l'avance et le même code en C++. La version robuste
 (qui prend en compte les éventuels problèmes) est vite complexe en C. En effet,
 en C il faut gérer manuellement les réallocations pour chaque ligne lue, mais
 aussi pour le tableau de lignes. Le C++, mais aussi glibc, fournissent des
 <em>primitives</em> dédiées qui épargnent au développeur de devoir réinventer la roue.
-Cf l&rsquo;article de Bjarne Stroustrup: <a href="http://www.research.att.com/~bs/new_learning.pdf">Learning C++ as a new language</a>.</p>
+Cf l'article de Bjarne Stroustrup: <a href="http://www.research.att.com/~bs/new_learning.pdf">Learning C++ as a new language</a>.</p>
 
 <p>On touche au paradoxe de la simplicité entre le C et le C++. Le C qui ne
 dispose uniquement que des briques élémentaires (relativement à la gestion de
-la mémoire et des chaines &ndash; et encore) est plus simple que le C++. Pourtant le
+la mémoire et des chaines &mdash; et encore) est plus simple que le C++. Pourtant le
 C++ qui offre des encapsulations de ces briques élémentaires permet de produire
 plus simplement du code robuste.</p>
 
@@ -74,29 +52,29 @@ plus simplement du code robuste.</p>
 ? Et bien, je vous invite à comparer la manipulation de chaines de caractères
 de Xerces-C++ avec les autres bibliothèques plus modernes.</p>
 
-<h2 id="le-c-moderne">Le C++ Moderne</h2>
+<h2>Le C++ Moderne</h2>
 
-<p>Pour comprendre ce qu&rsquo;est le <em>C++ Moderne</em>, il faut d&rsquo;abord voir ce qu&rsquo;est le <em>C++ historique</em>.</p>
+<p>Pour comprendre ce qu'est le <em>C++ Moderne</em>, il faut d'abord voir ce qu'est le <em>C++ historique</em>.</p>
 
-<h3 id="le-c-historique">Le C++ Historique</h3>
+<h3>Le C++ Historique</h3>
 
 <p>Un majorité écrasante, et regrettable, de ressources pédagogiques sur le C++
-suit ce que l&rsquo;on appelle aujourd&rsquo;hui une approche historique. « Le C++ descend
-du C, il est donc logique d&rsquo;enseigner le C avant le C++ ». Après tout nous
+suit ce que l'on appelle aujourd'hui une approche historique. « Le C++ descend
+du C, il est donc logique d'enseigner le C avant le C++ ». Après tout nous
 enseignons le latin avant le français à nos enfants, non ? Certes, cette
 comparaison, comme bien des comparaisons, est fallacieuse, mais posons-nous
 tout de même la question : où est le mal à enseigner itérativement du C vers le
-C++ ? Au delà de l&rsquo;aspect pédagogique qui nous fournit des abstractions plus
+C++ ? Au delà de l'aspect pédagogique qui nous fournit des abstractions plus
 simples à manipuler sur ce plan pédagogique, le soucis est dans les habitudes
 qui seront prises.</p>
 
 <p>Le C++ historique est un C++ où la bibliothèque standard ne mérite pas mieux
-qu&rsquo;une note en annexe d&rsquo;un cours, chose qui pousse à réinventer la roue et à
+qu'une note en annexe d'un cours, chose qui pousse à réinventer la roue et à
 verser dans le syndrome du
-<a href="http://en.wikipedia.org/wiki/Not_invented_here">NIH</a>. C&rsquo;est un C++ dont les
+<a href="http://en.wikipedia.org/wiki/Not_invented_here">NIH</a>. C'est un C++ dont les
 idiomes sont maîtrisés approximativement – assez logiquement, les cours
-modernisés sont plus au fait de l&rsquo;état de l&rsquo;art en matière d&rsquo;idiomes C++. Mais
-c&rsquo;est aussi et surtout un C++ où la gestion des erreurs est confiée à des codes
+modernisés sont plus au fait de l'état de l'art en matière d'idiomes C++. Mais
+c'est aussi et surtout un C++ où la gestion des erreurs est confiée à des codes
 de retour, comme en C.</p>
 
 <p>Souvent nous le savons que trop bien, le développeur est vite laxiste et ne
@@ -104,18 +82,21 @@ teste pas toutes les fonctions qui peuvent échouer pour traiter les cas
 dégradés. À commencer par les erreurs de type « mémoire saturée ». Un tel code
 cavalier dans sa gestion des erreurs ressemblerait à ceci :</p>
 
-<p><code>cpp
-    NotifyIcon* CreateNotifyIcon()
-    {
-        NotifyIcon* icon = new NotifyIcon();
-        icon.set_text("Blah blah blah");
-        icon.set_icon(new Icon(...), GetInfo());
-        icon.set_visible(true);
-        return icon;
-    }
-</code></p>
+<p>```cpp</p>
 
-<p>Sauf que … le C++ peut lever des exceptions. C&rsquo;est le comportement par défaut
+<pre><code>NotifyIcon* CreateNotifyIcon()
+{
+    NotifyIcon* icon = new NotifyIcon();
+    icon.set_text("Blah blah blah");
+    icon.set_icon(new Icon(...), GetInfo());
+    icon.set_visible(true);
+    return icon;
+}
+</code></pre>
+
+<p>```</p>
+
+<p>Sauf que … le C++ peut lever des exceptions. C'est le comportement par défaut
 des allocations de mémoire en C++, des types standards qui nous simplifient
 grandement la gestion des chaînes de caractères et des tableaux
 redimensionnables, des listes chaînées, des tables associatives, etc. Des COTS
@@ -127,102 +108,111 @@ de corriger le code précédent.</p>
 
 <p>Une version corrigée pourrait ressembler à ceci :</p>
 
-<p><code>cpp
-    NotifyIcon* CreateNotifyIcon()
-    {
-        NotifyIcon* icon = new NotifyIcon();
-        try {
-            icon.set_text("Blah blah blah");
-            icon.set_visible(true);
-            Info info = GetInfo();
-            icon.set_icon(new Icon(...), info);
-        } catch (...) {
-            delete icon; throw;
-        }
-        return icon;
+<p>```cpp</p>
+
+<pre><code>NotifyIcon* CreateNotifyIcon()
+{
+    NotifyIcon* icon = new NotifyIcon();
+    try {
+        icon.set_text("Blah blah blah");
+        icon.set_visible(true);
+        Info info = GetInfo();
+        icon.set_icon(new Icon(...), info);
+    } catch (...) {
+        delete icon; throw;
     }
-</code></p>
+    return icon;
+}
+</code></pre>
+
+<p>```</p>
 
 <p>Il semblerait que nous ayons fini. Et pourtant ce tout petit code est juste inmaintenable.</p>
 
-<p>Que se passe-t-il si <code>set_icon</code> lève une exception ? Sommes nous certains que l&rsquo;icône passée sera bien libérée ?
+<p>Que se passe-t-il si <code>set_icon</code> lève une exception ? Sommes nous certains que l'icône passée sera bien libérée ?
 Pouvons-nous changer de place sans risques le <code>set_icon</code> ? Même si un jour la copie du <code>GetInfo</code> lève à son tour une exception ?
 Et si nous rajoutions une troisième ressource, comment faire pour nettoyer correctement derrière nous ?
-Bienvenu dans l&rsquo;enfer de la gestion des ressources et du traitement des cas
+Bienvenu dans l'enfer de la gestion des ressources et du traitement des cas
 dégradés du C/C++ ! On aurait pu croire que ce code anodin soit simple à
-corriger avec un petit <em>catch</em>, ce n&rsquo;est pourtant pas le cas.</p>
+corriger avec un petit <em>catch</em>, ce n'est pourtant pas le cas.</p>
 
 <p>NB: Ces codes proviennent de deux articles, un de Raymond Chen, et sa réponse
-par Aaron Lahman, au sujet de l&rsquo;audit de codes dont le sujet est de savoir quel
+par Aaron Lahman, au sujet de l'audit de codes dont le sujet est de savoir quel
 style est le plus propice à repérer rapidement des codes incorrects. La
-traduction de la réponse est disponible à l&rsquo;adresse suivante :
+traduction de la réponse est disponible à l'adresse suivante :
 <a href="http://alexandre-laurent.developpez.com/cpp/retour-fonctions-ou-exceptions/">http://alexandre-laurent.developpez.com/cpp/retour-fonctions-ou-exceptions/</a>.</p>
 
-<p>Vous trouverez dans l&rsquo;article une version corrigée du code qui repose sur les
+<p>Vous trouverez dans l'article une version corrigée du code qui repose sur les
 codes de retour, avec un <code>if</code> toutes les deux lignes en moyenne pour remonter
 les erreurs, et restituer les ressources.</p>
 
-<h3 id="le-c-moderne-1">Le C++ Moderne</h3>
+<h3>Le C++ Moderne</h3>
 
 <p>La solution aux problèmes du C++ historique réside dans le C++ moderne.
 Décryptons cette tautologie.</p>
 
-<p>Oui le C++ est extrêmement complexe, personne ne prétend d&rsquo;ailleurs le
-maîtriser dans sa totalité, et l&rsquo;avènement du C++11 n&rsquo;est pas fait pour
+<p>Oui le C++ est extrêmement complexe, personne ne prétend d'ailleurs le
+maîtriser dans sa totalité, et l'avènement du C++11 n'est pas fait pour
 améliorer les choses. Et pourtant, paradoxalement le C++ est plus simple à
-utiliser que ce que l&rsquo;on peut croire. Il s&rsquo;agit d&rsquo;accepter de revoir notre
+utiliser que ce que l'on peut croire. Il s'agit d'accepter de revoir notre
 façon de penser la gestion des cas dégradés. Là où la tradition nous pousse à
-envisager tous les chemins d&rsquo;exécution possibles, ce qui a vite fait
-d&rsquo;exploser, l&rsquo;approche moderne nous pousse à surveiller toutes les ressources
+envisager tous les chemins d'exécution possibles, ce qui a vite fait
+d'exploser, l'approche moderne nous pousse à surveiller toutes les ressources
 qui devront être restituées.</p>
 
 <p>Pour cela on a recourt à une spécificité du C++ : tout objet local sera
 implicitement détruit en sortie de la portée où il vit, et ce quelque soit le
-chemin (propre &ndash; i.e. suite à un return ou une exception levée) qui conduit à
-l&rsquo;extérieur de cette portée. Si l&rsquo;on veut être pédant, ce comportement
-déterministe répond à l&rsquo;appellation <em>Resource Finalization is Destruction idiom</em>
-(RFID). Mais généralement on se contente de l&rsquo;appeler
+chemin (propre &mdash; i.e. suite à un return ou une exception levée) qui conduit à
+l'extérieur de cette portée. Si l'on veut être pédant, ce comportement
+déterministe répond à l'appellation <em>Resource Finalization is Destruction idiom</em>
+(RFID). Mais généralement on se contente de l'appeler
 <a href="http://cpp.developpez.com/faq/cpp/?page=pointeurs#POINTEURS_raii"><em>Resource Acquisition is Initialization idiom</em></a>
-(RAII) car le principe est qu&rsquo;une ressource à peine est-t-elle allouée, elle
+(RAII) car le principe est qu'une ressource à peine est-t-elle allouée, elle
 doit aussitôt être confiée à une capsule RAII qui assurera sa libération
 déterministe.</p>
 
-<p>Le standard C++98/03 n&rsquo;offre qu&rsquo;une seule capsule RAII généraliste, mais elle
+<p>Le standard C++98/03 n'offre qu'une seule capsule RAII généraliste, mais elle
 est assez limitée et elle vient avec des effets de bord indésirables pour les
 non-avertis. Il est toutefois facile de trouver des <em>scoped guards</em> prêts à
-l&rsquo;emploi, à commencer par chez <a href="http://www.boost.org/">boost</a>. Toutes les
+l'emploi, à commencer par chez <a href="http://www.boost.org/">boost</a>. Toutes les
 collections standards suivent le principe du RAII ; ce qui explique pourquoi le
 type <code>std::string</code> est si vite adopté par les développeurs, et pourquoi on
 cherche à orienter vers des <code>std::vector&lt;&gt;</code> pour gérer des tableaux. Le dernier
 standard paru en 2011 introduit enfin des scoped guards standards et sains, et
 des types dans la continuité du RAII : des pointeurs dit intelligents.</p>
 
-<p>Ainsi, si nous reprenons l&rsquo;exemple de la section précédente, le code devient une fois corrigé :</p>
+<p>Ainsi, si nous reprenons l'exemple de la section précédente, le code devient une fois corrigé :</p>
 
-<p><code>cpp
-    shared_ptr&lt;NotifyIcon&gt; CreateNotifyIcon()
-    {
-        shared_ptr&lt;NotifyIcon&gt; icon(new NotifyIcon());
-        icon-&gt;set_text("Blah blah blah");
-        shared_ptr&lt;Icon&gt; inner( new Icon(...) );
-        icon-&gt;set_icon(inner, GetInfo());
-        icon-&gt;set_visible(true);
-        return icon;
-    }
-</code></p>
+<p>```cpp</p>
 
-<p><code>cpp
-    // Ou en version C++14
-    unique_ptr&lt;NotifyIcon&gt; CreateNotifyIcon()
-    {
-        auto icon {make_unique&lt;NotifyIcon&gt;()};
-        icon-&gt;set_text("Blah blah blah");
-        auto inner {make_unique&lt;Icon&gt;(...)};
-        icon-&gt;set_icon(move(inner), GetInfo());
-        icon-&gt;set_visible(true);
-        return icon;
-    }
-</code></p>
+<pre><code>shared_ptr&lt;NotifyIcon&gt; CreateNotifyIcon()
+{
+    shared_ptr&lt;NotifyIcon&gt; icon(new NotifyIcon());
+    icon-&gt;set_text("Blah blah blah");
+    shared_ptr&lt;Icon&gt; inner( new Icon(...) );
+    icon-&gt;set_icon(inner, GetInfo());
+    icon-&gt;set_visible(true);
+    return icon;
+}
+</code></pre>
+
+<p>```</p>
+
+<p>```cpp</p>
+
+<pre><code>// Ou en version C++14
+unique_ptr&lt;NotifyIcon&gt; CreateNotifyIcon()
+{
+    auto icon {make_unique&lt;NotifyIcon&gt;()};
+    icon-&gt;set_text("Blah blah blah");
+    auto inner {make_unique&lt;Icon&gt;(...)};
+    icon-&gt;set_icon(move(inner), GetInfo());
+    icon-&gt;set_visible(true);
+    return icon;
+}
+</code></pre>
+
+<p>```</p>
 
 <p>Peu importe si les fonctions appelées échouent, peu importe si elles viennent à
 être réordonnées, nous avons la certitude que <code>inner</code> sera libérée (ou confié à
@@ -233,41 +223,41 @@ nominal.</p>
 code construit avec des exceptions, mais aussi avec un code continuant à
 fonctionner avec des codes de retour pour assurer la propagation des erreurs.</p>
 
-<p>À vrai dire bien qu&rsquo;il s&rsquo;agisse d&rsquo;une spécificité du C++, les autres langages
-pourvus d&rsquo;exceptions disposent généralement d&rsquo;un équivalent avec le
+<p>À vrai dire bien qu'il s'agisse d'une spécificité du C++, les autres langages
+pourvus d'exceptions disposent généralement d'un équivalent avec le
 <a href="http://en.wikipedia.org/wiki/Dispose_pattern"><em>dispose-pattern</em></a>
-(<code>try</code>-<code>catch</code>-<code>finally</code>) qui permet d&rsquo;obtenir le même comportement
+(<code>try</code>&ndash;<code>catch</code>&ndash;<code>finally</code>) qui permet d'obtenir le même comportement
 mais de façon explicite et non plus implicite. Si en plus ce langage est pourvu
-d&rsquo;un garbage collector, la gestion de la mémoire est encore gérée autrement
+d'un garbage collector, la gestion de la mémoire est encore gérée autrement
 alors que le C++ nous oriente vers une solution unique pour gérer toutes les
 ressources, sans distinctions. Il est aussi à noter que C# fut le premier des
 descendants mainstream du C++ à introduire une alternative implicite et
-déterministe au dispose-pattern via le mot clé <code>using</code>, et Java s&rsquo;y est également
-mis avec l&rsquo;introduction des
+déterministe au dispose-pattern via le mot clé <code>using</code>, et Java s'y est également
+mis avec l'introduction des
 <a href="http://docs.oracle.com/javase/tutorial/essential/exceptions/tryResourceClose.html"><em>try-with-resources</em></a>
 dans sa version 7.</p>
 
 <p>NB : Pour certains, « C++ moderne » pourrait rimer avec méta-programmation
 template et autres joyeusetés très puissantes et vite arcaniques qui sont au
 cœur du projet qui sert de laboratoire aux évolutions de la bibliothèque
-standard : boost. Certes, c&rsquo;est une utilisation moderne du langage, d&rsquo;une
-certaine façon, mais ce n&rsquo;est pas la modernité que l&rsquo;on attend du simple
-développeur lambda d&rsquo;applications. Il est attendu de lui qu&rsquo;il puisse écrire
+standard : boost. Certes, c'est une utilisation moderne du langage, d'une
+certaine façon, mais ce n'est pas la modernité que l'on attend du simple
+développeur lambda d'applications. Il est attendu de lui qu'il puisse écrire
 simplement du code qui réponde aux besoins ; la robustesse et la maintenabilité
-étant deux des besoins implicites. Suivre l&rsquo;«approche moderne» décrite
+étant deux des besoins implicites. Suivre l'«approche moderne» décrite
 précédemment est un premier pas dans cette direction.</p>
 
-<p>Le C++ moderne, c&rsquo;est aussi la bibliothèque standard, qui non seulement est
+<p>Le C++ moderne, c'est aussi la bibliothèque standard, qui non seulement est
 dans la continuité du RAII, mais qui aussi fournit des outils génériques à des
 besoins récurrents (collections, algorithmes, chaînes de caractères
 simplifiées) et pas seulement ces flux rigolos avec des <code>&lt;&lt;</code> et des <code>&gt;&gt;</code>.</p>
 
-<p>Le C++ moderne, c&rsquo;est aussi l&rsquo;application d&rsquo;idiomes (/patterns) modernisés. Par
-exemple, exit le test pour prévenir l&rsquo;auto-affectation qui ne garantit pas
-l&rsquo;<em>exception-safety</em>, mais bonjour l&rsquo;idiome
+<p>Le C++ moderne, c'est aussi l'application d'idiomes (/patterns) modernisés. Par
+exemple, exit le test pour prévenir l'auto-affectation qui ne garantit pas
+l'<em>exception-safety</em>, mais bonjour l'idiome
 <a href="http://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/Copy-and-swap"><em>copy-and-swap</em></a>.
-Le C++ moderne c&rsquo;est une nouvelle façon de penser en C++ qui implique une
-nouvelle façon d&rsquo;enseigner le C++.</p>
+Le C++ moderne c'est une nouvelle façon de penser en C++ qui implique une
+nouvelle façon d'enseigner le C++.</p>
 
 <p>Malgré cela, le C++ reste complexe sur bien des points très techniques (comment
 changer son allocateur, comment écrire des méta-programmes template, etc.) en
@@ -278,32 +268,32 @@ qui est une pierre angulaire pour savoir quand on peut hériter, ou encore la
 qui cherche à nous enseigner la différence entre faire soit même et déléguer.
 Il introduit aussi des choses assez spécifiques comme la distinction entre la
 <a href="http://cpp.developpez.com/faq/cpp/?page=classes#CLASS_valeur"><em>sémantique de valeur</em></a> et la
-<a href="http://cpp.developpez.com/faq/cpp/?page=classes#CLASS_entite"><em>sémantique d&rsquo;entité</em></a> à
+<a href="http://cpp.developpez.com/faq/cpp/?page=classes#CLASS_entite"><em>sémantique d'entité</em></a> à
 cause de sa dualité quant aux accès directs ou indirects aux objets.</p>
 
-<p>Et à aucun moment le C++98/03 n&rsquo;adresse la question de la programmation
+<p>Et à aucun moment le C++98/03 n'adresse la question de la programmation
 concurrente ou parallèle.</p>
 
-<h3 id="addendum-post-c11-edit-de-mars-2014">Addendum post C++11 (EDIT de mars 2014)</h3>
+<h3>Addendum post C++11 (EDIT de mars 2014)</h3>
 
-<p>L&rsquo;arrivée des compilateurs C++11, voire C++14 peut jouer sur la définition de
-<em>moderne</em> dans le cadre du C++. Jusqu&rsquo;à lors, la distinction
+<p>L'arrivée des compilateurs C++11, voire C++14 peut jouer sur la définition de
+<em>moderne</em> dans le cadre du C++. Jusqu'à lors, la distinction
 <em>moderne</em>/<em>historique</em> se limitait à C++ à la C VS C++ 98/03 avec bonnes
 pratiques dont le RAII. Le C++11 entérine les pointeurs intelligents, mais il
-apporte aussi son lot d&rsquo;autres simplifications comme <code>auto</code>, les
+apporte aussi son lot d'autres simplifications comme <code>auto</code>, les
 <em>range-based for loops</em>, ou de fonctionnalités comme les lambdas.</p>
 
-<p>Mon appréciation de la pratique du C++ à la sortie de l&rsquo;école, et en industrie,
-est telle que même à l&rsquo;orée du C++14, je continue à employer <em>moderne</em> dans le
+<p>Mon appréciation de la pratique du C++ à la sortie de l'école, et en industrie,
+est telle que même à l'orée du C++14, je continue à employer <em>moderne</em> dans le
 sens de <em>avec RAII</em>, et pas encore dans le sens: C++11/14 en opposition au
 C++98/03 avec les bonnes pratiques associées.</p>
 
-<h2 id="conclusion">Conclusion</h2>
+<h2>Conclusion</h2>
 
 <p>Votre serviteur a profité de sa soutenance N3 <em>[NdA: Les «experts» soutiennent
 sur un sujet en rapport avec leur domaine dans ma boite pour faire reconnaitre
 leur status.]</em> pour reprendre un chapitre du mémoire qui répondait à la
-question «C&rsquo;est quoi le C++ moderne ?». J&rsquo;espère avoir répondu à la question,
+question «C'est quoi le C++ moderne ?». J'espère avoir répondu à la question,
 mais surtout de vous avoir convaincu de la nécessité de cesser de surveiller
 tous les chemins possibles dans un code pour à la place surveiller toutes les
 ressources manipulées.</p>
