@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
+<<<<<<< HEAD
   <title><![CDATA[Luc Hermitte's Blog]]></title>
   <link href="http://LucHermitte.github.io/atom.xml" rel="self"/>
   <link href="http://LucHermitte.github.io/"/>
@@ -8,11 +9,21 @@
   <id>http://LucHermitte.github.io/</id>
   <author>
     <name><![CDATA[Luc Hermitte]]></name>
+=======
+  <title><![CDATA[My Octopress Blog]]></title>
+  <link href="http://LucHermitte.github.io/atom.xml" rel="self"/>
+  <link href="http://LucHermitte.github.io/"/>
+  <updated>2014-03-08T15:12:11+01:00</updated>
+  <id>http://LucHermitte.github.io/</id>
+  <author>
+    <name><![CDATA[Your Name]]></name>
+>>>>>>> 81155d23ee0e44d24e5cd88471eec08e5c3c1e0c
     
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
   
+<<<<<<< HEAD
   <entry>
     <title type="html"><![CDATA[Le C++ Moderne]]></title>
     <link href="http://LucHermitte.github.io/blog/2012/04/04/le-c-plus-plus-moderne/"/>
@@ -330,4 +341,6 @@ ressources manipulées.</p>
 ]]></content>
   </entry>
   
+=======
+>>>>>>> 81155d23ee0e44d24e5cd88471eec08e5c3c1e0c
 </feed>

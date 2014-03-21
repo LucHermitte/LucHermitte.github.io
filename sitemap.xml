@@ -1,6 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>
     <url>
+<<<<<<< HEAD
         <loc>http://LucHermitte.github.io/blog/2012/04/04/le-c-plus-plus-moderne/</loc>
         <lastmod>2014-03-20T18:11:42+01:00</lastmod>
     </url>
@@ -15,5 +16,17 @@
     <url>
         <loc>http://LucHermitte.github.io/blog/archives/</loc>
         <lastmod>2014-03-20T18:11:42+01:00</lastmod>
+=======
+        <loc>http://LucHermitte.github.io/blog/archives/</loc>
+        <lastmod>2014-03-08T15:09:26+01:00</lastmod>
+    </url>
+    <url>
+        <loc>http://LucHermitte.github.io/</loc>
+        <lastmod>2014-03-08T15:09:26+01:00</lastmod>
+    </url>
+    <url>
+        <loc>http://LucHermitte.github.io/robots.txt</loc>
+        <lastmod>2014-03-08T15:09:26+01:00</lastmod>
+>>>>>>> 81155d23ee0e44d24e5cd88471eec08e5c3c1e0c
     </url>
 </urlset>
