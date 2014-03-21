@@ -58,6 +58,14 @@ default_asides: [asides/recent_posts.html, asides/github.html, asides/delicious.
 # post_asides:
 # page_asides:
 
+# Another syntax highlighting engine: Kramdown + coderay
+#markdown: kramdown
+kramdown:
+    use_coderay: true
+    coderay:
+        coderay_line_numbers: table
+        coderay_css: class
+
 # ----------------------- #
 #   3rd Party Settings    #
 # ----------------------- #
