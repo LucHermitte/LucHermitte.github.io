@@ -140,53 +140,54 @@ On peut dans l'absolu distinguer autant d'acteurs dans l'écriture d'un code
 que de fonctions qui interviennent. Prenons le bout de code suivant :
 
 ```c++
-double metier() {                  // écrit par I
-   const double i = interrogeES(); // écrit par A
-   return sqrt(i);                 // écrit par B
+double metier() {                  // écrit par l'Intégrateur
+   const double i = interrogeES(); // écrit par le responsable UI
+   return sqrt(i);                 // écrit par le Mathématicien
 }
 ```
 
 Nous pouvons distinguer trois acteurs : 
 
-* la personne A, qui écrit `interrogeES`
-* la personne B, qui écrit `sqrt`
-* et la personne I, qui intègre tout cela ensemble lorsqu'elle écrit `metier`.
+* le responsable UI, qui écrit `interrogeES`
+* le Mathématicien, qui écrit `sqrt`
+* et l'Intégrateur, qui intègre tout cela ensemble lorsqu'elle écrit `metier`.
 
 `sqrt` a un contrat simple : le nombre reçu doit être positif. Si l'appel à
 `sqrt` échoue (plantage, résultat renvoyé aberrant, ...) alors que le nombre
-passé en paramètre est bien positif, alors B est responsable du problème. En
-effet, bien que les pré-conditions de `sqrt` sont bien vérifiées, ses
-post-conditions ne le sont pas : `sqrt` ne remplit pas sa part du contrat.
+passé en paramètre est bien positif, alors le Mathématicien est responsable du
+problème. En effet, bien que les pré-conditions de `sqrt` sont bien vérifiées,
+ses post-conditions ne le sont pas : `sqrt` ne remplit pas sa part du contrat.
 
-Si `i` n'est pas positif, alors B ne peut pas être tenu pour responsable de
-quoi que ce soit. La faute incombe au code client de `sqrt`.
+Si `i` n'est pas positif, alors le Mathématicien ne peut pas être tenu pour
+responsable de quoi que ce soit. La faute incombe au code client de `sqrt`.
 
 Maintenant, tout va dépendre si `interrogeES` dispose d'une post-condition sur
 ses sorties du type _renvoie un nombre positif_. Dans ce cas, la rupture de
-contrat est à ce niveau, et A est responsable de l'erreur de programmation. I
-est dans son droit d'enchainer `sqrt(interrogeES())`. C'est exactement la même
-chose que `sqrt(abs(whatever))`, personne n'irait accuser I de ne pas faire son
-boulot.
+contrat est à ce niveau, et le responsable UI est responsable de l'erreur de
+programmation. L'Intégrateur est dans son droit d'enchainer
+`sqrt(interrogeES())`. C'est exactement la même chose que
+`sqrt(abs(whatever))`, personne n'irait accuser l'Intégrateur de ne pas faire
+son boulot.
 
 En revanche, si `interrogeES` n'a aucune post-condition telle que le nombre
-renvoyé sera positif, alors I est responsable au moment de l'intégration de
+renvoyé sera positif, alors l'Intégrateur est responsable au moment de l'intégration de
 s'assurer que ce qu'il va passer à `sqrt` soit bien positif. Une correction
 typique serait :
 
 ```c++
-double metier() {                  // écrit par I
-   const double i = interrogeES(); // écrit par A
+double metier() {                  // écrit par l'Intégrateur
+   const double i = interrogeES(); // écrit par le responsable UI
    if (i <0)
        throw std::runtime_error("invalid input obtained ...");
-   return sqrt(i);                 // écrit par B
+   return sqrt(i);                 // écrit par le Mathématicien
 }
 ```
 
-Remarquez, que I est alors face à une erreur de contexte (/_runtime_) et
-nullement face à une erreur de programmation. Il est alors en droit de lever
-une exception, ou de boucler jusqu'à obtenir quelque chose qui lui permette de
-continuer. Sans cela nous aurions été face à une erreur de programmation
-commise par I.
+Remarquez, que l'Intégrateur est alors face à une erreur de contexte
+(/_runtime_) et nullement face à une erreur de programmation. Il est alors en
+droit de lever une exception, ou de boucler jusqu'à obtenir quelque chose qui
+lui permette de continuer. Sans cela nous aurions été face à une erreur de
+programmation commise par l'Intégrateur.
 
 
 En résumé :
@@ -207,18 +208,20 @@ La programmation par contrat n'a pas vocation à avoir des répercutions légale
 selon qui ne remplit pas son contrat. Cependant, il y a clairement une
 intersection entre la PpC et les responsabilités légales.
 
-Dans le cas où A et B sont deux contractants de I. Ce que j'ai détaillé au
-paragraphe précédant est normalement directement applicable. I sera responsable
-vis-à-vis de son client du bon fonctionnement de l'ensemble, mais A et B ont des
-responsabilités vis-à-vis de I.
+Dans le cas où le responsable UI et le Mathématicien sont deux contractants de
+l'Intégrateur. Ce que j'ai détaillé au paragraphe précédant est normalement
+directement applicable. L'Intégrateur sera responsable vis-à-vis de son client
+du bon fonctionnement de l'ensemble, mais le responsable UI et le Mathématicien
+ont des responsabilités vis-à-vis de l'Intégrateur.
 
-Si maintenant, A ou B ne livrent plus des
+Si maintenant, le responsable UI ou le Mathématicien ne livrent plus des
 [COTS](http://en.wikipedia.org/wiki/Commercial_off-the-shelf), mais des
-bibliothèques tierces OpenSources ou Libres. À moins que I ait pris un contrat
-de maintenance auprès des auteurs A et B, il est peu probable que A et B aient
-la moindre responsabilité légale vis à vis de I. 
+bibliothèques tierces OpenSources ou Libres. À moins que l'Intégrateur ait pris
+un contrat de maintenance auprès du responsable UI et du Mathématicien, il est
+peu probable que le responsable UI ou le Mathématicien aient la moindre
+responsabilité légale vis à vis de l'Intégrateur. 
 
-I est seul responsable vis-à-vis de son client. À lui de trouver des
+L'Intégrateur est seul responsable vis-à-vis de son client. À lui de trouver des
 contournements, ou mieux de corriger ces composants tiers et de reverser les
 patchs à la communauté.
 
