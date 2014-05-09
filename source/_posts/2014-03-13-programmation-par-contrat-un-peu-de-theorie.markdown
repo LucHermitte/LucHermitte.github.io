@@ -126,7 +126,7 @@ de codes durant lesquelles une propriété sera vraie :
   dans un état cohérent et pertinent_ (_cf._ FAQ C++ dvpz) ;
 * un _invariant de classe_ est une propriété toujours observable depuis
   l'extérieur des instances de la classe -- p.ex. une séquence triée garantira
-  que tous les éléments de la séquence sont toujours ordonnées lorsque le code
+  que tous les éléments de la séquence sont toujours ordonnés lorsque le code
   utilisant la séquence cherche à y accéder, cependant ponctuellement, le temps
   de l'insertion d'un nouvel élément l'invariant de la classe n'a pas à être
   vérifié depuis les fonctions internes de la séquence ;
@@ -227,7 +227,7 @@ Mais je m'égare, ceci est une autre histoire.  Revenons à nos moutons.
 ## <a id="ProgrammationDefensive"></a>III- Parenthèse : La Programmation Défensive
 
 La _Programmation Défensive_ a pour objectif qu'un programme ne doit jamais
-s'arrêter et pour pouvoir toujours continuer.
+s'arrêter afin de pouvoir toujours continuer.
 
 Bien que la PpC puisse être détournée pour faire de la programmation
 défensive, ce n'est pas son objectif premier. La PpC ne fait que stipuler que
@@ -268,7 +268,7 @@ pas quel est le nombre, ni d'où il vient. Après une longue investigation pour
 traquer d'où vient ce nombre négatif, on comprend enfin qu'il faut instrumenter
 `process` pour intercepter l'exception. Soit on fait le `catch` au niveau de la
 fonction, et on sait dans quel fichier a lieu l'erreur, soit on encadre l'appel
-à `my::sqrt` pour remonter plus d'information. Et là ... on fait ce que le code
+à `my::sqrt` pour remonter plus d'informations. Et là ... on fait ce que le code
 client aurait du faire dès le début : assurer que le contrat des fonctions
 appelées est bien respecté.
 
@@ -286,14 +286,15 @@ void my::process(boost::filesystem::path const& file) {
     for (std::size_t l = 1 ; f >> d ; ++l) {
         if (d <= 0) 
             throw std::runtime_error(
-                "Invalid negative distance at the "+std::to_string(l)
+                "Invalid negative distance " + std::to_string(d)
+                +" at the "+std::to_string(l)
                 +"th line in distances file "+file.string());
         my::memorize(my::sqrt(d));
     }
 }
 ```
 Cette fois-ci, nous aurions droit à un message non seulement plus explicite,
-mais surtout bien plus utile : *"Invalid negative distances at the 42th line of
+mais surtout bien plus utile : *"Invalid negative distance -28.15 at the 42th line of
 distances file distances.txt"*.
 
 Mes conclusions personnelles sur le sujet :
@@ -330,7 +331,7 @@ pointer avec un bagage bien plus gros sans rien avoir à payer en supplément
 (certes il partira en soute).
 Même chose pour les post-conditions : nous n'avons aucune garantie d'estomac
 rempli sans surcouts dans les compagnies aériennes. Sauf chez les compagnies
-traditionnelles qui assurent en sortie un estomac rempli.
+traditionnelles qui assurent en sortie un estomac non vide.
 Côté invariants, un rectangle immuable a tous ses côtés perpendiculaires, un
 carré immuable a aussi tous ses côtés de longueur égale.
 

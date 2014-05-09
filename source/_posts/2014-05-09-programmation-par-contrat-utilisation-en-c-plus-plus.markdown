@@ -13,18 +13,19 @@ quelques techniques d'application de la PpC au C++.
 
 ## <a id="Documentation"></a>Documentation
 
-Comme je l'avais signalé plus haut, la première chose que l'on peut faire à
-partir des contrats, c'est de les documenter clairement.
+Comme je l'avais signalé dans le précédent billet, la première chose que l'on
+peut faire à partir des contrats, c'est de les documenter clairement.
 Il s'agit probablement d'une des choses les plus importantes à documenter dans
 un code source. Et malheureusement trop souvent c'est négligé.
 
 L'outil [Doxygen](http://doxygen.org) met à notre disposition les tags `@pre`,
 `@post`, et `@invariant` pour documenter nos contrats. Je ne peux que
-conseiller d'en user et d'en abuser.
+vous conseiller d'en user et d'en abuser.
 
 
 ## Les assertions
 
+(A rédiger...)
 rien / exception / assertion
 
 analyse statique qui profite des assertions
@@ -44,8 +45,8 @@ eux privés et virtuels (généralement virtuels purs).
 
 Ce pattern a deux objectifs avoués. Le premier est de découpler les interfaces
 pour les _utilisateurs_ du pattern. Le code client doit passer par l'interface
-publique qui est non virtuelle, tandis que le code qui spécialise doit passer
-par l'interface privée et virtuelle.
+publique qui est non virtuelle, tandis que le code qui spécialise doit
+s'intéresser à l'interface privée et virtuelle.
 
 Le second objectif, est de créer des super interfaces qui baignent dans la
 PpC. Les interfaces classiques à la Java/C#/COM/CORBA/... ne permettent pas
@@ -225,10 +226,14 @@ vérification des contrats de la macro `NDEBUG` qui est plus liée au mode de
 compilation (_Débug_ VS _Release_).
 
 ### propal C++14/17:
+(A rédiger...)
+
 http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3753.pdf
 
 
 ## Invariants statiques
+
+(A rédiger...)
 
 - références
 - boost.unit
