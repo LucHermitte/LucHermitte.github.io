@@ -179,6 +179,8 @@ Ainsi, si nous reprenons l'exemple de la section précédente, le code devient u
     }
 ```
 
+Ou en version C++14 :
+
 ```cpp
     // Ou en version C++14
     unique_ptr<NotifyIcon> CreateNotifyIcon()
