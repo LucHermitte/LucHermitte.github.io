@@ -85,8 +85,8 @@ Le C, et par extension le C++, nous offrent un outil tout indiqué pour traquer
 les erreurs de programmation : les assertions.
 
 En effet, compilé sans la directive de précompilation `NDEBUG`, une assertion
-va arréter un programme et créer un fichier core. Il est ensuite possible
-d'ouvrir le fichier core depuis le debuggueur pour pouvoir explorer l'état du
+va arréter un programme et créer un fichier _core_. Il est ensuite possible
+d'ouvrir le fichier _core_ depuis le debuggueur pour pouvoir explorer l'état du
 programme au moment de la détection de l'erreur.
 
 #### Exemple d'exploitation des assertions
@@ -128,11 +128,12 @@ assertion "n >=0" failed: file "test-assert.cpp", line 7, function: double my::s
 Aborted (core dumped)
 ```
 
-On a déjà l'indication où l'erreur a été trouvée.
-Investigons plus en avant. Si on lance `gdb ./test-assert core` (à conditions
-que `ulimit` autorise bien les _coredumps_ sur votre plateforme, faites un
-`ulimit -c unlimited` le cas échéant), ou `gdb ./test-assert` puis `run` pour
-une investigation pseudo interactive, on observe ceci :
+On dispose de suite de l'indication où l'erreur a été détectée.
+Mais investigons plus en avant. Si on lance `gdb ./test-assert core.pid42`
+(cela peut nécessiter de demander à `ulimit` d'autoriser les _coredumps_ sur
+votre plateforme, faites un `ulimit -c unlimited` pour cela), ou `gdb
+./test-assert` puis `run` pour une investigation pseudo-interactive, on observe
+ceci :
 
 ```
 $ gdb test-assert
@@ -248,24 +249,25 @@ ou peut-être le sauront-ils demain.
 #### Pré- et post-conditions de fonctions membres, à la Non-Virtual Interface Pattern (NVI)
 
 Le pattern NVI est un _Design Pattern_ qui ressemble au DP _Template Method_ mais qui
-n'est pas le _Template Method_. Le principe du pattern : l'interface publique
-est non virtuelle, et elle fait appel à des comportements spécialisés qui sont
-eux privés et virtuels (généralement virtuels purs).
+n'est pas le _Template Method_. Le principe du pattern est le suivant :
+l'interface publique est non virtuelle, et elle fait appel à des comportements
+spécialisés qui sont eux privés et virtuels (généralement virtuels purs).
 
 Ce pattern a deux objectifs avoués. Le premier est de découpler les interfaces
 pour les _utilisateurs_ du pattern. Le code client doit passer par l'interface
 publique qui est non virtuelle, tandis que le code qui spécialise doit
 s'intéresser à l'interface privée et virtuelle.
 
-Le second objectif, est de créer des super interfaces qui baignent dans la
+Le second objectif, est de créer des super-interfaces qui baignent dans la
 PpC. Les interfaces classiques à la Java/C#/COM/CORBA/... ne permettent pas
 d'associer nativement des contrats à leurs méthodes. Avec le pattern NVI on
 peut, avec un soupçon d'huile de coude, rajouter des contrats aux fonctions
 membres.
 
 Les fonctions publiques et non virtuelles se voient définies `inline`s, elles
-vérifient en premier lieu pré-conditions et invariants, elles exécutent le code
-spécialisé, et elles finissent par vérifier post-conditions et invariants.
+vérifient en premier lieu pré-conditions et invariants, elles exécutent ensuite
+le code spécialisé, et elles finissent par vérifier post-conditions et
+invariants.  
 Soit:
 
 ```c++
@@ -302,7 +304,9 @@ versions mères pour n'oublier personne.
 ```c++
 struct WithInvariants : boost::noncopyable {
     void check_invariants() const {
+#ifndef NDEBUG
         do_check_invariants();
+#endif
     }
 protected:
     ~WithInvariants() {}
@@ -352,8 +356,7 @@ protected:
 Matthew Wilson consacre le premier chapitre de son [_Imperfect C++_](#IPCpp) à
 la PpC. Je ne peux que vous en conseiller la lecture.
 
-Il présente au §I.1.3 une technique qui n'est pas sans rappeler ce que nous
-faisons avec le pattern NVI au niveau des classes:
+Il y présente au §I.1.3 la technique suivante :
 
 ```c++
 double my::sqrt(double n)
@@ -432,7 +435,10 @@ suggérait Matthew Wilson. Au détail qu'il passe par une fonction `is_valid`
 renvoyant un booléen et que l'`InvariantChecker` s'occupe de vérifier
 l'assertion si `MYLIB_DBC_ACTIVATED` est bien défini -- il découple la
 vérification des contrats de la macro `NDEBUG` qui est plus liée au mode de
-compilation (_Débug_ VS _Release_).
+compilation (_Débug_ VS _Release_).  
+Pour ma part, je préfère avoir une assertion différente pour chaque invariant
+plutôt qu'un seul `assert(is_valid());`. Cela permet de savoir plus précisément
+quel contrat est violé.
 
 ### propal C++14/17:
 (A rédiger...)

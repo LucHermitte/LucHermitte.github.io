@@ -150,10 +150,10 @@ Nous pouvons distinguer trois acteurs :
 
 * le responsable UI, qui écrit `interrogeES`
 * le Mathématicien, qui écrit `sqrt`
-* et l'Intégrateur, qui intègre tout cela ensemble lorsqu'elle écrit `metier`.
+* et l'Intégrateur, qui intègre tout cela ensemble lorsqu'il écrit `metier`.
 
 `sqrt` a un contrat simple : le nombre reçu doit être positif. Si l'appel à
-`sqrt` échoue (plantage, résultat renvoyé aberrant, ...) alors que le nombre
+`sqrt` échoue (plantage, résultat renvoyé aberrant, ...) tandis que le nombre
 passé en paramètre est bien positif, alors le Mathématicien est responsable du
 problème. En effet, bien que les pré-conditions de `sqrt` sont bien vérifiées,
 ses post-conditions ne le sont pas : `sqrt` ne remplit pas sa part du contrat.
@@ -268,14 +268,14 @@ void my::process(boost::filesystem::path const& file) {
 Si un nombre négatif devait être présent dans le fichier, nous aurions droit à
 l'exception *"Negative number sent to sqrt"*. Limpide, n'est-ce pas ? On ne sait
 pas quel est le nombre, ni d'où il vient. Après une longue investigation pour
-traquer d'où vient ce nombre négatif, on comprend enfin qu'il faut instrumenter
+traquer l'origine ce nombre négatif, on comprend enfin qu'il faut instrumenter
 `process` pour intercepter l'exception. Soit on fait le `catch` au niveau de la
 fonction, et on sait dans quel fichier a lieu l'erreur, soit on encadre l'appel
 à `my::sqrt` pour remonter plus d'informations. Et là ... on fait ce que le code
 client aurait du faire dès le début : assurer que le contrat des fonctions
 appelées est bien respecté.
 
-Si on avait embrassé la PpC dès le début, ce bout de code aurait ressemblé à :
+Si on avait embrassé la PpC dès le départ, ce bout de code aurait ressemblé à :
 ```c++
 double my::sqrt(double n) {
     assert(n>=0 && "sqrt can't process negative numbers");
@@ -317,7 +317,7 @@ est un outil qui permet d'éviter de définir des hiérarchies de classes qui se
 retourneront contre nous.
 
 Le LSP est formulé relativement aux contrats des classes pour établir quand une
-classe peut dériver (publiquement en C++) en tout quiétude d'une autre.
+classe peut dériver (publiquement en C++) en toute quiétude d'une autre.
 Le principe est que :
 
 * les pré-conditions ne peuvent être qu'affaiblies, ou laissées telles quelles,
@@ -325,32 +325,35 @@ Le principe est que :
   quelles,
 * et la classe fille ne peut qu'ajouter des invariants.
 
-Dit comme cela, cela peut paraitre compliqué, et pourtant c'est très logique.
+Dit comme cela, cela peut paraitre compliqué, et pourtant c'est très logique.  
 Par exemple, une compagnie aérienne a des pré-requis sur les bagages acceptés
 sans surcouts. Pour toutes, un bagage de 50x40x20cm sera toujours accepté. En
-particulier, chez les compagnies low-costs. En revanche, les grandes compagnie
+particulier, chez les compagnies low-costs. En revanche, les grandes compagnies
 historiques (et non low-costs) affaiblissent cette pré-condition : on peut se
-pointer avec un bagage bien plus gros sans rien avoir à payer en supplément
-(certes il partira en soute).
+s'enregistrer avec un bagage bien plus gros sans avoir à payer de supplément
+(certes il partira en soute).  
 Même chose pour les post-conditions : nous n'avons aucune garantie d'estomac
-rempli sans surcouts dans les compagnies aériennes. Sauf chez les compagnies
-traditionnelles qui assurent en sortie un estomac non vide.
+rempli sans surcouts une fois à bord de l'avion. Sauf chez les compagnies
+traditionnelles qui assurent en sortie un estomac non vide.  
 Côté invariants, un rectangle immuable a tous ses côtés perpendiculaires, un
-carré immuable a aussi tous ses côtés de longueur égale.
+carré immuable a en plus tous ses côtés de longueur égale.
 
 Parmi les conséquences du LSP, on pourra déduire qu'une _liste triée_ n'est pas
 substituable à une _liste_, ou qu'un _carré non immuable_ n'est pas un
-_rectangle non immuable_. Je vous renvoie à la littérature et/ou la FAQ.
+_rectangle non immuable_. Je vous renvoie à la littérature et/ou la FAQ pour
+plus d'informations sur le sujet.
 
 
 ## V- Références
+
+(à reformuler/dispatcher)
 
 - Bertrand Meyer
 - <a id="Dunksi2014"></a>Dunksi2014 -- [Coder Efficacement -- Bonnes pratiques et erreurs à éviter (en C++)](http://www.d-booker.fr/programmation-et-langage/157-coder-efficacement.html) de Philippe Dunski, D-Booker, Février 2014
 - <a id="IPCpp"></a>_Imperfect C++_ de Matthew Wilson, Addisson-Wesley
   Professionnal, Octobre 2004
 - [n3753](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3753.pdf)
-- billets de Andrzej
+- billets d'Andrzej
   - http://akrzemi1.wordpress.com/2013/01/04/preconditions-part-i/
   - http://akrzemi1.wordpress.com/2013/02/11/preconditions-part-ii/
   - http://akrzemi1.wordpress.com/2013/03/13/preconditions-part-iii/
