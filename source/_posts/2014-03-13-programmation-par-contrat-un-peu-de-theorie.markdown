@@ -17,13 +17,13 @@ croisées au fil des ans.
 
 ## I- Les Erreurs
 
-En développement, il y a toujours des problèmes qui vont venir nous
-enquiquiner. Certains correspondront à des problèmes plausibles induits par le
-contexte (fichiers invalides, connexions réseau coupées, utilisateurs qui
-saisissent n'importe quoi, ...), d'autres seront des _erreurs de programmation_.
+En développement, il y a toujours des problèmes qui vont venir nous ennuyer.
+Certains correspondront à des problèmes plausibles induits par le contexte
+(fichiers invalides, connexions réseau coupées, utilisateurs qui saisissent
+n'importe quoi, ...), d'autres seront des _erreurs de programmation_.
 
-Dans la suite de ce billet, je vais traiter du cas des erreurs de programmation
-principalement.
+Dans la suite de ce billet, je vais principalement traiter du cas des erreurs
+de programmation.
 
 ### Les types d'erreurs de programmation
 
@@ -57,7 +57,7 @@ cas des erreurs numériques, ou des fichiers que l'on croit avoir ouverts.
 
 Dans les meilleurs de mes mondes, on fait en sorte de ne pas pouvoir compiler
 quand on est face à une erreur de programmation. Les assertions statiques nous
-aideront pour cela.
+aideront en cela.  
 On peut aussi appliquer des petites recettes dont le principe chapeau consiste
 à confier nos invariants au compilateur. Par exemple, on évite de disposer de
 variables dans des états non pertinents (FAQ C++ dvpz), on utilise des
@@ -113,8 +113,9 @@ qu'ils soient explicites, ou implicites (`this`), mais aussi à toutes les
 globales accessibles.
 
 #### Les post-conditions 
-Si une fonction est appelée avec ses pré-conditions vérifiées, alors ses
-post-conditions seront respectées à la sortie.
+Les post-conditions sont les garanties qu'on a sur le résultat d'une fonction
+si les pré-conditions sont remplies et que la fonction s'est exécutée
+correctement.
 
 #### Les invariants
 Il y a plusieurs natures d'invariants. On va parler d'invariants pour des zones
@@ -198,7 +199,7 @@ En résumé :
   fonction appelée.
 
 
-NB: Jusqu'à présent que je considérai seulement deux acteurs relativement aux
+NB: Jusqu'à présent je considérai seulement deux acteurs relativement aux
 responsabilités. C'est Philippe Dunski qui m'a fait entrevoir le troisième
 intervenant lors de ma relecture de son livre [[Dunksi2014](#Dunksi2014)].
 
@@ -227,7 +228,7 @@ patchs à la communauté.
 
 Mais je m'égare, ceci est une autre histoire.  Revenons à nos moutons.
 
-## <a id="ProgrammationDefensive"></a>III- Parenthèse : La Programmation Défensive
+## <a id="ProgrammationDefensive"></a>III- Programmation par Contrat ou Programmation Défensive ?
 
 La _Programmation Défensive_ a pour objectif qu'un programme ne doit jamais
 s'arrêter afin de pouvoir toujours continuer.
@@ -308,6 +309,22 @@ Mes conclusions personnelles sur le sujet :
   ; p.ex. l'assertion pourrait être détournée en *Release* pour lever une
   exception. Plus sur le sujet dans le prochain billet.
 
+
+### Comment reconnaitre des contrats ?
+
+Il est important de le rappeler, les contrats tels que présentés ici sont
+orientés vers la recherche des erreurs de programmation. C'est à dire, un code
+qui ne respecte pas le contrats de ses divers constituants présente une erreur
+de programmation.
+
+En aucun cas une violation de contrat correspondra à une situation
+exceptionnelle (et plausible), _cf._ [[Wilson2006]](#Wilson2006)
+
+Il est également à noter qu'une vérification de contrat devrait pouvoir être
+retirée d'un code source sans que son comportement ne soit impacté. En effet,
+un programme dépourvu d'erreur de logique n'aura aucun contrat qui se fasse
+violer, et la vérification devient superflue.
+
 ## IV- Parenthèse OO : PpC & _Principe de Substitution de Liskov_ (LSP)
 
 Je ne rentrerai pas dans les détails du LSP. Je vous renvoie plutôt à la
@@ -348,12 +365,13 @@ plus d'informations sur le sujet.
 
 (à reformuler/dispatcher)
 
-- Bertrand Meyer
-- <a id="Dunksi2014"></a>Dunksi2014 -- [Coder Efficacement -- Bonnes pratiques et erreurs à éviter (en C++)](http://www.d-booker.fr/programmation-et-langage/157-coder-efficacement.html) de Philippe Dunski, D-Booker, Février 2014
-- <a id="IPCpp"></a>_Imperfect C++_ de Matthew Wilson, Addisson-Wesley
-  Professionnal, Octobre 2004
+- <a id="Meyer1988"></a>[Meyer2000] -- [Conception et programmation orientées objet](http://www.editions-eyrolles.com/Livre/9782212122701/conception-et-programmation-orientees-objet) de Bertrand Meyer, Eyrolles, 1988, Seconde Édition parue en 2000
+- <a id="Dunksi2014"></a>[Dunksi2014] -- [Coder Efficacement -- Bonnes pratiques et erreurs à éviter (en C++)](http://www.d-booker.fr/programmation-et-langage/157-coder-efficacement.html) de Philippe Dunski, D-Booker, Février 2014
+- <a id="IPCpp"></a>[Wilson2004] -- _Imperfect C++_ de Matthew Wilson, Addisson-Wesley Professionnal, Octobre 2004.
+- <a id="Wilson2006"></a>[Wilson2006] -- [_Contract Programming 101_](http://www.artima.com/cppsource/deepspace3.html), Matthew Wilson, artima, Janvier 2006.
 - [n3753](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3753.pdf)
-- billets d'Andrzej
+- Billets d'Andrzej  
+  Il s'agit là d'une excellente série d'articles/billets sur la PpC.
   - http://akrzemi1.wordpress.com/2013/01/04/preconditions-part-i/
   - http://akrzemi1.wordpress.com/2013/02/11/preconditions-part-ii/
   - http://akrzemi1.wordpress.com/2013/03/13/preconditions-part-iii/
@@ -363,6 +381,8 @@ plus d'informations sur le sujet.
   - http://blog.regehr.org/archives/1091
   - http://pempek.net/articles/2013/11/16/assertions-or-exceptions/
   - http://pempek.net/articles/2013/11/17/cross-platform-cpp-assertion-library/
-  - [Programmation par contrat, application en C++](http://julien-blanc.developpez.com/articles/cpp/Programmation_par_contrat_cplusplus/), de Julien Blanc, 14 décembre 2009
+  - [Programmation par contrat, application en C++](http://julien-blanc.developpez.com/articles/cpp/Programmation_par_contrat_cplusplus/), de Julien Blanc, 14 décembre 2009  
+    Vous trouverez d'autres explications et d'autres techniques dans son
+    article.
 
 

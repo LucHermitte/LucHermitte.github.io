@@ -456,3 +456,10 @@ http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3753.pdf
 - les divers types de pointeurs (cf. prochain billet)
 - init vs constructeur
 
+## Remerciements
+
+Un grand merci à tous mes relecteurs,
+Guilhem Bonnefille,
+David Côme,
+Philippe Lacour,
+Cédric Poncet-Montange
