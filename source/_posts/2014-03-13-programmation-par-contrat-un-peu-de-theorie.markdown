@@ -11,9 +11,11 @@ footer: true
 Cela faisait un moment que je voulais partager mes conclusions sur la
 _Programmation par Contrat_, et en particulier comment l'appliquer au C++.
 
-Voici un premier billet qui aborde l'aspect théorique. Dans un second billet,
+Voici un premier billet qui aborde l'aspect théorique. Dans un [second
+billet]({%post_url 2014-05-09-programmation-par-contrat-les-assertions%}),
 je traiterai des _assertions_. Et en guise de conslusion, je présenterai des
-techniques d'application de la PpC au C++ que j'ai croisées au fil des ans.
+[techniques d'application de la PpC au C++]({%post_url 2014-05-13-programmation-par-contrat-snippets-pour-le-c-plus-plus%})
+que j'ai croisées au fil des ans.
 
 ## I- Les Erreurs
 
@@ -47,7 +49,7 @@ réaliser un traitement sur un fichier sans vérifier préalablement qu'il exist
 est une erreur de programmation. La différence est subtile. J'y reviendrai plus
 [loin](#ProgrammationDefensive).
 
-### Ce que l'on en fait
+### Que faire de ces erreurs ?
 
 Les erreurs qui bloquent la compilation, on n'a pas trop d'autre choix que de
 les corriger. Les autres erreurs ... souvent, pas grand chose n'en est fait.
@@ -67,8 +69,9 @@ responsables changent (_cf._ un prochain billet), on fait en sorte de ne pas
 pouvoir additionner des distances avec des masses (_cf._
 [boost.unit](http://boost.org/libs/units)), ...
 
-Pour les autres cas, Bertrand Meyer a jeté les bases d'un outil, la
-_programmation par contrat_, et le C nous offre un second outil, les _assertions_.
+Pour les autres cas, [[Meyer1988]](#Meyer1988) a jeté les bases d'un outil, la
+_programmation par contrat_, et le C nous offre un second outil, les
+_assertions_ que nous détaillerons dans [le prochain billet]({%post_url 2014-05-09-programmation-par-contrat-les-assertions%}).
 
 
 ## II- La programmation par contrat
@@ -88,9 +91,9 @@ comme elle l'entend.
 
 On peut se demander à quoi ça sert. En effet, si on passe un nombre négatif à
 `sqrt` et qu'elle plante, on n'est pas plus avancés. Le bug est toujours là. Et
-pourtant, nous avons fait un pas énorme : nous avons formalisé les contrats de
-`sqrt`. Nous disposons de spécifications précises, et d'une
-[documentation](#Documentation) qui pourra accompagner le code.
+pourtant, nous avons fait un énorme pas en avant : nous avons formalisé les
+contrats de `sqrt`. Nous disposons de spécifications précises, et d'une
+[documentation]({%post_url 2014-05-09-programmation-par-contrat-les-assertions%}#Documentation) qui pourra accompagner le code.
 
 Heureusement, nous pouvons aller bien plus loin. Nous pouvons profiter des
 contrats exprimés pour les confier à des outils d'analyse statique qui se
