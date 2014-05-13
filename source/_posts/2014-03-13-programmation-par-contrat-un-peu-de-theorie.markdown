@@ -11,8 +11,7 @@ footer: true
 Cela faisait un moment que je voulais partager mes conclusions sur la
 _Programmation par Contrat_, et en particulier comment l'appliquer au C++.
 
-Voici un premier billet qui aborde l'aspect théorique. Dans un [second
-billet]({%post_url 2014-05-09-programmation-par-contrat-les-assertions%}),
+Voici un premier billet qui aborde l'aspect théorique. Dans un [second billet]({%post_url 2014-05-09-programmation-par-contrat-les-assertions%}),
 je traiterai des _assertions_. Et en guise de conslusion, je présenterai des
 [techniques d'application de la PpC au C++]({%post_url 2014-05-13-programmation-par-contrat-snippets-pour-le-c-plus-plus%})
 que j'ai croisées au fil des ans.
@@ -204,7 +203,7 @@ En résumé :
 
 NB: Jusqu'à présent je considérai seulement deux acteurs relativement aux
 responsabilités. C'est Philippe Dunski qui m'a fait entrevoir le troisième
-intervenant lors de ma relecture de son livre [[Dunksi2014](#Dunksi2014)].
+intervenant lors de ma relecture de son livre [[Dunksi2014]](#Dunksi2014).
 
 ### Contrats commerciaux... et licences
 
@@ -231,7 +230,7 @@ patchs à la communauté.
 
 Mais je m'égare, ceci est une autre histoire.  Revenons à nos moutons.
 
-## <a id="ProgrammationDefensive"></a>III- Programmation par Contrat ou Programmation Défensive ?
+## <a id="ProgrammationDefensive"></a>III- La Programmation Défensive, antogoniste ou complémentaire ?
 
 La _Programmation Défensive_ a pour objectif qu'un programme ne doit jamais
 s'arrêter afin de pouvoir toujours continuer.
@@ -254,6 +253,7 @@ _programmation défensive_ consisterait à vérifier dans la fonction `my::sqrt`
 le paramètre reçu est positif, et à lever une exception dans le cas contraire.
 
 Ce qui donnerait :
+
 ```c++
 double my::sqrt(double n) {
     if (n<0) throw std::domain_error("Negative number sent to sqrt");
@@ -269,17 +269,41 @@ void my::process(boost::filesystem::path const& file) {
     }
 }
 ```
+
 Si un nombre négatif devait être présent dans le fichier, nous aurions droit à
 l'exception *"Negative number sent to sqrt"*. Limpide, n'est-ce pas ? On ne sait
 pas quel est le nombre, ni d'où il vient. Après une longue investigation pour
-traquer l'origine ce nombre négatif, on comprend enfin qu'il faut instrumenter
-`process` pour intercepter l'exception. Soit on fait le `catch` au niveau de la
-fonction, et on sait dans quel fichier a lieu l'erreur, soit on encadre l'appel
-à `my::sqrt` pour remonter plus d'informations. Et là ... on fait ce que le code
-client aurait du faire dès le début : assurer que le contrat des fonctions
-appelées est bien respecté.
+traquer l'origine de ce nombre négatif, on comprend enfin qu'il faut
+instrumenter `process` pour intercepter l'exception. Soit on fait le `catch` au
+niveau de la fonction, et on sait dans quel fichier a lieu l'erreur, soit on
+encadre l'appel à `my::sqrt` pour remonter plus d'informations.
 
-Si on avait embrassé la PpC dès le départ, ce bout de code aurait ressemblé à :
+```c++
+void my::process(boost::filesystem::path const& file) {
+    boost::ifstream f(file);
+    if (!f) throw std::runtime_error("Cannot open "+file.string());
+    double d;
+    while (f >> d) {
+        double sq = 0;
+        try {
+            sq = my::sqrt(d);
+        }
+        catch (std::logic_error const&) {
+            throw std::runtime_error(
+                "Invalid negative distance " + std::to_string(d)
+                +" at the "+std::to_string(l)
+                +"th line in distances file "+file.string());
+        }
+        my::memorize(sq);
+    }
+}
+```
+
+Et là ... on fait ce que le code client aurait du faire dès le début : assurer
+que le contrat des fonctions appelées est bien respecté.  
+En effet, si on avait embrassé la PpC dès le départ, ce bout de code aurait
+ressemblé à :
+
 ```c++
 double my::sqrt(double n) {
     assert(n>=0 && "sqrt can't process negative numbers");
@@ -300,17 +324,32 @@ void my::process(boost::filesystem::path const& file) {
     }
 }
 ```
-Cette fois-ci, nous aurions droit à un message non seulement plus explicite,
-mais surtout bien plus utile : *"Invalid negative distance -28.15 at the 42th line of
-distances file distances.txt"*.
+Cela n'est-il pas plus simple et propre pour disposer d'un message non
+seulement plus explicite, mais surtout bien plus utile ? Comparez ce nouveau
+message *"Invalid negative distance -28.15 at the 42th line of distances file
+distances.txt"*, au précédent *"Negative number sent to sqrt"*.  
+Notez que l'on pourrait aussi critiquer l'impact en termes de performances de
+cette solution. Un `catch` n'est pas si gratuit que cela -- a contrario du
+*Stack Unwinding*.
+
+Il est vrai que la Programmation Défensive permet d'une certaine façon de
+centraliser et factoriser les vérifications. Mais les vérifications ainsi
+centralisées ne disposent pas du contexte qui permet de remonter des erreurs
+correctes. Il est nécessaire d'enrichir les exceptions pauvres en les
+transformant au niveau du code client. D'où la question légitime que l'on est en
+droit de se poser : *Mais pourquoi ne pas faire ce que le code client était
+censé faire dès le début ? Pourquoi ne pas vérifier les pré-conditions des
+fonctions que l'on va appeler avant de les appeler ?*
+
 
 Mes conclusions personnelles sur le sujet :
 
-* Je préfère 100 fois la PpC à la Programmation Défensive : il faut assumer nos
-  responsabilités et ne pas décharger nos utilisateurs de leurs devoirs.
-* Il est possible de détourner la PpC pour faire de la Programmation Défensive
-  ; p.ex. l'assertion pourrait être détournée en *Release* pour lever une
-  exception. Plus sur le sujet dans le prochain billet.
+* Philosophiquement, je préfère 100 fois la PpC à la Programmation Défensive :
+  il faut assumer nos responsabilités et ne pas décharger nos utilisateurs de
+  leurs devoirs.
+* Toutefois, il est possible de détourner la PpC pour faire de la Programmation
+  Défensive ; p.ex. l'assertion pourrait être détournée en *Release* pour lever
+  une exception. J'y reviendrai dans le [prochain billet]({%post_url 2014-05-09-programmation-par-contrat-les-assertions%}).
 
 
 ### Comment reconnaitre des contrats ?
@@ -332,9 +371,9 @@ violer, et la vérification devient superflue.
 
 Je ne rentrerai pas dans les détails du LSP. Je vous renvoie plutôt à la
 [FAQ C++ de développez](http://cpp.developpez.com/faq/cpp/?page=L-heritage#Qu-est-ce-que-le-LSP),
-ou à [[Dunksi2014](#Dunksi2014)]. Il faut retenir que le LSP
-est un outil qui permet d'éviter de définir des hiérarchies de classes qui se
-retourneront contre nous.
+ou à [[Dunksi2014]](#Dunksi2014). Il faut retenir que le LSP est un outil qui
+permet d'éviter de définir des hiérarchies de classes qui se retourneront
+contre nous.
 
 Le LSP est formulé relativement aux contrats des classes pour établir quand une
 classe peut dériver (publiquement en C++) en toute quiétude d'une autre.
