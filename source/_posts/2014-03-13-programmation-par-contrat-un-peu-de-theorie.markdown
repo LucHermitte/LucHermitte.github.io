@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Programmation par Contrat -- un peu de théorie"
+title: "Programmation par Contrat 1/3 -- un peu de théorie"
 date: 2014-03-13 17:47:34 +0100
 comments: true
 categories: C++
@@ -12,8 +12,8 @@ Cela faisait un moment que je voulais partager mes conclusions sur la
 _Programmation par Contrat_, et en particulier comment l'appliquer au C++.
 
 Voici un premier billet qui aborde l'aspect théorique. Dans un second billet,
-je vous présenterai des techniques d'application de la PpC au C++ que j'ai
-croisées au fil des ans.
+je traiterai des _assertions_. Et en guise de conslusion, je présenterai des
+techniques d'application de la PpC au C++ que j'ai croisées au fil des ans.
 
 ## I- Les Erreurs
 
@@ -365,8 +365,8 @@ plus d'informations sur le sujet.
 
 (à reformuler/dispatcher)
 
-- <a id="Meyer1988"></a>[Meyer2000] -- [Conception et programmation orientées objet](http://www.editions-eyrolles.com/Livre/9782212122701/conception-et-programmation-orientees-objet) de Bertrand Meyer, Eyrolles, 1988, Seconde Édition parue en 2000
-- <a id="Dunksi2014"></a>[Dunksi2014] -- [Coder Efficacement -- Bonnes pratiques et erreurs à éviter (en C++)](http://www.d-booker.fr/programmation-et-langage/157-coder-efficacement.html) de Philippe Dunski, D-Booker, Février 2014
+- <a id="Meyer1988"></a>[Meyer2000] -- [_Conception et programmation orientées objet_](http://www.editions-eyrolles.com/Livre/9782212122701/conception-et-programmation-orientees-objet) de Bertrand Meyer, Eyrolles, 1988, Seconde Édition parue en 2000
+- <a id="Dunksi2014"></a>[Dunksi2014] -- [_Coder Efficacement -- Bonnes pratiques et erreurs à éviter (en C++)_](http://www.d-booker.fr/programmation-et-langage/157-coder-efficacement.html) de Philippe Dunski, D-Booker, Février 2014
 - <a id="IPCpp"></a>[Wilson2004] -- _Imperfect C++_ de Matthew Wilson, Addisson-Wesley Professionnal, Octobre 2004.
 - <a id="Wilson2006"></a>[Wilson2006] -- [_Contract Programming 101_](http://www.artima.com/cppsource/deepspace3.html), Matthew Wilson, artima, Janvier 2006.
 - [n3753](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3753.pdf)
@@ -377,11 +377,11 @@ plus d'informations sur le sujet.
   - http://akrzemi1.wordpress.com/2013/03/13/preconditions-part-iii/
   - http://akrzemi1.wordpress.com/2013/04/18/preconditions-part-iv/
 - Autres articles
-  - [When and How to Use Exception](http://www.drdobbs.com/when-and-how-to-use-exceptions/184401836), Herb Sutter, August 01, 2004
+  - [_When and How to Use Exception_](http://www.drdobbs.com/when-and-how-to-use-exceptions/184401836), Herb Sutter, August 01, 2004
   - http://blog.regehr.org/archives/1091
   - http://pempek.net/articles/2013/11/16/assertions-or-exceptions/
   - http://pempek.net/articles/2013/11/17/cross-platform-cpp-assertion-library/
-  - [Programmation par contrat, application en C++](http://julien-blanc.developpez.com/articles/cpp/Programmation_par_contrat_cplusplus/), de Julien Blanc, 14 décembre 2009  
+  - [_Programmation par contrat, application en C++_](http://julien-blanc.developpez.com/articles/cpp/Programmation_par_contrat_cplusplus/), de Julien Blanc, 14 décembre 2009  
     Vous trouverez d'autres explications et d'autres techniques dans son
     article.
 
