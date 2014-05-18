@@ -12,7 +12,7 @@ Cela faisait un moment que je voulais partager mes conclusions sur la
 _Programmation par Contrat_, et en particulier comment l'appliquer au C++.
 
 Voici un premier billet qui aborde l'aspect théorique. Dans un [second billet]({%post_url 2014-05-09-programmation-par-contrat-les-assertions%}),
-je traiterai des _assertions_. Et en guise de conslusion, je présenterai des
+je traiterai des _assertions_. En guise de conclusion, je présenterai des
 [techniques d'application de la PpC au C++]({%post_url 2014-05-13-programmation-par-contrat-snippets-pour-le-c-plus-plus%})
 que j'ai croisées au fil des ans.
 
@@ -24,7 +24,8 @@ Certains correspondront à des problèmes plausibles induits par le contexte
 n'importe quoi, ...), d'autres seront des _erreurs de programmation_.
 
 Dans la suite de ce billet, je vais principalement traiter du cas des erreurs
-de programmation.
+de programmation. Toutefois, la confusion étant facile, des parenthèses
+régulières seront faites sur les situations exceptionnelles mais plausibles.
 
 ### Les types d'erreurs de programmation
 
@@ -48,7 +49,7 @@ réaliser un traitement sur un fichier sans vérifier préalablement qu'il exist
 est une erreur de programmation. La différence est subtile. J'y reviendrai plus
 [loin](#ProgrammationDefensive).
 
-### Que faire de ces erreurs ?
+### Que faire de ces erreurs de programmation ?
 
 Les erreurs qui bloquent la compilation, on n'a pas trop d'autre choix que de
 les corriger. Les autres erreurs ... souvent, pas grand chose n'en est fait.
@@ -69,8 +70,10 @@ pouvoir additionner des distances avec des masses (_cf._
 [boost.unit](http://boost.org/libs/units)), ...
 
 Pour les autres cas, [[Meyer1988]](#Meyer1988) a jeté les bases d'un outil, la
-_programmation par contrat_, et le C nous offre un second outil, les
-_assertions_ que nous détaillerons dans [le prochain billet]({%post_url 2014-05-09-programmation-par-contrat-les-assertions%}).
+_programmation par contrat_. Le C nous offre un second outil, les _assertions_
+qui permettent de retranscrire les contrats dans notre code pour détecter au
+plus tôt les erreurs de programmation. Nous les détaillerons dans
+[le prochain billet]({%post_url 2014-05-09-programmation-par-contrat-les-assertions%}).
 
 
 ## II- La programmation par contrat
@@ -94,12 +97,17 @@ pourtant, nous avons fait un énorme pas en avant : nous avons formalisé les
 contrats de `sqrt`. Nous disposons de spécifications précises, et d'une
 [documentation]({%post_url 2014-05-09-programmation-par-contrat-les-assertions%}#Documentation) qui pourra accompagner le code.
 
-Heureusement, nous pouvons aller bien plus loin. Nous pouvons profiter des
-contrats exprimés pour les confier à des outils d'analyse statique qui se
-chargeront de vérifier les ruptures possibles en explorant un maximum de
-chemins d'exécution possibles. Nous pouvons aussi marquer le code avec des
-assertions représentatives des contrats identifiés pour repérer les ruptures de
-contrats en phase de tests et développement.
+
+Heureusement, nous pouvons aller bien plus loin. Nous pouvons aussi marquer le
+code avec des assertions représentatives des contrats identifiés pour repérer
+les ruptures de contrats en phase de tests et développement.
+
+Idéalement, nous aurions du pouvoir aller beaucoup plus loin. En effet, les
+outils d'analyse statique de code devraient pouvoir exploiter les contrats
+exprimés avec des assertions pour vérifier qu'ils n'étaient jamais violés
+lors de leur exploration des chemins d'exécution possibles.  
+Seulement, les quelques que j'ai pu regarder utilisent au contraire les
+assertions pour retirer des branches à explorer.
 
 ### Les trois contrats
 
@@ -126,9 +134,10 @@ de codes durant lesquelles une propriété sera vraie :
 * un _invariant de boucle_ correspondra à ce qui est toujours vrai à
   l'intérieur de la boucle (p.ex. que `i < N` dans le cas d'une boucle `for`) ;
 * une variable devrait toujours avoir pour invariant : _est utilisable, et est
-  dans un état cohérent et pertinent_ (_cf._ FAQ C++ dvpz) ;
+  dans un état cohérent et pertinent_ ; cet invariant est positionné à la
+  sortie de son constructeur (_cf._ FAQ C++ dvpz) ;
 * un _invariant de classe_ est une propriété toujours observable depuis
-  l'extérieur des instances de la classe -- p.ex. une séquence triée garantira
+  du code extérieur aux instances de la classe -- p.ex. une séquence triée garantira
   que tous les éléments de la séquence sont toujours ordonnés lorsque le code
   utilisant la séquence cherche à y accéder, cependant ponctuellement, le temps
   de l'insertion d'un nouvel élément l'invariant de la classe n'a pas à être
@@ -139,8 +148,9 @@ de codes durant lesquelles une propriété sera vraie :
 
 ### Acteurs et responsabilités
 
-On peut dans l'absolu distinguer autant d'acteurs dans l'écriture d'un code
-que de fonctions qui interviennent. Prenons le bout de code suivant :
+Ces contrats son définis entre les acteurs qui interviennent dans l'écriture
+d'un code.  On peut dans l'absolu distinguer autant d'acteurs que de fonctions.
+Prenons le bout de code suivant :
 
 ```c++
 double metier() {                  // écrit par l'Intégrateur
@@ -158,19 +168,21 @@ Nous pouvons distinguer trois acteurs :
 `sqrt` a un contrat simple : le nombre reçu doit être positif. Si l'appel à
 `sqrt` échoue (plantage, résultat renvoyé aberrant, ...) tandis que le nombre
 passé en paramètre est bien positif, alors le Mathématicien est responsable du
-problème. En effet, bien que les pré-conditions de `sqrt` sont bien vérifiées,
-ses post-conditions ne le sont pas : `sqrt` ne remplit pas sa part du contrat.
+problème et ce peu importe ce qui est fait par les autres acteurs. En effet,
+bien que les pré-conditions de `sqrt` sont bien vérifiées, ses post-conditions
+ne le sont pas : `sqrt` ne remplit pas sa part du contrat.
 
 Si `i` n'est pas positif, alors le Mathématicien ne peut pas être tenu pour
 responsable de quoi que ce soit. La faute incombe au code client de `sqrt`.
 
-Maintenant, tout va dépendre si `interrogeES` dispose d'une post-condition sur
-ses sorties du type _renvoie un nombre positif_. Dans ce cas, la rupture de
-contrat est à ce niveau, et le responsable UI est responsable de l'erreur de
-programmation. L'Intégrateur est dans son droit d'enchainer
+À ce stade, tout va dépendre si `interrogeES` dispose d'une post-condition sur
+ses sorties du type _renvoie un nombre positif_. Si c'est le cas, la rupture de
+contrat est alors à ce niveau, et le responsable UI est responsable de l'erreur
+de programmation. En effet, l'Intégrateur est dans son droit d'enchainer
 `sqrt(interrogeES())`. C'est exactement la même chose que
 `sqrt(abs(whatever))`, personne n'irait accuser l'Intégrateur de ne pas faire
-son boulot.
+son boulot vu que les pré-conditions de `sqrt` sont censées être assurées par
+les post-conditions de `interrogeES`.
 
 En revanche, si `interrogeES` n'a aucune post-condition telle que le nombre
 renvoyé sera positif, alors l'Intégrateur est responsable au moment de l'intégration de
@@ -196,16 +208,17 @@ programmation commise par l'Intégrateur.
 En résumé :
 
 * la responsabilité de vérifier les pré-conditions d'une fonction échoie au
-  code client, ou au code qui alimente les entrées de la fonction appelée.
-* la responsabilité de vérifier les post-conditions d'une fonction échoie à la
+  code client, voire indirectement au code qui alimente les entrées de cette
   fonction appelée.
+* la responsabilité de vérifier les post-conditions d'une fonction échoie à
+  cette fonction appelée.
 
 
 NB: Jusqu'à présent je considérai seulement deux acteurs relativement aux
 responsabilités. C'est Philippe Dunski qui m'a fait entrevoir le troisième
 intervenant lors de ma relecture de son livre [[Dunksi2014]](#Dunksi2014).
 
-### Contrats commerciaux... et licences
+### Petite parenthèse sur les contrats commerciaux... et les licences
 
 La programmation par contrat n'a pas vocation à avoir des répercutions légales
 selon qui ne remplit pas son contrat. Cependant, il y a clairement une
@@ -218,22 +231,27 @@ du bon fonctionnement de l'ensemble, mais le responsable UI et le Mathématicien
 ont des responsabilités vis-à-vis de l'Intégrateur.
 
 Si maintenant, le responsable UI ou le Mathématicien ne livrent plus des
-[COTS](http://en.wikipedia.org/wiki/Commercial_off-the-shelf), mais des
-bibliothèques tierces OpenSources ou Libres. À moins que l'Intégrateur ait pris
-un contrat de maintenance auprès du responsable UI et du Mathématicien, il est
-peu probable que le responsable UI ou le Mathématicien aient la moindre
-responsabilité légale vis à vis de l'Intégrateur. 
+[COTS](http://en.wikipedia.org/wiki/Commercial_off-the-shelf) (a sens
+commercial), mais des bibliothèques tierces OpenSources ou Libres. À moins que
+l'Intégrateur ait pris un contrat de maintenance auprès du responsable UI et du
+Mathématicien, il est peu probable que le responsable UI ou le Mathématicien
+aient la moindre responsabilité légale vis à vis de l'Intégrateur. 
 
 L'Intégrateur est seul responsable vis-à-vis de son client. À lui de trouver des
-contournements, ou mieux de corriger ces composants tiers et de reverser les
-patchs à la communauté.
+contournements, ou mieux de corriger ces composants tiers qu'il a choisi
+d'utiliser, et de reverser les patchs à la communauté.
 
 Mais je m'égare, ceci est une autre histoire.  Revenons à nos moutons.
 
-## <a id="ProgrammationDefensive"></a>III- La Programmation Défensive, antogoniste ou complémentaire ?
+## <a id="ProgrammationDefensive"></a>III- La Programmation Défensive, une philosophie antogoniste ou complémentaire ?
+
+Il est difficile de traiter de la PpC sans évoquer la _Programmation
+Défensive_. Souvent ces deux approches sont confondues tant la frontière entre
+les deux est subtile.
 
 La _Programmation Défensive_ a pour objectif qu'un programme ne doit jamais
-s'arrêter afin de pouvoir toujours continuer.
+s'arrêter afin de pouvoir toujours continuer. On s'intéresse à la robustesse
+d'un programme. 
 
 Bien que la PpC puisse être détournée pour faire de la programmation
 défensive, ce n'est pas son objectif premier. La PpC ne fait que stipuler que
@@ -241,7 +259,7 @@ si un contrat est respecté, alors tout se passera bien. Si le contrat n'est pas
 respecté tout peut arriver : on peut assister à des plantages plus ou moins
 prévisibles, on peut produire des résultats erronés, on peut stopper
 volontairement au point de détection des erreurs, et on peut aussi remonter
-des exceptions.
+des exceptions. Avec la PpC, on s'intéresse à l'écriture de code correct.
 
 Le choix de remonter des exceptions, depuis le lieu de la détection de la
 rupture de contrat, est un choix de programmation défensive. C'est un choix que
@@ -301,8 +319,8 @@ void my::process(boost::filesystem::path const& file) {
 
 Et là ... on fait ce que le code client aurait du faire dès le début : assurer
 que le contrat des fonctions appelées est bien respecté.  
-En effet, si on avait embrassé la PpC dès le départ, ce bout de code aurait
-ressemblé à :
+En effet, si on avait embrassé la PpC dans l'écriture de ces deux fonctions, ce
+bout de code aurait ressemblé à :
 
 ```c++
 double my::sqrt(double n) {
@@ -344,12 +362,16 @@ fonctions que l'on va appeler avant de les appeler ?*
 
 Mes conclusions personnelles sur le sujet :
 
+* La PpC s'intéresse à l'écriture de codes corrects. La Programmation Défensive
+  s'intéresse à l'écriture de code qui restent robustes dans le cas où ils ne
+  seraient pas corrects.
 * Philosophiquement, je préfère 100 fois la PpC à la Programmation Défensive :
   il faut assumer nos responsabilités et ne pas décharger nos utilisateurs de
   leurs devoirs.
-* Toutefois, il est possible de détourner la PpC pour faire de la Programmation
-  Défensive ; p.ex. l'assertion pourrait être détournée en *Release* pour lever
-  une exception. J'y reviendrai dans le [prochain billet]({%post_url 2014-05-09-programmation-par-contrat-les-assertions%}).
+* Toutefois, il est possible de détourner la PpC  basée sur des assertions en C
+  et C++ pour faire de la Programmation Défensive ; p.ex. l'assertion pourrait
+  être détournée en *Release* pour lever une exception. J'y reviendrai dans le
+  [prochain billet]({%post_url 2014-05-09-programmation-par-contrat-les-assertions%}).
 
 
 ### Comment reconnaitre des contrats ?
@@ -382,18 +404,23 @@ Le principe est que :
 * les pré-conditions ne peuvent être qu'affaiblies, ou laissées telles quelles,
 * les post-conditions ne peuvent être que renforcées, ou laissées telles
   quelles,
-* et la classe fille ne peut qu'ajouter des invariants.
+* et une classe fille ne peut qu'ajouter des invariants.
 
-Dit comme cela, cela peut paraitre compliqué, et pourtant c'est très logique.  
-Par exemple, une compagnie aérienne a des pré-requis sur les bagages acceptés
-sans surcouts. Pour toutes, un bagage de 50x40x20cm sera toujours accepté. En
-particulier, chez les compagnies low-costs. En revanche, les grandes compagnies
-historiques (et non low-costs) affaiblissent cette pré-condition : on peut se
-s'enregistrer avec un bagage bien plus gros sans avoir à payer de supplément
-(certes il partira en soute).  
-Même chose pour les post-conditions : nous n'avons aucune garantie d'estomac
-rempli sans surcouts une fois à bord de l'avion. Sauf chez les compagnies
-traditionnelles qui assurent en sortie un estomac non vide.  
+Dit comme cela, cela peut paraitre abscon, et pourtant c'est très logique.  
+
+####Quelques exemples
+Prenons par exemple, une compagnie aérienne. Elle a des pré-requis sur les
+bagages acceptés sans surcouts. Pour toutes les compagnies, un bagage de
+50x40x20cm sera toujours accepté. En particulier, chez les compagnies
+low-costs. En revanche, les grandes compagnies historiques (et non low-costs)
+affaiblissent cette pré-condition : on peut se s'enregistrer avec un bagage
+bien plus gros sans avoir à payer de supplément (certes il partira en soute).  
+Il en va de même pour les post-conditions : nous n'avons aucune garantie
+d'estomac rempli sans surcouts une fois à bord de l'avion. Sauf chez les
+compagnies traditionnelles qui assurent en sortie un estomac non vide.  
+On peut donc dire a priori qu'une compagnie low-cost est une compagnie, de même
+qu'une compagnie traditionnelle.
+
 Côté invariants, un rectangle immuable a tous ses côtés perpendiculaires, un
 carré immuable a en plus tous ses côtés de longueur égale.
 

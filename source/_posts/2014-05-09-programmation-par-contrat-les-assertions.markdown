@@ -25,7 +25,7 @@ L'outil [Doxygen](http://doxygen.org) met à notre disposition les tags `@pre`,
 vous conseiller d'en user et d'en abuser.
 
 
-## Que faire des contrats ?
+## Comment prendre en compte les contrats dans le code ?
 
 À partir d'un contrat bien établi, nous avons techniquement plusieurs choix en
 C++. 
@@ -41,8 +41,8 @@ le problème au plus proche de l'erreur. Malheureusement, en C et en C++, les
 problèmes tendent à survenir bien plus tard.
 
 Cette mauvaise pratique consistant à ignorer les contrats (ou à ne pas s'en
-préoccuper) est assez répandue. Je ne cache pas que l'un des objectifs de ces
-billets est de combattre cette habitude.
+préoccuper) est assez répandue. Je ne cache pas que l'un des objectifs de cette
+série de billets est de combattre cette habitude.
 
 ### Option 2 : on lance des exceptions dans la tradition de la Programmation Défensive
 
@@ -81,13 +81,20 @@ renvoie en théorie un nombre entre -1 et 1, ce qui constitue une post-condition
 toute indiquée. De fait par construction, `1-sin(x)` est positif, et donc
 compatible avec le contrat de `sqrt`.
 
+En vérité, il existe une troisième façon de s'y prendre. Sous des systèmes
+POSIX, on peut déclencher des _coredumps_ par programmation et ce sans
+interrompre le cours de l'exécution. Cela peut être fait depuis les
+constructeurs de nos exceptions de logique (Voir
+[ceci](http://stackoverflow.com/a/979297), ou
+[ceci](http://stackoverflow.com/a/18581317)).
+
 ### Option 3 : on formalise nos suppositions à l'aide d'assertions
 
 Le C, et par extension le C++, nous offrent un outil tout indiqué pour traquer
 les erreurs de programmation : les assertions.
 
 En effet, compilé sans la directive de précompilation `NDEBUG`, une assertion
-va arréter un programme et créer un fichier _core_. Il est ensuite possible
+va arrêter un programme et créer un fichier _core_. Il est ensuite possible
 d'ouvrir le fichier _core_ depuis le debuggueur pour pouvoir explorer l'état du
 programme au moment de la détection de l'erreur.
 
@@ -100,13 +107,22 @@ Sans faire un cours sur gdb, regardons ce qu'il se passe sur ce petit programme 
 #include <iostream>
 #include <cmath>
 #include <cassert>
+#include <limits>
 
 namespace my {
+    /** Computes square root.
+     * @pre \c n must be positive, checked with an assertion
+     * @post <tt>result * result == n</tt>, checked with an assertion
+     */
     double sqrt(double n) {
         assert(n >=0);
-        return std::sqrt(n);
+        const double result = std::sqrt(n);
+        assert(std::abs(result*result - n) < std::numeric_limits<double>::epsilon() * 100);
     }
 
+    /** Computes sinus.
+     * @post \c n belongs to [-1, 1], unchecked
+     */
     double sin(double n) {
         const double r = std::sin(n);
         assert(r <= 1 && r >= -1);
@@ -126,12 +142,12 @@ int main ()
 Exécuté en console, on verra juste :
 ```
 $ ./test-assert
-assertion "n >=0" failed: file "test-assert.cpp", line 7, function: double my::sqrt(double)
+assertion "n >=0" failed: file "test-assert.cpp", line 14, function: double my::sqrt(double)
 Aborted (core dumped)
 ```
 
 On dispose de suite de l'indication où l'erreur a été détectée.
-Mais investigons plus en avant. Si on lance `gdb ./test-assert core.pid42`
+Mais investiguons plus en avant. Si on lance `gdb ./test-assert core.pid42`
 (cela peut nécessiter de demander à `ulimit` d'autoriser les _coredumps_ sur
 votre plateforme, faites un `ulimit -c unlimited` pour cela), ou `gdb
 ./test-assert` puis `run` pour une investigation pseudo-interactive, on observe
@@ -159,7 +175,7 @@ Reading symbols from /cygdrive/c/Dev/blog/source/_posts/test-assert...done.
 Starting program: /cygdrive/c/Dev/blog/source/_posts/test-assert
 [New Thread 5264.0xe2c]
 [New Thread 5264.0x6fc]
-assertion "n >=0" failed: file "test-assert.cpp", line 7, function: double my::sqrt(double)
+assertion "n >=0" failed: file "test-assert.cpp", line 14, function: double my::sqrt(double)
 
 Program received signal SIGABRT, Aborted.
 0x0022da18 in ?? ()
@@ -176,8 +192,8 @@ La pile d'appels (_back trace_) contient :
 #5  0x610d8312 in raise () from /usr/bin/cygwin1.dll
 #6  0x610d85b3 in abort () from /usr/bin/cygwin1.dll
 #7  0x61001aed in __assert_func () from /usr/bin/cygwin1.dll
-#8  0x004011d3 in my::sqrt (n=-1) at test-assert.cpp:7
-#9  0x0040125a in main () at test-assert.cpp:21
+#8  0x004011d3 in my::sqrt (n=-1) at test-assert.cpp:14
+#9  0x0040125a in main () at test-assert.cpp:32
 ```
 
 Avec un `up 8` pour se positionner au niveau où l'assertion est fausse, on peut
@@ -186,7 +202,7 @@ demander ce que vaut ce fameux `n`.
 
 ```
 (gdb) up 8
-#8  0x004011d3 in my::sqrt (n=-1) at test-assert.cpp:7
+#8  0x004011d3 in my::sqrt (n=-1) at test-assert.cpp:14
 7               assert(n >=0);
 (gdb) p n
 $1 = -1
@@ -206,10 +222,10 @@ NB: l'équivalent existe pour d'autres environnements comme VC++.
 #### Un outil pour les phases de développement et de tests ...
 
 Les assertions ne sont vérifiées que si `NDEBUG` n'est pas défini au moment de
-la précompilation. Généralement, sa définition accompagne les mode _Release_ de
+la précompilation. Généralement, sa définition accompagne le mode _Release_ de
 VC++ et de CMake. Ce qui veut dire qu'en mode _Release_ aucune assertion n'est
 vérifiée, soit qu'en production, les assertions sont normalement ignorées. Le
-corrolaire de tout cela est que les assertions sont un outil de vérification de
+corolaire de tout cela est que les assertions sont un outil de vérification de
 la logique applicative qui n'est utilisé qu'en phases de développement et de
 tests.
 
@@ -230,8 +246,8 @@ paramètre -> message `assert(condition && "explications");` ou `assert(!"explic
 
 À mon grand regret, les outils d'analyse statique de code comme [clang
 analyzer](http://clang-analyzer.llvm.org/) ne semblent pas exploiter les
-assertions pour détecter statiquement des erreurs de logique, mais pour inhiber
-l'analyse de certains chemins d'éxécutions.
+assertions pour détecter statiquement des erreurs de logique. Au contraire, ils
+les utilisent pour inhiber l'analyse de certains chemins d'exécutions.
 
 Ainsi, dans l'exemple de `test-assert.cpp` que j'ai donné plus haut, les outils
 d'analyse statique de code ne feront pas le rapprochement entre la
@@ -245,9 +261,25 @@ ou peut-être le sauront-ils demain.
 
 
 ### propal C++14/17:
-(A rédiger...)
 
-http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3753.pdf
+Il y a déjà eu des propositions de mots clés plus ou moins sémantiquement forts
+pour supporter en standard la PpC en C++. Dans la dernière en date, 
+[n3753](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3753.pdf),
+John Lakos et Alexei Zakharov introduisent une macro `pre_assert` assez
+flexible.
+
+Elle supporte des niveaux d'importance de vérification (toujours, parfois) un
+peu à l'image des niveaux Error/Warning/Info/Debug dans les frameworks de log.
+Elle permet de faire de la programmation défensive (i.e. de lever des
+exceptions au lieu de simples assertions). Elle permet également de transformer
+les assertions en assertions de frameworks de tests unitaires.
+
+S'il fallait lui trouver un défaut, je dirai que le nom `pre_assert` est trop
+restrictif, en effet cette proposition serait également parfaitement applicable
+aux post-conditions et aux invariants.
+
+À noter qu'elle est déjà implémentée et disponible à l'intérieur de la
+[bibliothèque BDE/BSL](https://github.com/bloomberg/bde) sous licence MIT.
 
 
 ## Invariants statiques
@@ -265,5 +297,6 @@ http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3753.pdf
 Un grand merci à tous mes relecteurs,
 Guilhem Bonnefille,
 David Côme,
+Sébastien Dinot,
 Philippe Lacour,
 Cédric Poncet-Montange
