@@ -106,10 +106,10 @@ Idéalement, nous aurions du pouvoir aller beaucoup plus loin. En effet, les
 outils d'analyse statique de code devraient pouvoir exploiter les contrats
 exprimés avec des assertions pour vérifier qu'ils n'étaient jamais violés
 lors de leur exploration des chemins d'exécution possibles.  
-Seulement, les quelques que j'ai pu regarder utilisent au contraire les
+Seulement, les quelques outils que j'ai pu regarder utilisent au contraire les
 assertions pour retirer des branches à explorer.
 
-### Les trois contrats
+### Les trois contrats de la PpC
 
 La PpC définit trois contrats :
 #### Les pré-conditions 
@@ -123,7 +123,7 @@ qu'ils soient explicites, ou implicites (`this`), mais aussi à toutes les
 globales accessibles.
 
 #### Les post-conditions 
-Les post-conditions sont les garanties qu'on a sur le résultat d'une fonction
+Les post-conditions sont les garanties que l'on a sur le résultat d'une fonction
 si les pré-conditions sont remplies et que la fonction s'est exécutée
 correctement.
 
@@ -149,7 +149,7 @@ de codes durant lesquelles une propriété sera vraie :
 ### Acteurs et responsabilités
 
 Ces contrats son définis entre les acteurs qui interviennent dans l'écriture
-d'un code.  On peut dans l'absolu distinguer autant d'acteurs que de fonctions.
+d'un code.  On peut dans l'absolu distinguer autant d'acteurs que de fonctions.  
 Prenons le bout de code suivant :
 
 ```c++
@@ -231,8 +231,8 @@ du bon fonctionnement de l'ensemble, mais le responsable UI et le Mathématicien
 ont des responsabilités vis-à-vis de l'Intégrateur.
 
 Si maintenant, le responsable UI ou le Mathématicien ne livrent plus des
-[COTS](http://en.wikipedia.org/wiki/Commercial_off-the-shelf) (a sens
-commercial), mais des bibliothèques tierces OpenSources ou Libres. À moins que
+[COTS](http://en.wikipedia.org/wiki/Commercial_off-the-shelf) (au sens
+commercial), mais des bibliothèques tierces OpenSources ou Libres, à moins que
 l'Intégrateur ait pris un contrat de maintenance auprès du responsable UI et du
 Mathématicien, il est peu probable que le responsable UI ou le Mathématicien
 aient la moindre responsabilité légale vis à vis de l'Intégrateur. 
@@ -347,23 +347,86 @@ seulement plus explicite, mais surtout bien plus utile ? Comparez ce nouveau
 message *"Invalid negative distance -28.15 at the 42th line of distances file
 distances.txt"*, au précédent *"Negative number sent to sqrt"*.  
 Notez que l'on pourrait aussi critiquer l'impact en termes de performances de
-cette solution. Un `catch` n'est pas si gratuit que cela -- a contrario du
-*Stack Unwinding*.
+la solution précédente (avec le `catch`). Un `catch` n'est pas si gratuit que
+cela -- a contrario du *Stack Unwinding*.
 
+### Des objections ?
+
+Il est des objections classiques à l'utilisation de la PpC. Décortiquons-les.
+
+#### *- La PpC éparpille les vérifications alors que la Programmation Défensive les factorise.*
 Il est vrai que la Programmation Défensive permet d'une certaine façon de
 centraliser et factoriser les vérifications. Mais les vérifications ainsi
 centralisées ne disposent pas du contexte qui permet de remonter des erreurs
 correctes. Il est nécessaire d'enrichir les exceptions pauvres en les
-transformant au niveau du code client. D'où la question légitime que l'on est en
-droit de se poser : *Mais pourquoi ne pas faire ce que le code client était
-censé faire dès le début ? Pourquoi ne pas vérifier les pré-conditions des
-fonctions que l'on va appeler avant de les appeler ?*
+transformant au niveau du code client, et là on perd les factorisations.  
+D'où la question légitime que l'on est en droit de se poser : *Mais pourquoi ne
+pas faire ce que le code client était censé faire dès le début ? Pourquoi ne
+pas vérifier les pré-conditions des fonctions que l'on va appeler avant de les
+appeler ?*
+
+Ensuite, il est toujours possible de factoriser grâce aux assertions. En en
+mode _Release_ elles lèvent des exceptions, alors factorisation il y a.
+
+TODO:
+Factorisation mélange pb de runtime et erreurs
+Factorisation implique de toujours vérifier dynamiquement ce qui est garantit
+statiquement, et surtout idéalement: si pas d'erreur de prog => pas de test à
+faire dans les cas où il n'y a pas de runtime à vérifier.
+
+#### *-Le mode Debug ne doit pas se comporter différemment du mode Release!*
+Remontons à l'origine de cette exigence pour mieux appréhender son impact sur
+la PpC telle que je vous la propose (avec des assertions).  
+
+Parfois, le mode _Debug_ est plus permissif que le mode _Release_ : il cache
+des erreurs de programmation. Souvent c'est du à des outils (comme VC++) dont le mode
+_Debug_ zéro-initialise des variables même quand le code néglige de les
+initialiser.
+
+Avec des assertions, c'est tout le contraire. En effet, le mode _Debug_ ne sera
+pas plus permissif, mais au contraire il sera plus restrictif et intransigeant
+que le mode _Release_. Ainsi, si un test passe en mode _Debug_, il passera
+également en mode _Release_ (relativement aux assertions) : si le test est OK,
+c'est que les assertions traversées ne détectent aucune rupture de contrat en
+_Debug_, il n'y aurait aucune raison qu'il en aille autrement en _Release_.
+A contrario, un test qui finit en _coredump_ en _Debug_ aurait pu tomber en
+marche en _Release_, comme planter de façon plus ou moins compréhensible (plutôt
+moins en général).  
+Ce qui est sûr, c'est qu'en phase de développement et de tests, les
+développeurs auraient vu l'erreur de programmation et ils auraient du la
+corriger pour voir le test passer.
 
 
+
+#### *-On utilise l'une ou l'autre*
+Oui et non. Si la PpC s'intéresse à l'écriture de code correct, la
+Programmation Défensive s'intéresse à l'écriture de code robuste. Certes
+l'objectif premier n'est pas le même (dans un cas on essaie de repérer et
+éliminer les erreurs de programmation, dans l'autre on essaie de ne pas planter
+en cas d'erreur de programmation), mais les deux techniques peuvent se
+compléter.
+
+TODO: c'est sûr que si pas d'erreur de prog, alors pas besoin de test dynamique
+pour les cas où les inputs sont assurées par des algos et non un
+contexte/runtime possiblement corrompu/invalide
+
+#### *- La programmation Défensive est plus adaptée aux développeurs inexpérimentés.*
+TODO: mélange toutes les erreurs (prog et runtime). vision plus floue, au final
+fonctions plus complexes. Logique complèete non maitrisée, et plus difficile à
+maitriser. 
+Diagnostic des erreurs runtime & logique plus pauvre.
+
+TODO: autres arguments:
+- impacte les perf même quand on sait que c'est OK statiquement (sqrt(1-sin(x)))
+- déresponsabilisition et illusion de factorisation
+- complefixication des fonctions (en ppc: on fait des suppositions "OK le
+  pointeur ne sera jamais nul => pas de test à prévoir ni d'état à remonter)
+
+### En résumé
 Mes conclusions personnelles sur le sujet :
 
 * La PpC s'intéresse à l'écriture de codes corrects. La Programmation Défensive
-  s'intéresse à l'écriture de code qui restent robustes dans le cas où ils ne
+  s'intéresse à l'écriture de codes qui restent robustes dans le cas où ils ne
   seraient pas corrects.
 * Philosophiquement, je préfère 100 fois la PpC à la Programmation Défensive :
   il faut assumer nos responsabilités et ne pas décharger nos utilisateurs de
@@ -434,7 +497,7 @@ plus d'informations sur le sujet.
 
 (à reformuler/dispatcher)
 
-- <a id="Meyer1988"></a>[Meyer2000] -- [_Conception et programmation orientées objet_](http://www.editions-eyrolles.com/Livre/9782212122701/conception-et-programmation-orientees-objet) de Bertrand Meyer, Eyrolles, 1988, Seconde Édition parue en 2000
+- <a id="Meyer1988"> </a>[Meyer2000] -- [_Conception et programmation orientées objet_](http://www.editions-eyrolles.com/Livre/9782212122701/conception-et-programmation-orientees-objet) de Bertrand Meyer, Eyrolles, 1988, Seconde Édition parue en 2000
 - <a id="Dunksi2014"></a>[Dunksi2014] -- [_Coder Efficacement -- Bonnes pratiques et erreurs à éviter (en C++)_](http://www.d-booker.fr/programmation-et-langage/157-coder-efficacement.html) de Philippe Dunski, D-Booker, Février 2014
 - <a id="IPCpp"></a>[Wilson2004] -- _Imperfect C++_ de Matthew Wilson, Addisson-Wesley Professionnal, Octobre 2004.
 - <a id="Wilson2006"></a>[Wilson2006] -- [_Contract Programming 101_](http://www.artima.com/cppsource/deepspace3.html), Matthew Wilson, artima, Janvier 2006.
