@@ -207,3 +207,21 @@ Pour ma part, je préfère avoir une assertion différente pour chaque invariant
 plutôt qu'un seul `assert(is_valid());`. Cela permet de savoir plus précisément
 quel contrat est violé.
 
+### Critiques envisageables avec cette approche
+On peut s'attendre qu'en cas d'exception dans une fonction membre (ou amie)
+d'un objet, l'invariant ne soit plus respecté. Dans ce cas là, l'approche
+proposée juste au dessus va poser d'énormes problèmes.
+
+Toutefois cela voudrait dire que l'exception ne laisse plus l'objet dans un
+état cohérent, et que nous n'avons pas la
+[_garantie basique_](http://en.wikipedia.org/wiki/Exception_safety).
+
+Dans le même genre d'idée, nous nous retrouverions dans la même situation que
+si on utilisait des constructeurs qui ne garantissent pas l'invariant de leurs
+classes, et qui sont utilisés conjointement avec des fonctions `init()`. En
+effet, si l'invariant ne peut plus être assuré statiquement par programmation,
+il est nécessaire de l'assurer dynamiquement en vérifiant en debut de chaque
+fonction membre (/amie) si l'objet est bien valide.
+
+C'est pour tout ces raisons que je ne suis pas d'accord avec cette critique.
+(TODO: à reformuler)

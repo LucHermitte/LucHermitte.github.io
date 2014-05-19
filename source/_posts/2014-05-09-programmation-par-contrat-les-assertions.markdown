@@ -257,7 +257,10 @@ le code n'appelait jamais `my::sqrt` avec un nombre négatif.
 
 NB: Je généralise à partir de mon test avec clang analyzer. Peut-être que
 d'autres outils savent tirer parti des contrats déclarés à l'aide d'assertions,
-ou peut-être le sauront-ils demain.
+ou peut-être le sauront-ils demain.  
+Pour information, je n'ai pas eu l'occasion de tester des outils comme _Code
+Contract_ (pour .NET), Ada2012 (si on sort du périmètre du C++) ni même
+_Polyspace_.
 
 
 ### Le standard s'enrichira-t-il en 2014/2017 pour programmer avec des contrats ?
@@ -296,6 +299,7 @@ parfaitement applicable aux post-conditions et aux invariants.
 ## Remerciements
 
 Un grand merci à tous mes relecteurs, correcteurs et détracteurs. J'ai nommé: 
+Julien Blanc,
 Guilhem Bonnefille,
 David Côme,
 Sébastien Dinot,

@@ -70,9 +70,11 @@ pouvoir additionner des distances avec des masses (_cf._
 [boost.unit](http://boost.org/libs/units)), ...
 
 Pour les autres cas, [[Meyer1988]](#Meyer1988) a jeté les bases d'un outil, la
-_programmation par contrat_. Le C nous offre un second outil, les _assertions_
-qui permettent de retranscrire les contrats dans notre code pour détecter au
-plus tôt les erreurs de programmation. Nous les détaillerons dans
+_programmation par contrat_. Le C nous offre un second outil, les _assertions_.
+Les assertions permettent d'installer des points de contrôle dans un programme
+pour vérifier que les traitements se passent bien. Ces points de contrôles
+seront utilisés pour vérifier les contrats prélablement définis.
+Nous les détaillerons dans
 [le prochain billet]({%post_url 2014-05-09-programmation-par-contrat-les-assertions%}).
 
 
@@ -133,6 +135,10 @@ de codes durant lesquelles une propriété sera vraie :
 
 * un _invariant de boucle_ correspondra à ce qui est toujours vrai à
   l'intérieur de la boucle (p.ex. que `i < N` dans le cas d'une boucle `for`) ;
+  [NdA.: À vrai dire, c'est une appelation que l'on peut voir comme abusive. En
+  effet, ces invariants peuvent être rompus avant de sortir de la boucle.
+  Certains préfèrent utiliser le terme de _variant de boucle_ pour désigner une
+  propriété qui va permettre de sortir de la boucle.]
 * une variable devrait toujours avoir pour invariant : _est utilisable, et est
   dans un état cohérent et pertinent_ ; cet invariant est positionné à la
   sortie de son constructeur (_cf._ FAQ C++ dvpz) ;
@@ -423,7 +429,13 @@ TODO: autres arguments:
   pointeur ne sera jamais nul => pas de test à prévoir ni d'état à remonter)
 
 ### En résumé
-Mes conclusions personnelles sur le sujet :
+Tout d'abord une petite remarque importante, la Programmation Défensive a
+d'autres objectifs orthogonaux à ce qui est discuté dans ces billets : elle
+aussi utilisée pour introduire une tolérance aux erreurs matérielles, limiter
+les conséquences de ces erreurs (comme les corruptions de mémoire).  Cet un
+aspect que je n'aborde pas dans le cadre de la comparaison avec le PpC.
+
+Sinon, voici mes conclusions personnelles sur le sujet :
 
 * La PpC s'intéresse à l'écriture de codes corrects. La Programmation Défensive
   s'intéresse à l'écriture de codes qui restent robustes dans le cas où ils ne
