@@ -121,7 +121,7 @@ namespace my {
     }
 
     /** Computes sinus.
-     * @post \c n belongs to [-1, 1], unchecked
+     * @post \c n belongs to [-1, 1], checked with an assertion
      */
     double sin(double n) {
         const double r = std::sin(n);
@@ -247,26 +247,26 @@ paramètre -> message `assert(condition && "explications");` ou `assert(!"explic
 À mon grand regret, les outils d'analyse statique de code comme [clang
 analyzer](http://clang-analyzer.llvm.org/) ne semblent pas exploiter les
 assertions pour détecter statiquement des erreurs de logique. Au contraire, ils
-les utilisent pour inhiber l'analyse de certains chemins d'exécutions.
+les utilisent pour inhiber l'analyse de certains chemins d'exécution.
 
 Ainsi, dans l'exemple de `test-assert.cpp` que j'ai donné plus haut, les outils
 d'analyse statique de code ne feront pas le rapprochement entre la
 post-condition de `my::sin` et la pré-conditon de `my::sqrt`, mais feront
 plutôt comme si les assertions étaient toujours vraies, c'est à dire comme si
-le code n'appelait jamais `my::sin` avec un nombre négatif.
+le code n'appelait jamais `my::sqrt` avec un nombre négatif.
 
 NB: Je généralise à partir de mon test avec clang analyzer. Peut-être que
 d'autres outils savent tirer parti des contrats déclarés à l'aide d'assertions,
 ou peut-être le sauront-ils demain.
 
 
-### propal C++14/17:
+### Le standard s'enrichira-t-il en 2014/2017 pour programmer avec des contrats ?
 
 Il y a déjà eu des propositions de mots clés plus ou moins sémantiquement forts
 pour supporter en standard la PpC en C++. Dans la dernière en date, 
 [n3753](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3753.pdf),
-John Lakos et Alexei Zakharov introduisent une macro `pre_assert` assez
-flexible.
+John Lakos et Alexei Zakharov introduisent un ensemble de macros `pre_assert`
+assez flexible.
 
 Elle supporte des niveaux d'importance de vérification (toujours, parfois) un
 peu à l'image des niveaux Error/Warning/Info/Debug dans les frameworks de log.
@@ -294,7 +294,7 @@ aux post-conditions et aux invariants.
 
 ## Remerciements
 
-Un grand merci à tous mes relecteurs,
+Un grand merci à tous mes relecteurs, correcteurs et détracteurs. J'ai nommé: 
 Guilhem Bonnefille,
 David Côme,
 Sébastien Dinot,
