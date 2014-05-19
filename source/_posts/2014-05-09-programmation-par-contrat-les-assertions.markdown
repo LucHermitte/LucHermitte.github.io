@@ -268,15 +268,16 @@ pour supporter en standard la PpC en C++. Dans la dernière en date,
 John Lakos et Alexei Zakharov introduisent un ensemble de macros `pre_assert`
 assez flexible.
 
-Elle supporte des niveaux d'importance de vérification (toujours, parfois) un
-peu à l'image des niveaux Error/Warning/Info/Debug dans les frameworks de log.
-Elle permet de faire de la programmation défensive (i.e. de lever des
-exceptions au lieu de simples assertions). Elle permet également de transformer
-les assertions en assertions de frameworks de tests unitaires.
+Elles supportent des niveaux d'importance de vérification (_toujours_,
+_parfois_) un peu à l'image des niveaux _Error_/_Warning_/_Info_/_Debug_ dans
+les frameworks de log.  Elle permet de faire de la programmation défensive
+(i.e. de lever des exceptions au lieu de simples assertions). Elle permet
+également de transformer les assertions en assertions de frameworks de tests
+unitaires.
 
-S'il fallait lui trouver un défaut, je dirai que le nom `pre_assert` est trop
-restrictif, en effet cette proposition serait également parfaitement applicable
-aux post-conditions et aux invariants.
+S'il fallait lui trouver un défaut, je dirai que sémantiquement le nom
+`pre_assert` est trop restrictif, en effet cette proposition serait également
+parfaitement applicable aux post-conditions et aux invariants.
 
 À noter qu'elle est déjà implémentée et disponible à l'intérieur de la
 [bibliothèque BDE/BSL](https://github.com/bloomberg/bde) sous licence MIT.

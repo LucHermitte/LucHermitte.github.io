@@ -441,7 +441,7 @@ Mes conclusions personnelles sur le sujet :
 
 Il est important de le rappeler, les contrats tels que présentés ici sont
 orientés vers la recherche des erreurs de programmation. C'est à dire, un code
-qui ne respecte pas le contrats de ses divers constituants présente une erreur
+qui ne respecte pas les contrats de ses divers constituants présente une erreur
 de programmation.
 
 En aucun cas une violation de contrat correspondra à une situation
