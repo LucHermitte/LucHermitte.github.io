@@ -430,9 +430,9 @@ TODO: autres arguments:
 
 ### En résumé
 Tout d'abord une petite remarque importante, la Programmation Défensive a
-d'autres objectifs orthogonaux à ce qui est discuté dans ces billets : elle
+d'autres objectifs orthogonaux à ce qui est discuté dans ces billets : elle est
 aussi utilisée pour introduire une tolérance aux erreurs matérielles, limiter
-les conséquences de ces erreurs (comme les corruptions de mémoire).  Cet un
+les conséquences de ces erreurs (comme les corruptions de mémoire).  C'est un
 aspect que je n'aborde pas dans le cadre de la comparaison avec le PpC.
 
 Sinon, voici mes conclusions personnelles sur le sujet :

@@ -118,6 +118,7 @@ namespace my {
         assert(n >=0);
         const double result = std::sqrt(n);
         assert(std::abs(result*result - n) < std::numeric_limits<double>::epsilon() * 100);
+        return result;
     }
 
     /** Computes sinus.
@@ -193,7 +194,7 @@ La pile d'appels (_back trace_) contient :
 #6  0x610d85b3 in abort () from /usr/bin/cygwin1.dll
 #7  0x61001aed in __assert_func () from /usr/bin/cygwin1.dll
 #8  0x004011d3 in my::sqrt (n=-1) at test-assert.cpp:14
-#9  0x0040125a in main () at test-assert.cpp:32
+#9  0x0040125a in main () at test-assert.cpp:33
 ```
 
 Avec un `up 8` pour se positionner au niveau où l'assertion est fausse, on peut
@@ -303,5 +304,6 @@ Julien Blanc,
 Guilhem Bonnefille,
 David Côme,
 Sébastien Dinot,
+Iradrille,
 Philippe Lacour,
 Cédric Poncet-Montange

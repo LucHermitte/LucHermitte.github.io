@@ -66,7 +66,7 @@ Pour ce qui est de gérer en plus les invariants de tous les contrats, et des
 classes finales. Je partirai avec un héritage virtuel depuis une classe de base
 virtuelle `WithInvariants` dont la fonction de vérification serait spécialisée
 par tous les intermédiaires. Et dont les intermédiaires appelleraient toutes
-versions mères pour n'oublier personne. 
+les versions mères pour n'oublier personne. 
 
 ```c++
 struct WithInvariants : boost::noncopyable {
