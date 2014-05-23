@@ -4,7 +4,7 @@ title: "Programmation par contrat 2/3 -- les assertions"
 date: 2014-05-26 12:07:42 +0200
 comments: true
 categories: C++
-published: true
+published: false
 footer: true
 ---
 
