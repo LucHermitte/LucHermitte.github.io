@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Programmation par Contrat 1/3 -- un peu de théorie"
-date: 2014-03-13 17:47:34 +0100
+date: 2014-05-24 01:00:00 +0100
 comments: true
 categories: C++
 published: true
@@ -27,7 +27,7 @@ Dans la suite de ce billet, je vais principalement traiter du cas des erreurs
 de programmation. Toutefois, la confusion étant facile, des parenthèses
 régulières seront faites sur les situations exceptionnelles mais plausibles.
 
-### Les types d'erreurs de programmation
+### I-1. Les types d'erreurs de programmation
 
 Quand on parle d'erreur de programmation, les premières qui vont nous venir à
 l'esprit sont les erreurs de syntaxe (point-virgule oublié), ou de grammaire
@@ -49,7 +49,7 @@ réaliser un traitement sur un fichier sans vérifier préalablement qu'il exist
 est une erreur de programmation. La différence est subtile. J'y reviendrai plus
 [loin](#ProgrammationDefensive).
 
-### Que faire de ces erreurs de programmation ?
+### I-2. Que faire de ces erreurs de programmation ?
 
 Les erreurs qui bloquent la compilation, on n'a pas trop d'autre choix que de
 les corriger. Les autres erreurs ... souvent, pas grand chose n'en est fait.
@@ -73,7 +73,7 @@ Pour les autres cas, [[Meyer1988]](#Meyer1988) a jeté les bases d'un outil, la
 _programmation par contrat_. Le C nous offre un second outil, les _assertions_.
 Les assertions permettent d'installer des points de contrôle dans un programme
 pour vérifier que les traitements se passent bien. Ces points de contrôles
-seront utilisés pour vérifier les contrats prélablement définis.
+seront utilisés pour vérifier les contrats préalablement définis.
 Nous les détaillerons dans
 [le prochain billet]({%post_url 2014-05-09-programmation-par-contrat-les-assertions%}).
 
@@ -104,14 +104,14 @@ Heureusement, nous pouvons aller bien plus loin. Nous pouvons aussi marquer le
 code avec des assertions représentatives des contrats identifiés pour repérer
 les ruptures de contrats en phase de tests et développement.
 
-Idéalement, nous aurions du pouvoir aller beaucoup plus loin. En effet, les
+Idéalement, nous aurions dû pouvoir aller beaucoup plus loin. En effet, les
 outils d'analyse statique de code devraient pouvoir exploiter les contrats
 exprimés avec des assertions pour vérifier qu'ils n'étaient jamais violés
 lors de leur exploration des chemins d'exécution possibles.  
 Seulement, les quelques outils que j'ai pu regarder utilisent au contraire les
 assertions pour retirer des branches à explorer.
 
-### Les trois contrats de la PpC
+### II.1- Les trois contrats de la PpC
 
 La PpC définit trois contrats :
 #### Les pré-conditions 
@@ -129,13 +129,26 @@ Les post-conditions sont les garanties que l'on a sur le résultat d'une fonctio
 si les pré-conditions sont remplies et que la fonction s'est exécutée
 correctement.
 
+> __Important :__ Si une fonction voit qu'elle ne pourra pas remplir ses
+> post-conditions, alors elle __doit__ échouer -- de préférence en levant une
+> exception de _runtime_ en ce qui me concerne.  
+
+Notez cet emploi du _futur_. Il ne s'agit pas de vérifier si les calculs ou
+l'algorithme est correct en sortie de fonction, mais de vérifier si le contexte
+permet bien à la fonction de se dérouler correctement.  
+
+Le cas _"j'ai fait tous mes calculs, ils sont faux, et je ne sais pas
+pourquoi"_ ne justifie pas une exception. Il s'agit d'une erreur de
+programmation ou de logique. Nous le verrons plus loin, et dans le prochain
+billet, ce cas est mieux traité avec des assertions.
+
 #### Les invariants
 Il y a plusieurs natures d'invariants. On va parler d'invariants pour des zones
 de codes durant lesquelles une propriété sera vraie :
 
 * un _invariant de boucle_ correspondra à ce qui est toujours vrai à
   l'intérieur de la boucle (p.ex. que `i < N` dans le cas d'une boucle `for`) ;
-  [NdA.: À vrai dire, c'est une appelation que l'on peut voir comme abusive. En
+  [NdA.: À vrai dire, c'est une appellation que l'on peut voir comme abusive. En
   effet, ces invariants peuvent être rompus avant de sortir de la boucle.
   Certains préfèrent utiliser le terme de _variant de boucle_ pour désigner une
   propriété qui va permettre de sortir de la boucle.]
@@ -152,7 +165,7 @@ de codes durant lesquelles une propriété sera vraie :
   invariant une garantie de non-nullité.
 
 
-### Acteurs et responsabilités
+### II.2- Acteurs et responsabilités
 
 Ces contrats son définis entre les acteurs qui interviennent dans l'écriture
 d'un code.  On peut dans l'absolu distinguer autant d'acteurs que de fonctions.  
@@ -206,17 +219,18 @@ double metier() {                  // écrit par l'Intégrateur
 
 Remarquez, que l'Intégrateur est alors face à une erreur de contexte
 (/_runtime_) et nullement face à une erreur de programmation. Il est alors en
-droit de lever une exception, ou de boucler jusqu'à obtenir quelque chose qui
-lui permette de continuer. Sans cela nous aurions été face à une erreur de
-programmation commise par l'Intégrateur.
+droit de lever une exception (souvenez-vous, si une post-condition ne peut pas
+être respectée, alors la fonction doit échouer), ou de boucler jusqu'à obtenir
+quelque chose qui lui permette de continuer. Sans cela nous aurions été face à
+une erreur de programmation commise par l'Intégrateur.
 
 
 En résumé :
 
-* la responsabilité de vérifier les pré-conditions d'une fonction échoie au
+> * la responsabilité de vérifier les pré-conditions d'une fonction échoie au
   code client, voire indirectement au code qui alimente les entrées de cette
   fonction appelée.
-* la responsabilité de vérifier les post-conditions d'une fonction échoie à
+> * la responsabilité de vérifier les post-conditions d'une fonction échoie à
   cette fonction appelée.
 
 
@@ -224,7 +238,7 @@ NB: Jusqu'à présent je considérai seulement deux acteurs relativement aux
 responsabilités. C'est Philippe Dunski qui m'a fait entrevoir le troisième
 intervenant lors de ma relecture de son livre [[Dunksi2014]](#Dunksi2014).
 
-### Petite parenthèse sur les contrats commerciaux... et les licences
+### II.3- Petite parenthèse sur les contrats commerciaux... et les licences
 
 La programmation par contrat n'a pas vocation à avoir des répercutions légales
 selon qui ne remplit pas son contrat. Cependant, il y a clairement une
@@ -249,14 +263,22 @@ d'utiliser, et de reverser les patchs à la communauté.
 
 Mais je m'égare, ceci est une autre histoire.  Revenons à nos moutons.
 
-## <a id="ProgrammationDefensive"></a>III- La Programmation Défensive, une philosophie antogoniste ou complémentaire ?
+## <a id="ProgrammationDefensive"></a>III- La Programmation Défensive, une philosophie antagoniste ou complémentaire ?
 
 Il est difficile de traiter de la PpC sans évoquer la _Programmation
 Défensive_. Souvent ces deux approches sont confondues tant la frontière entre
 les deux est subtile.
 
+_Tout d'abord une petite remarque importante, la Programmation Défensive a
+d'autres objectifs orthogonaux à ce qui est discuté dans ces billets : elle est
+aussi utilisée pour introduire une tolérance aux erreurs matérielles, limiter
+les conséquences de ces erreurs (comme les corruptions de mémoire).  C'est un
+aspect que je n'aborde pas dans le cadre de la comparaison avec le PpC._
+
+### III.1- Présentons la Programmation Défensive
+
 La _Programmation Défensive_ a pour objectif qu'un programme ne doit jamais
-s'arrêter afin de pouvoir toujours continuer. On s'intéresse à la robustesse
+s'arrêter afin de toujours pouvoir continuer. On s'intéresse à la robustesse
 d'un programme. 
 
 Bien que la PpC puisse être détournée pour faire de la programmation
@@ -323,7 +345,7 @@ void my::process(boost::filesystem::path const& file) {
 }
 ```
 
-Et là ... on fait ce que le code client aurait du faire dès le début : assurer
+Et là ... on fait ce que le code client aurait dû faire dès le début : assurer
 que le contrat des fonctions appelées est bien respecté.  
 En effet, si on avait embrassé la PpC dans l'écriture de ces deux fonctions, ce
 bout de code aurait ressemblé à :
@@ -356,31 +378,70 @@ Notez que l'on pourrait aussi critiquer l'impact en termes de performances de
 la solution précédente (avec le `catch`). Un `catch` n'est pas si gratuit que
 cela -- a contrario du *Stack Unwinding*.
 
-### Des objections ?
+### III.2- Des objections ?
 
-Il est des objections classiques à l'utilisation de la PpC. Décortiquons-les.
+Il est des objections classiques à l'utilisation de la PpC en terrain où la
+Programmation Défensive occupe déjà la place. Décortiquons-les.
 
-#### *- La PpC éparpille les vérifications alors que la Programmation Défensive les factorise.*
+#### *"-On utilise l'une ou l'autre"*
+Oui et non. Si la PpC s'intéresse à l'écriture de code correct, la
+Programmation Défensive s'intéresse à l'écriture de code robuste. Certes
+l'objectif premier n'est pas le même (dans un cas on essaie de repérer et
+éliminer les erreurs de programmation, dans l'autre on essaie de ne pas planter
+en cas d'erreur de programmation), mais les deux techniques peuvent se
+compléter.  
+D'abord on élimine les bugs, ensuite on essaie de résister aux bugs
+récalcitrants.
+
+À vrai dire, on peut utiliser simultanément ces deux approches sur de mêmes
+contrats. En effet, il est possible de modifier la définition d'une assertion
+en mode _Release_ pour lui faire lever une exception de logique. En mode
+_Debug_ elle nous aidera à contrôler les enchainements d'opérations
+
+Ce qui indubitable, c'est qu'en cas de certitude qu'il n'y a pas d'erreur de
+programmation sur des enchainements de fonctions, alors il n'y a pas besoin de
+test dynamique sur les entrées des fonctions.  
+Reste que toute la difficulté réside dans comment être certains qu'une séquence
+d'opérations est exempte de bugs.
+
+#### *"- La PpC éparpille les vérifications alors que la Programmation Défensive les factorise."*
 Il est vrai que la Programmation Défensive permet d'une certaine façon de
 centraliser et factoriser les vérifications. Mais les vérifications ainsi
 centralisées ne disposent pas du contexte qui permet de remonter des erreurs
 correctes. Il est nécessaire d'enrichir les exceptions pauvres en les
 transformant au niveau du code client, et là on perd les factorisations.  
-D'où la question légitime que l'on est en droit de se poser : *Mais pourquoi ne
+D'où la question légitime que l'on est en droit de se poser : *"Mais pourquoi ne
 pas faire ce que le code client était censé faire dès le début ? Pourquoi ne
-pas vérifier les pré-conditions des fonctions que l'on va appeler avant de les
-appeler ?*
+pas vérifier les pré-conditions des fonctions que l'on va appeler, avant de les
+appeler ?"*
 
-Ensuite, il est toujours possible de factoriser grâce aux assertions. En en
-mode _Release_ elles lèvent des exceptions, alors factorisation il y a.
+Ensuite, il est toujours possible de factoriser grâce aux assertions. Si en
+mode _Release_ les assertions lèvent des exceptions, alors factorisation il y
+a.
 
-TODO:
-Factorisation mélange pb de runtime et erreurs
-Factorisation implique de toujours vérifier dynamiquement ce qui est garantit
-statiquement, et surtout idéalement: si pas d'erreur de prog => pas de test à
-faire dans les cas où il n'y a pas de runtime à vérifier.
+Ce qui me gêne avec cette _factorisation_, c'est que l'on mélange les problèmes
+de _runtime_ avec les erreurs de programmation ou de logique. J'aime bien le
+[_Single Responsability Principle (SRP)_](http://en.wikipedia.org/wiki/Single_responsibility_principle),
+mais là, j'ai la franche impression que l'on mélange les responsabilités des
+vérifications.  
+De fait, on commence à avoir des systèmes aux responsabilités de plus en plus
+confuses.
 
-#### *-Le mode Debug ne doit pas se comporter différemment du mode Release!*
+De plus, cette factorisation implique de toujours vérifier dynamiquement ce qui
+est garantit statiquement. D'autant que idéalement s'il n'y a pas d'erreur de
+programmation, alors il n'y a pas de test à faire dans les cas où le _runtime_
+n'a pas à être vérifié.  
+Quel sens il y a-t-il à écrire ceci ? 
+
+```c++
+for (std::size_t i=0, N=vect.size(); i!=N ; ++i)
+    f(vect.at(i));
+
+// ou de vérifier la positivité des paramètres de sqrt() dans
+sqrt(1-sin(x))
+```
+
+#### *"-Le mode Debug ne doit pas se comporter différemment du mode Release!"*
 Remontons à l'origine de cette exigence pour mieux appréhender son impact sur
 la PpC telle que je vous la propose (avec des assertions).  
 
@@ -399,42 +460,34 @@ A contrario, un test qui finit en _coredump_ en _Debug_ aurait pu tomber en
 marche en _Release_, comme planter de façon plus ou moins compréhensible (plutôt
 moins en général).  
 Ce qui est sûr, c'est qu'en phase de développement et de tests, les
-développeurs auraient vu l'erreur de programmation et ils auraient du la
+développeurs auraient vu l'erreur de programmation et ils auraient dû la
 corriger pour voir le test passer.
 
+#### *"- La programmation Défensive est plus adaptée aux développeurs inexpérimentés."*
+C'est possible. On ne réfléchit pas avant. On code et on voit ensuite ce qu'il
+se passe. Traditionnellement, les débutants tendent à être formés de la sorte.
 
+Seulement, on complexifie grandement la base de code avec cette approche.
+Les erreurs (de programmations et logiques) sont mélangées aux cas dégradés du
+_runtime_. Nous avons une vision plus floue, des fonctions plus complexes qui
+propagent et rattrapent des exceptions qui ne sont censées se produire.  
+Bref, nous avons une logique d'ensemble plus difficile à maîtriser.
 
-#### *-On utilise l'une ou l'autre*
-Oui et non. Si la PpC s'intéresse à l'écriture de code correct, la
-Programmation Défensive s'intéresse à l'écriture de code robuste. Certes
-l'objectif premier n'est pas le même (dans un cas on essaie de repérer et
-éliminer les erreurs de programmation, dans l'autre on essaie de ne pas planter
-en cas d'erreur de programmation), mais les deux techniques peuvent se
-compléter.
+Les cas dégradés induits par nos métiers complexifient déjà grandement les
+applications. Rajouter au milieu du code de gestion des erreurs de
+programmation complexifie encore plus les systèmes. D'ailleurs, ne
+rajoutent-ils pas de nouveaux risques de bugs ?
 
-TODO: c'est sûr que si pas d'erreur de prog, alors pas besoin de test dynamique
-pour les cas où les inputs sont assurées par des algos et non un
-contexte/runtime possiblement corrompu/invalide
+De fait, je me pose sincèrement la question : en voulant rendre plus
+accessibles nos systèmes à des développeurs inexpérimentés, ne faisons-nous pas
+le contraire ?
 
-#### *- La programmation Défensive est plus adaptée aux développeurs inexpérimentés.*
-TODO: mélange toutes les erreurs (prog et runtime). vision plus floue, au final
-fonctions plus complexes. Logique complèete non maitrisée, et plus difficile à
-maitriser. 
-Diagnostic des erreurs runtime & logique plus pauvre.
+À noter aussi aussi que le diagnostic des erreurs de _runtime_ ou de logique
+est plus pauvre avec la _factorisation_ de la Programmation Défensive. Et de
+fait, on complexifie les tâches d'investigation des problèmes vu que l'on
+déresponsabilise les véritables responsables.
 
-TODO: autres arguments:
-- impacte les perf même quand on sait que c'est OK statiquement (sqrt(1-sin(x)))
-- déresponsabilisition et illusion de factorisation
-- complefixication des fonctions (en ppc: on fait des suppositions "OK le
-  pointeur ne sera jamais nul => pas de test à prévoir ni d'état à remonter)
-
-### En résumé
-Tout d'abord une petite remarque importante, la Programmation Défensive a
-d'autres objectifs orthogonaux à ce qui est discuté dans ces billets : elle est
-aussi utilisée pour introduire une tolérance aux erreurs matérielles, limiter
-les conséquences de ces erreurs (comme les corruptions de mémoire).  C'est un
-aspect que je n'aborde pas dans le cadre de la comparaison avec le PpC.
-
+### III.3- En résumé
 Sinon, voici mes conclusions personnelles sur le sujet :
 
 * La PpC s'intéresse à l'écriture de codes corrects. La Programmation Défensive
@@ -449,7 +502,7 @@ Sinon, voici mes conclusions personnelles sur le sujet :
   [prochain billet]({%post_url 2014-05-09-programmation-par-contrat-les-assertions%}).
 
 
-### Comment reconnaitre des contrats ?
+### III.4- Comment reconnaitre des contrats ?
 
 Il est important de le rappeler, les contrats tels que présentés ici sont
 orientés vers la recherche des erreurs de programmation. C'est à dire, un code
@@ -481,7 +534,7 @@ Le principe est que :
   quelles,
 * et une classe fille ne peut qu'ajouter des invariants.
 
-Dit comme cela, cela peut paraitre abscon, et pourtant c'est très logique.  
+Dit comme cela, cela peut paraitre abscons, et pourtant c'est très logique.  
 
 ####Quelques exemples
 Prenons par exemple, une compagnie aérienne. Elle a des pré-requis sur les
@@ -504,10 +557,20 @@ substituable à une _liste_, ou qu'un _carré non immuable_ n'est pas un
 _rectangle non immuable_. Je vous renvoie à la littérature et/ou la FAQ pour
 plus d'informations sur le sujet.
 
+## V- Remerciements
 
-## V- Références
+Un grand merci à tous mes relecteurs, correcteurs et détracteurs. J'ai nommé: 
+Julien Blanc,
+Guilhem Bonnefille,
+David Côme,
+Sébastien Dinot,
+Iradrille,
+Philippe Lacour,
+Cédric Poncet-Montange
 
-(à reformuler/dispatcher)
+## VI- Références
+
+[_NdA: Je réorganiserai les liens au fur et à mesure des sorties des articles_]
 
 - <a id="Meyer1988"> </a>[Meyer2000] -- [_Conception et programmation orientées objet_](http://www.editions-eyrolles.com/Livre/9782212122701/conception-et-programmation-orientees-objet) de Bertrand Meyer, Eyrolles, 1988, Seconde Édition parue en 2000
 - <a id="Dunksi2014"></a>[Dunksi2014] -- [_Coder Efficacement -- Bonnes pratiques et erreurs à éviter (en C++)_](http://www.d-booker.fr/programmation-et-langage/157-coder-efficacement.html) de Philippe Dunski, D-Booker, Février 2014

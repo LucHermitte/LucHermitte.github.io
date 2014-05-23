@@ -1,10 +1,10 @@
 ---
 layout: post
 title: "Programmation par contrat 2/3 -- les assertions"
-date: 2014-05-09 12:07:42 +0200
+date: 2014-05-25 12:07:42 +0200
 comments: true
 categories: C++
-published: true
+published: false
 footer: true
 ---
 
@@ -297,13 +297,3 @@ parfaitement applicable aux post-conditions et aux invariants.
 - les divers types de pointeurs (cf. prochain billet)
 - init vs constructeur
 
-## Remerciements
-
-Un grand merci à tous mes relecteurs, correcteurs et détracteurs. J'ai nommé: 
-Julien Blanc,
-Guilhem Bonnefille,
-David Côme,
-Sébastien Dinot,
-Iradrille,
-Philippe Lacour,
-Cédric Poncet-Montange
