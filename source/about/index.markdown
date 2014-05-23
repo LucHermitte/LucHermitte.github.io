@@ -9,7 +9,7 @@ footer: true
 Hello all,
 
 I'm a French C++ developer in Aerospace industry. As such, this blog will be
-about C++. However, most of my C++ posts will be French (sorry guys).
+about C++. However, most of my C++ posts will be in French (sorry guys).
 
 I've also been a vimmer for quite some times now.  [Vim](http://www.vim.org)
 posts should be in English. And they'll be about my plugins suites hosted
