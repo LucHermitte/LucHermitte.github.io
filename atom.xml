@@ -4,7 +4,7 @@
   <title><![CDATA[Luc Hermitte's Blog]]></title>
   <link href="http://LucHermitte.github.io/atom.xml" rel="self"/>
   <link href="http://LucHermitte.github.io/"/>
-  <updated>2014-03-21T11:46:37+01:00</updated>
+  <updated>2014-05-24T01:29:15+02:00</updated>
   <id>http://LucHermitte.github.io/</id>
   <author>
     <name><![CDATA[Luc Hermitte]]></name>
@@ -12,6 +12,692 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Programmation Par Contrat 1/3 -- Un Peu De Théorie]]></title>
+    <link href="http://LucHermitte.github.io/blog/2014/05/24/programmation-par-contrat-un-peu-de-theorie/"/>
+    <updated>2014-05-24T02:00:00+02:00</updated>
+    <id>http://LucHermitte.github.io/blog/2014/05/24/programmation-par-contrat-un-peu-de-theorie</id>
+    <content type="html"><![CDATA[<p>Cela faisait un moment que je voulais partager mes conclusions sur la
+<em>Programmation par Contrat</em>, et en particulier comment l&#8217;appliquer au C++.</p>
+
+<p>Voici un premier billet qui aborde l&#8217;aspect théorique. Dans un <a href="#">second billet</a>,
+je traiterai des <em>assertions</em>. En guise de conclusion, je présenterai des
+<a href="#">techniques d&#8217;application de la PpC au C++</a>
+que j&#8217;ai croisées au fil des ans.</p>
+
+<h2>I- Les Erreurs</h2>
+
+<p>En développement, il y a toujours des problèmes qui vont venir nous ennuyer.
+Certains correspondront à des problèmes plausibles induits par le contexte
+(fichiers invalides, connexions réseau coupées, utilisateurs qui saisissent
+n&#8217;importe quoi, &hellip;), d&#8217;autres seront des <em>erreurs de programmation</em>.</p>
+
+<p>Dans la suite de ce billet, je vais principalement traiter du cas des erreurs
+de programmation. Toutefois, la confusion étant facile, des parenthèses
+régulières seront faites sur les situations exceptionnelles mais plausibles.</p>
+
+<h3>I-1. Les types d&#8217;erreurs de programmation</h3>
+
+<p>Quand on parle d&#8217;erreur de programmation, les premières qui vont nous venir à
+l&#8217;esprit sont les erreurs de syntaxe (point-virgule oublié), ou de grammaire
+(types non respectés). Ces erreurs-ci, les langages compilés vont nous les
+signaler. On peut considérer qu&#8217;il est impossible de livrer un exécutable sur
+une plateforme qui n&#8217;a pas passé cette phase de vérification.</p>
+
+<p>Il existe de nombreuses autres erreurs de programmation qu&#8217;aucun compilateur ne
+signalera jamais. On peut se tromper dans la conception ou la retranscription
+d&#8217;un algorithme, et ainsi renvoyer des résultats numériques aberrants. On peut
+aussi faire des suppositions totalement erronées, comme traiter les lignes d&#8217;un
+fichier qui n&#8217;existe pas, ou exploiter un élément après sa recherche
+infructueuse dans une liste, &hellip; Les plus classiques sont les accès
+hors bornes, et tous les autres problèmes de déréférencement de pointeur nul
+et de <a href="http://en.wikipedia.org/wiki/Dangling_pointer"><em>dangling pointer</em></a>.</p>
+
+<p>Bien sûr, un fichier qui n&#8217;existe pas est une erreur de contexte. Mais
+réaliser un traitement sur un fichier sans vérifier préalablement qu&#8217;il existe
+est une erreur de programmation. La différence est subtile. J&#8217;y reviendrai plus
+<a href="#ProgrammationDefensive">loin</a>.</p>
+
+<h3>I-2. Que faire de ces erreurs de programmation ?</h3>
+
+<p>Les erreurs qui bloquent la compilation, on n&#8217;a pas trop d&#8217;autre choix que de
+les corriger. Les autres erreurs &hellip; souvent, pas grand chose n&#8217;en est fait.
+Elles sont là, elles trainent jusqu&#8217;à ce qu&#8217;elles soient trouvées, puis
+corrigées. Les pires d&#8217;entre-elles ne sont jamais détectées. C&#8217;est souvent le
+cas des erreurs numériques, ou des fichiers que l&#8217;on croit avoir ouverts.</p>
+
+<p>Dans les meilleurs de mes mondes, on fait en sorte de ne pas pouvoir compiler
+quand on est face à une erreur de programmation. Les assertions statiques nous
+aideront en cela.<br/>
+On peut aussi appliquer des petites recettes dont le principe chapeau consiste
+à confier nos invariants au compilateur. Par exemple, on évite de disposer de
+variables dans des états non pertinents (FAQ C++ dvpz), on utilise des
+références à la place de pointeurs quand on sait que l&#8217;on est censés disposer
+de <em>liens</em> non nuls, on annote comme <strong>transférables</strong> les types dont les
+responsables changent (<em>cf.</em> un prochain billet), on fait en sorte de ne pas
+pouvoir additionner des distances avec des masses (<em>cf.</em>
+<a href="http://boost.org/libs/units">boost.unit</a>), &hellip;</p>
+
+<p>Pour les autres cas, <a href="#Meyer1988">[Meyer1988]</a> a jeté les bases d&#8217;un outil, la
+<em>programmation par contrat</em>. Le C nous offre un second outil, les <em>assertions</em>.
+Les assertions permettent d&#8217;installer des points de contrôle dans un programme
+pour vérifier que les traitements se passent bien. Ces points de contrôles
+seront utilisés pour vérifier les contrats préalablement définis.
+Nous les détaillerons dans
+<a href="#">le prochain billet</a>.</p>
+
+<h2>II- La programmation par contrat</h2>
+
+<p>Les contrats, dans la programmation, servent à poser les bases de qui est censé
+faire quoi. Par exemple, la fonction <code>sqrt(x)</code> ne prend que des paramètres
+numériques positifs <em>x</em>, et elle renvoie des nombres toujours positifs qui
+vérifient <em>result = x²</em>. On retrouve la notion de <em>domaine de définition</em> des
+<em>fonctions</em> en mathématiques.</p>
+
+<p>Dit autrement, si on respecte le contrat d&#8217;appel d&#8217;une fonction (on parle de
+ses <em>pré-conditions</em>), cette fonction est censée nous garantir respecter son
+contrat de sortie (on parle de <em>post-conditions</em>). Si les pré-conditions ne
+sont pas respectées, les post-conditions (à commencer par le bon déroulement de
+la fonction) pourront ne pas être respectées : la fonction est libre de faire
+comme elle l&#8217;entend.</p>
+
+<p>On peut se demander à quoi ça sert. En effet, si on passe un nombre négatif à
+<code>sqrt</code> et qu&#8217;elle plante, on n&#8217;est pas plus avancés. Le bug est toujours là. Et
+pourtant, nous avons fait un énorme pas en avant : nous avons formalisé les
+contrats de <code>sqrt</code>. Nous disposons de spécifications précises, et d&#8217;une
+<a href="##Documentation">documentation</a> qui pourra accompagner le code.</p>
+
+<p>Heureusement, nous pouvons aller bien plus loin. Nous pouvons aussi marquer le
+code avec des assertions représentatives des contrats identifiés pour repérer
+les ruptures de contrats en phase de tests et développement.</p>
+
+<p>Idéalement, nous aurions dû pouvoir aller beaucoup plus loin. En effet, les
+outils d&#8217;analyse statique de code devraient pouvoir exploiter les contrats
+exprimés avec des assertions pour vérifier qu&#8217;ils n&#8217;étaient jamais violés
+lors de leur exploration des chemins d&#8217;exécution possibles.<br/>
+Seulement, les quelques outils que j&#8217;ai pu regarder utilisent au contraire les
+assertions pour retirer des branches à explorer.</p>
+
+<h3>II.1- Les trois contrats de la PpC</h3>
+
+<p>La PpC définit trois contrats :</p>
+
+<h4>Les pré-conditions</h4>
+
+<p>Elles sont le pendant des <em>domaines de définition</em> des fonctions mathématiques.
+Si l&#8217;état du système vérifie les pré-conditions d&#8217;une fonction à l&#8217;instant de
+son appel, alors la fonction est censée se dérouler correctement et de façon
+<em>prévisible</em> (je simplifie).</p>
+
+<p>Typiquement, l&#8217;<em>état du système</em> correspondra aux paramètres de la fonction,
+qu&#8217;ils soient explicites, ou implicites (<code>this</code>), mais aussi à toutes les
+globales accessibles.</p>
+
+<h4>Les post-conditions</h4>
+
+<p>Les post-conditions sont les garanties que l&#8217;on a sur le résultat d&#8217;une fonction
+si les pré-conditions sont remplies et que la fonction s&#8217;est exécutée
+correctement.</p>
+
+<blockquote><p><strong>Important :</strong> Si une fonction voit qu&#8217;elle ne pourra pas remplir ses
+post-conditions, alors elle <strong>doit</strong> échouer &mdash; de préférence en levant une
+exception de <em>runtime</em> en ce qui me concerne.</p></blockquote>
+
+<p>Notez cet emploi du <em>futur</em>. Il ne s&#8217;agit pas de vérifier si les calculs ou
+l&#8217;algorithme est correct en sortie de fonction, mais de vérifier si le contexte
+permet bien à la fonction de se dérouler correctement.</p>
+
+<p>Le cas <em>&ldquo;j&#8217;ai fait tous mes calculs, ils sont faux, et je ne sais pas
+pourquoi&rdquo;</em> ne justifie pas une exception. Il s&#8217;agit d&#8217;une erreur de
+programmation ou de logique. Nous le verrons plus loin, et dans le prochain
+billet, ce cas est mieux traité avec des assertions.</p>
+
+<h4>Les invariants</h4>
+
+<p>Il y a plusieurs natures d&#8217;invariants. On va parler d&#8217;invariants pour des zones
+de codes durant lesquelles une propriété sera vraie :</p>
+
+<ul>
+<li>un <em>invariant de boucle</em> correspondra à ce qui est toujours vrai à
+l&#8217;intérieur de la boucle (p.ex. que <code>i &lt; N</code> dans le cas d&#8217;une boucle <code>for</code>) ;
+[NdA.: À vrai dire, c&#8217;est une appellation que l&#8217;on peut voir comme abusive. En
+effet, ces invariants peuvent être rompus avant de sortir de la boucle.
+Certains préfèrent utiliser le terme de <em>variant de boucle</em> pour désigner une
+propriété qui va permettre de sortir de la boucle.]</li>
+<li>une variable devrait toujours avoir pour invariant : <em>est utilisable, et est
+dans un état cohérent et pertinent</em> ; cet invariant est positionné à la
+sortie de son constructeur (<em>cf.</em> FAQ C++ dvpz) ;</li>
+<li>un <em>invariant de classe</em> est une propriété toujours observable depuis
+du code extérieur aux instances de la classe &mdash; p.ex. une séquence triée garantira
+que tous les éléments de la séquence sont toujours ordonnés lorsque le code
+utilisant la séquence cherche à y accéder, cependant ponctuellement, le temps
+de l&#8217;insertion d&#8217;un nouvel élément l&#8217;invariant de la classe n&#8217;a pas à être
+vérifié depuis les fonctions internes de la séquence ;</li>
+<li>une <em>référence</em> est généralement acceptée en C++ comme un pointeur avec pour
+invariant une garantie de non-nullité.</li>
+</ul>
+
+
+<h3>II.2- Acteurs et responsabilités</h3>
+
+<p>Ces contrats son définis entre les acteurs qui interviennent dans l&#8217;écriture
+d&#8217;un code.  On peut dans l&#8217;absolu distinguer autant d&#8217;acteurs que de fonctions.<br/>
+Prenons le bout de code suivant :</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">double</span> <span class="n">metier</span><span class="p">()</span> <span class="p">{</span>                  <span class="c1">// écrit par l&#39;Intégrateur</span>
+</span><span class='line'>   <span class="k">const</span> <span class="kt">double</span> <span class="n">i</span> <span class="o">=</span> <span class="n">interrogeES</span><span class="p">();</span> <span class="c1">// écrit par le responsable UI</span>
+</span><span class='line'>   <span class="k">return</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">i</span><span class="p">);</span>                 <span class="c1">// écrit par le Mathématicien</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Nous pouvons distinguer trois acteurs :</p>
+
+<ul>
+<li>le responsable UI, qui écrit <code>interrogeES</code></li>
+<li>le Mathématicien, qui écrit <code>sqrt</code></li>
+<li>et l&#8217;Intégrateur, qui intègre tout cela ensemble lorsqu&#8217;il écrit <code>metier</code>.</li>
+</ul>
+
+
+<p><code>sqrt</code> a un contrat simple : le nombre reçu doit être positif. Si l&#8217;appel à
+<code>sqrt</code> échoue (plantage, résultat renvoyé aberrant, &hellip;) tandis que le nombre
+passé en paramètre est bien positif, alors le Mathématicien est responsable du
+problème et ce peu importe ce qui est fait par les autres acteurs. En effet,
+bien que les pré-conditions de <code>sqrt</code> sont bien vérifiées, ses post-conditions
+ne le sont pas : <code>sqrt</code> ne remplit pas sa part du contrat.</p>
+
+<p>Si <code>i</code> n&#8217;est pas positif, alors le Mathématicien ne peut pas être tenu pour
+responsable de quoi que ce soit. La faute incombe au code client de <code>sqrt</code>.</p>
+
+<p>À ce stade, tout va dépendre si <code>interrogeES</code> dispose d&#8217;une post-condition sur
+ses sorties du type <em>renvoie un nombre positif</em>. Si c&#8217;est le cas, la rupture de
+contrat est alors à ce niveau, et le responsable UI est responsable de l&#8217;erreur
+de programmation. En effet, l&#8217;Intégrateur est dans son droit d&#8217;enchainer
+<code>sqrt(interrogeES())</code>. C&#8217;est exactement la même chose que
+<code>sqrt(abs(whatever))</code>, personne n&#8217;irait accuser l&#8217;Intégrateur de ne pas faire
+son boulot vu que les pré-conditions de <code>sqrt</code> sont censées être assurées par
+les post-conditions de <code>interrogeES</code>.</p>
+
+<p>En revanche, si <code>interrogeES</code> n&#8217;a aucune post-condition telle que le nombre
+renvoyé sera positif, alors l&#8217;Intégrateur est responsable au moment de l&#8217;intégration de
+s&#8217;assurer que ce qu&#8217;il va passer à <code>sqrt</code> soit bien positif. Une correction
+typique serait :</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">double</span> <span class="n">metier</span><span class="p">()</span> <span class="p">{</span>                  <span class="c1">// écrit par l&#39;Intégrateur</span>
+</span><span class='line'>   <span class="k">const</span> <span class="kt">double</span> <span class="n">i</span> <span class="o">=</span> <span class="n">interrogeES</span><span class="p">();</span> <span class="c1">// écrit par le responsable UI</span>
+</span><span class='line'>   <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">&lt;</span><span class="mi">0</span><span class="p">)</span>
+</span><span class='line'>       <span class="k">throw</span> <span class="n">std</span><span class="o">::</span><span class="n">runtime_error</span><span class="p">(</span><span class="s">&quot;invalid input obtained ...&quot;</span><span class="p">);</span>
+</span><span class='line'>   <span class="k">return</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">i</span><span class="p">);</span>                 <span class="c1">// écrit par le Mathématicien</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Remarquez, que l&#8217;Intégrateur est alors face à une erreur de contexte
+(/<em>runtime</em>) et nullement face à une erreur de programmation. Il est alors en
+droit de lever une exception (souvenez-vous, si une post-condition ne peut pas
+être respectée, alors la fonction doit échouer), ou de boucler jusqu&#8217;à obtenir
+quelque chose qui lui permette de continuer. Sans cela nous aurions été face à
+une erreur de programmation commise par l&#8217;Intégrateur.</p>
+
+<p>En résumé :</p>
+
+<blockquote><ul>
+<li>la responsabilité de vérifier les pré-conditions d&#8217;une fonction échoie au
+code client, voire indirectement au code qui alimente les entrées de cette
+fonction appelée.</li>
+<li>la responsabilité de vérifier les post-conditions d&#8217;une fonction échoie à
+cette fonction appelée.</li>
+</ul>
+</blockquote>
+
+<p>NB: Jusqu&#8217;à présent je considérai seulement deux acteurs relativement aux
+responsabilités. C&#8217;est Philippe Dunski qui m&#8217;a fait entrevoir le troisième
+intervenant lors de ma relecture de son livre <a href="#Dunksi2014">[Dunksi2014]</a>.</p>
+
+<h3>II.3- Petite parenthèse sur les contrats commerciaux&hellip; et les licences</h3>
+
+<p>La programmation par contrat n&#8217;a pas vocation à avoir des répercutions légales
+selon qui ne remplit pas son contrat. Cependant, il y a clairement une
+intersection entre la PpC et les responsabilités légales.</p>
+
+<p>Dans le cas où le responsable UI et le Mathématicien sont deux contractants de
+l&#8217;Intégrateur. Ce que j&#8217;ai détaillé au paragraphe précédant est normalement
+directement applicable. L&#8217;Intégrateur sera responsable vis-à-vis de son client
+du bon fonctionnement de l&#8217;ensemble, mais le responsable UI et le Mathématicien
+ont des responsabilités vis-à-vis de l&#8217;Intégrateur.</p>
+
+<p>Si maintenant, le responsable UI ou le Mathématicien ne livrent plus des
+<a href="http://en.wikipedia.org/wiki/Commercial_off-the-shelf">COTS</a> (au sens
+commercial), mais des bibliothèques tierces OpenSources ou Libres, à moins que
+l&#8217;Intégrateur ait pris un contrat de maintenance auprès du responsable UI et du
+Mathématicien, il est peu probable que le responsable UI ou le Mathématicien
+aient la moindre responsabilité légale vis à vis de l&#8217;Intégrateur.</p>
+
+<p>L&#8217;Intégrateur est seul responsable vis-à-vis de son client. À lui de trouver des
+contournements, ou mieux de corriger ces composants tiers qu&#8217;il a choisi
+d&#8217;utiliser, et de reverser les patchs à la communauté.</p>
+
+<p>Mais je m&#8217;égare, ceci est une autre histoire.  Revenons à nos moutons.</p>
+
+<h2><a id="ProgrammationDefensive"></a>III- La Programmation Défensive, une philosophie antagoniste ou complémentaire ?</h2>
+
+<p>Il est difficile de traiter de la PpC sans évoquer la <em>Programmation
+Défensive</em>. Souvent ces deux approches sont confondues tant la frontière entre
+les deux est subtile.</p>
+
+<p><em>Tout d&#8217;abord une petite remarque importante, la Programmation Défensive a
+d&#8217;autres objectifs orthogonaux à ce qui est discuté dans ces billets : elle est
+aussi utilisée pour introduire une tolérance aux erreurs matérielles, limiter
+les conséquences de ces erreurs (comme les corruptions de mémoire).  C&#8217;est un
+aspect que je n&#8217;aborde pas dans le cadre de la comparaison avec le PpC.</em></p>
+
+<h3>III.1- Présentons la Programmation Défensive</h3>
+
+<p>La <em>Programmation Défensive</em> a pour objectif qu&#8217;un programme ne doit jamais
+s&#8217;arrêter afin de toujours pouvoir continuer. On s&#8217;intéresse à la robustesse
+d&#8217;un programme.</p>
+
+<p>Bien que la PpC puisse être détournée pour faire de la programmation
+défensive, ce n&#8217;est pas son objectif premier. La PpC ne fait que stipuler que
+si un contrat est respecté, alors tout se passera bien. Si le contrat n&#8217;est pas
+respecté tout peut arriver : on peut assister à des plantages plus ou moins
+prévisibles, on peut produire des résultats erronés, on peut stopper
+volontairement au point de détection des erreurs, et on peut aussi remonter
+des exceptions. Avec la PpC, on s&#8217;intéresse à l&#8217;écriture de code correct.</p>
+
+<p>Le choix de remonter des exceptions, depuis le lieu de la détection de la
+rupture de contrat, est un choix de programmation défensive. C&#8217;est un choix que
+j&#8217;assimile à une déresponsabilisation des véritables responsables.</p>
+
+<p>Supposons une application qui lit un fichier de distances, et qui pour le besoin
+de son métier calcule des racines carrées sur ces distances. L&#8217;approche de la
+<em>programmation défensive</em> consisterait à vérifier dans la fonction <code>my::sqrt</code> que
+le paramètre reçu est positif, et à lever une exception dans le cas contraire.</p>
+
+<p>Ce qui donnerait :</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">double</span> <span class="n">my</span><span class="o">::</span><span class="n">sqrt</span><span class="p">(</span><span class="kt">double</span> <span class="n">n</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">n</span><span class="o">&lt;</span><span class="mi">0</span><span class="p">)</span> <span class="k">throw</span> <span class="n">std</span><span class="o">::</span><span class="n">domain_error</span><span class="p">(</span><span class="s">&quot;Negative number sent to sqrt&quot;</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">sqrt</span><span class="p">(</span><span class="n">n</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">void</span> <span class="n">my</span><span class="o">::</span><span class="n">process</span><span class="p">(</span><span class="n">boost</span><span class="o">::</span><span class="n">filesystem</span><span class="o">::</span><span class="n">path</span> <span class="k">const</span><span class="o">&amp;</span> <span class="n">file</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">boost</span><span class="o">::</span><span class="n">ifstream</span> <span class="n">f</span><span class="p">(</span><span class="n">file</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">f</span><span class="p">)</span> <span class="k">throw</span> <span class="n">std</span><span class="o">::</span><span class="n">runtime_error</span><span class="p">(</span><span class="s">&quot;Cannot open &quot;</span><span class="o">+</span><span class="n">file</span><span class="p">.</span><span class="n">string</span><span class="p">());</span>
+</span><span class='line'>    <span class="kt">double</span> <span class="n">d</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">while</span> <span class="p">(</span><span class="n">f</span> <span class="o">&gt;&gt;</span> <span class="n">d</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="n">my</span><span class="o">::</span><span class="n">memorize</span><span class="p">(</span><span class="n">my</span><span class="o">::</span><span class="n">sqrt</span><span class="p">(</span><span class="n">d</span><span class="p">));</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Si un nombre négatif devait être présent dans le fichier, nous aurions droit à
+l&#8217;exception <em>&ldquo;Negative number sent to sqrt&rdquo;</em>. Limpide, n&#8217;est-ce pas ? On ne sait
+pas quel est le nombre, ni d&#8217;où il vient. Après une longue investigation pour
+traquer l&#8217;origine de ce nombre négatif, on comprend enfin qu&#8217;il faut
+instrumenter <code>process</code> pour intercepter l&#8217;exception. Soit on fait le <code>catch</code> au
+niveau de la fonction, et on sait dans quel fichier a lieu l&#8217;erreur, soit on
+encadre l&#8217;appel à <code>my::sqrt</code> pour remonter plus d&#8217;informations.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">void</span> <span class="n">my</span><span class="o">::</span><span class="n">process</span><span class="p">(</span><span class="n">boost</span><span class="o">::</span><span class="n">filesystem</span><span class="o">::</span><span class="n">path</span> <span class="k">const</span><span class="o">&amp;</span> <span class="n">file</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">boost</span><span class="o">::</span><span class="n">ifstream</span> <span class="n">f</span><span class="p">(</span><span class="n">file</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">f</span><span class="p">)</span> <span class="k">throw</span> <span class="n">std</span><span class="o">::</span><span class="n">runtime_error</span><span class="p">(</span><span class="s">&quot;Cannot open &quot;</span><span class="o">+</span><span class="n">file</span><span class="p">.</span><span class="n">string</span><span class="p">());</span>
+</span><span class='line'>    <span class="kt">double</span> <span class="n">d</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">while</span> <span class="p">(</span><span class="n">f</span> <span class="o">&gt;&gt;</span> <span class="n">d</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="kt">double</span> <span class="n">sq</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">try</span> <span class="p">{</span>
+</span><span class='line'>            <span class="n">sq</span> <span class="o">=</span> <span class="n">my</span><span class="o">::</span><span class="n">sqrt</span><span class="p">(</span><span class="n">d</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>        <span class="k">catch</span> <span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">logic_error</span> <span class="k">const</span><span class="o">&amp;</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="k">throw</span> <span class="n">std</span><span class="o">::</span><span class="n">runtime_error</span><span class="p">(</span>
+</span><span class='line'>                <span class="s">&quot;Invalid negative distance &quot;</span> <span class="o">+</span> <span class="n">std</span><span class="o">::</span><span class="n">to_string</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+</span><span class='line'>                <span class="o">+</span><span class="s">&quot; at the &quot;</span><span class="o">+</span><span class="n">std</span><span class="o">::</span><span class="n">to_string</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
+</span><span class='line'>                <span class="o">+</span><span class="s">&quot;th line in distances file &quot;</span><span class="o">+</span><span class="n">file</span><span class="p">.</span><span class="n">string</span><span class="p">());</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>        <span class="n">my</span><span class="o">::</span><span class="n">memorize</span><span class="p">(</span><span class="n">sq</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Et là &hellip; on fait ce que le code client aurait dû faire dès le début : assurer
+que le contrat des fonctions appelées est bien respecté.<br/>
+En effet, si on avait embrassé la PpC dans l&#8217;écriture de ces deux fonctions, ce
+bout de code aurait ressemblé à :</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">double</span> <span class="n">my</span><span class="o">::</span><span class="n">sqrt</span><span class="p">(</span><span class="kt">double</span> <span class="n">n</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">assert</span><span class="p">(</span><span class="n">n</span><span class="o">&gt;=</span><span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="s">&quot;sqrt can&#39;t process negative numbers&quot;</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">sqrt</span><span class="p">(</span><span class="n">n</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">void</span> <span class="n">my</span><span class="o">::</span><span class="n">process</span><span class="p">(</span><span class="n">boost</span><span class="o">::</span><span class="n">filesystem</span><span class="o">::</span><span class="n">path</span> <span class="k">const</span><span class="o">&amp;</span> <span class="n">file</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">boost</span><span class="o">::</span><span class="n">ifstream</span> <span class="n">f</span><span class="p">(</span><span class="n">file</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">f</span><span class="p">)</span> <span class="k">throw</span> <span class="n">std</span><span class="o">::</span><span class="n">runtime_error</span><span class="p">(</span><span class="s">&quot;Cannot open &quot;</span><span class="o">+</span><span class="n">file</span><span class="p">.</span><span class="n">string</span><span class="p">());</span>
+</span><span class='line'>    <span class="kt">double</span> <span class="n">d</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">for</span> <span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">size_t</span> <span class="n">l</span> <span class="o">=</span> <span class="mi">1</span> <span class="p">;</span> <span class="n">f</span> <span class="o">&gt;&gt;</span> <span class="n">d</span> <span class="p">;</span> <span class="o">++</span><span class="n">l</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">d</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">)</span>
+</span><span class='line'>            <span class="k">throw</span> <span class="n">std</span><span class="o">::</span><span class="n">runtime_error</span><span class="p">(</span>
+</span><span class='line'>                <span class="s">&quot;Invalid negative distance &quot;</span> <span class="o">+</span> <span class="n">std</span><span class="o">::</span><span class="n">to_string</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+</span><span class='line'>                <span class="o">+</span><span class="s">&quot; at the &quot;</span><span class="o">+</span><span class="n">std</span><span class="o">::</span><span class="n">to_string</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
+</span><span class='line'>                <span class="o">+</span><span class="s">&quot;th line in distances file &quot;</span><span class="o">+</span><span class="n">file</span><span class="p">.</span><span class="n">string</span><span class="p">());</span>
+</span><span class='line'>        <span class="n">my</span><span class="o">::</span><span class="n">memorize</span><span class="p">(</span><span class="n">my</span><span class="o">::</span><span class="n">sqrt</span><span class="p">(</span><span class="n">d</span><span class="p">));</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Cela n&#8217;est-il pas plus simple et propre pour disposer d&#8217;un message non
+seulement plus explicite, mais surtout bien plus utile ? Comparez ce nouveau
+message <em>&ldquo;Invalid negative distance -28.15 at the 42th line of distances file
+distances.txt&rdquo;</em>, au précédent <em>&ldquo;Negative number sent to sqrt&rdquo;</em>.<br/>
+Notez que l&#8217;on pourrait aussi critiquer l&#8217;impact en termes de performances de
+la solution précédente (avec le <code>catch</code>). Un <code>catch</code> n&#8217;est pas si gratuit que
+cela &mdash; a contrario du <em>Stack Unwinding</em>.</p>
+
+<h3>III.2- Des objections ?</h3>
+
+<p>Il est des objections classiques à l&#8217;utilisation de la PpC en terrain où la
+Programmation Défensive occupe déjà la place. Décortiquons-les.</p>
+
+<h4><em>&ldquo;-On utilise l&#8217;une ou l&#8217;autre&rdquo;</em></h4>
+
+<p>Oui et non. Si la PpC s&#8217;intéresse à l&#8217;écriture de code correct, la
+Programmation Défensive s&#8217;intéresse à l&#8217;écriture de code robuste. Certes
+l&#8217;objectif premier n&#8217;est pas le même (dans un cas on essaie de repérer et
+éliminer les erreurs de programmation, dans l&#8217;autre on essaie de ne pas planter
+en cas d&#8217;erreur de programmation), mais les deux techniques peuvent se
+compléter.<br/>
+D&#8217;abord on élimine les bugs, ensuite on essaie de résister aux bugs
+récalcitrants.</p>
+
+<p>À vrai dire, on peut utiliser simultanément ces deux approches sur de mêmes
+contrats. En effet, il est possible de modifier la définition d&#8217;une assertion
+en mode <em>Release</em> pour lui faire lever une exception de logique. En mode
+<em>Debug</em> elle nous aidera à contrôler les enchainements d&#8217;opérations</p>
+
+<p>Ce qui indubitable, c&#8217;est qu&#8217;en cas de certitude qu&#8217;il n&#8217;y a pas d&#8217;erreur de
+programmation sur des enchainements de fonctions, alors il n&#8217;y a pas besoin de
+test dynamique sur les entrées des fonctions.<br/>
+Reste que toute la difficulté réside dans comment être certains qu&#8217;une séquence
+d&#8217;opérations est exempte de bugs.</p>
+
+<h4><em>&ldquo;&ndash; La PpC éparpille les vérifications alors que la Programmation Défensive les factorise.&rdquo;</em></h4>
+
+<p>Il est vrai que la Programmation Défensive permet d&#8217;une certaine façon de
+centraliser et factoriser les vérifications. Mais les vérifications ainsi
+centralisées ne disposent pas du contexte qui permet de remonter des erreurs
+correctes. Il est nécessaire d&#8217;enrichir les exceptions pauvres en les
+transformant au niveau du code client, et là on perd les factorisations.<br/>
+D&#8217;où la question légitime que l&#8217;on est en droit de se poser : <em>&ldquo;Mais pourquoi ne
+pas faire ce que le code client était censé faire dès le début ? Pourquoi ne
+pas vérifier les pré-conditions des fonctions que l&#8217;on va appeler, avant de les
+appeler ?&rdquo;</em></p>
+
+<p>Ensuite, il est toujours possible de factoriser grâce aux assertions. Si en
+mode <em>Release</em> les assertions lèvent des exceptions, alors factorisation il y
+a.</p>
+
+<p>Ce qui me gêne avec cette <em>factorisation</em>, c&#8217;est que l&#8217;on mélange les problèmes
+de <em>runtime</em> avec les erreurs de programmation ou de logique. J&#8217;aime bien le
+<a href="http://en.wikipedia.org/wiki/Single_responsibility_principle"><em>Single Responsability Principle (SRP)</em></a>,
+mais là, j&#8217;ai la franche impression que l&#8217;on mélange les responsabilités des
+vérifications.<br/>
+De fait, on commence à avoir des systèmes aux responsabilités de plus en plus
+confuses.</p>
+
+<p>De plus, cette factorisation implique de toujours vérifier dynamiquement ce qui
+est garantit statiquement. D&#8217;autant que idéalement s&#8217;il n&#8217;y a pas d&#8217;erreur de
+programmation, alors il n&#8217;y a pas de test à faire dans les cas où le <em>runtime</em>
+n&#8217;a pas à être vérifié.<br/>
+Quel sens il y a-t-il à écrire ceci ?</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="k">for</span> <span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">size_t</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">N</span><span class="o">=</span><span class="n">vect</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="n">i</span><span class="o">!=</span><span class="n">N</span> <span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">f</span><span class="p">(</span><span class="n">vect</span><span class="p">.</span><span class="n">at</span><span class="p">(</span><span class="n">i</span><span class="p">));</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// ou de vérifier la positivité des paramètres de sqrt() dans</span>
+</span><span class='line'><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4><em>&ldquo;-Le mode Debug ne doit pas se comporter différemment du mode Release!&rdquo;</em></h4>
+
+<p>Remontons à l&#8217;origine de cette exigence pour mieux appréhender son impact sur
+la PpC telle que je vous la propose (avec des assertions).</p>
+
+<p>Parfois, le mode <em>Debug</em> est plus permissif que le mode <em>Release</em> : il cache
+des erreurs de programmation. Souvent c&#8217;est du à des outils (comme VC++) dont le mode
+<em>Debug</em> zéro-initialise des variables même quand le code néglige de les
+initialiser.</p>
+
+<p>Avec des assertions, c&#8217;est tout le contraire. En effet, le mode <em>Debug</em> ne sera
+pas plus permissif, mais au contraire il sera plus restrictif et intransigeant
+que le mode <em>Release</em>. Ainsi, si un test passe en mode <em>Debug</em>, il passera
+également en mode <em>Release</em> (relativement aux assertions) : si le test est OK,
+c&#8217;est que les assertions traversées ne détectent aucune rupture de contrat en
+<em>Debug</em>, il n&#8217;y aurait aucune raison qu&#8217;il en aille autrement en <em>Release</em>.
+A contrario, un test qui finit en <em>coredump</em> en <em>Debug</em> aurait pu tomber en
+marche en <em>Release</em>, comme planter de façon plus ou moins compréhensible (plutôt
+moins en général).<br/>
+Ce qui est sûr, c&#8217;est qu&#8217;en phase de développement et de tests, les
+développeurs auraient vu l&#8217;erreur de programmation et ils auraient dû la
+corriger pour voir le test passer.</p>
+
+<h4><em>&ldquo;&ndash; La programmation Défensive est plus adaptée aux développeurs inexpérimentés.&rdquo;</em></h4>
+
+<p>C&#8217;est possible. On ne réfléchit pas avant. On code et on voit ensuite ce qu&#8217;il
+se passe. Traditionnellement, les débutants tendent à être formés de la sorte.</p>
+
+<p>Seulement, on complexifie grandement la base de code avec cette approche.
+Les erreurs (de programmations et logiques) sont mélangées aux cas dégradés du
+<em>runtime</em>. Nous avons une vision plus floue, des fonctions plus complexes qui
+propagent et rattrapent des exceptions qui ne sont censées se produire.<br/>
+Bref, nous avons une logique d&#8217;ensemble plus difficile à maîtriser.</p>
+
+<p>Les cas dégradés induits par nos métiers complexifient déjà grandement les
+applications. Rajouter au milieu du code de gestion des erreurs de
+programmation complexifie encore plus les systèmes. D&#8217;ailleurs, ne
+rajoutent-ils pas de nouveaux risques de bugs ?</p>
+
+<p>De fait, je me pose sincèrement la question : en voulant rendre plus
+accessibles nos systèmes à des développeurs inexpérimentés, ne faisons-nous pas
+le contraire ?</p>
+
+<p>À noter aussi aussi que le diagnostic des erreurs de <em>runtime</em> ou de logique
+est plus pauvre avec la <em>factorisation</em> de la Programmation Défensive. Et de
+fait, on complexifie les tâches d&#8217;investigation des problèmes vu que l&#8217;on
+déresponsabilise les véritables responsables.</p>
+
+<h3>III.3- En résumé</h3>
+
+<p>Sinon, voici mes conclusions personnelles sur le sujet :</p>
+
+<ul>
+<li>La PpC s&#8217;intéresse à l&#8217;écriture de codes corrects. La Programmation Défensive
+s&#8217;intéresse à l&#8217;écriture de codes qui restent robustes dans le cas où ils ne
+seraient pas corrects.</li>
+<li>Philosophiquement, je préfère 100 fois la PpC à la Programmation Défensive :
+il faut assumer nos responsabilités et ne pas décharger nos utilisateurs de
+leurs devoirs.</li>
+<li>Toutefois, il est possible de détourner la PpC  basée sur des assertions en C
+et C++ pour faire de la Programmation Défensive ; p.ex. l&#8217;assertion pourrait
+être détournée en <em>Release</em> pour lever une exception. J&#8217;y reviendrai dans le
+<a href="#">prochain billet</a>.</li>
+</ul>
+
+
+<h3>III.4- Comment reconnaitre des contrats ?</h3>
+
+<p>Il est important de le rappeler, les contrats tels que présentés ici sont
+orientés vers la recherche des erreurs de programmation. C&#8217;est à dire, un code
+qui ne respecte pas les contrats de ses divers constituants présente une erreur
+de programmation.</p>
+
+<p>En aucun cas une violation de contrat correspondra à une situation
+exceptionnelle (et plausible), <em>cf.</em> <a href="#Wilson2006">[Wilson2006]</a></p>
+
+<p>Il est également à noter qu&#8217;une vérification de contrat devrait pouvoir être
+retirée d&#8217;un code source sans que son comportement ne soit impacté. En effet,
+un programme dépourvu d&#8217;erreur de logique n&#8217;aura aucun contrat qui se fasse
+violer, et la vérification devient superflue.</p>
+
+<h2>IV- Parenthèse OO : PpC &amp; <em>Principe de Substitution de Liskov</em> (LSP)</h2>
+
+<p>Je ne rentrerai pas dans les détails du LSP. Je vous renvoie plutôt à la
+<a href="http://cpp.developpez.com/faq/cpp/?page=L-heritage#Qu-est-ce-que-le-LSP">FAQ C++ de développez</a>,
+ou à <a href="#Dunksi2014">[Dunksi2014]</a>. Il faut retenir que le LSP est un outil qui
+permet d&#8217;éviter de définir des hiérarchies de classes qui se retourneront
+contre nous.</p>
+
+<p>Le LSP est formulé relativement aux contrats des classes pour établir quand une
+classe peut dériver (publiquement en C++) en toute quiétude d&#8217;une autre.
+Le principe est que :</p>
+
+<ul>
+<li>les pré-conditions ne peuvent être qu&#8217;affaiblies, ou laissées telles quelles,</li>
+<li>les post-conditions ne peuvent être que renforcées, ou laissées telles
+quelles,</li>
+<li>et une classe fille ne peut qu&#8217;ajouter des invariants.</li>
+</ul>
+
+
+<p>Dit comme cela, cela peut paraitre abscons, et pourtant c&#8217;est très logique.</p>
+
+<h4>Quelques exemples</h4>
+
+<p>Prenons par exemple, une compagnie aérienne. Elle a des pré-requis sur les
+bagages acceptés sans surcouts. Pour toutes les compagnies, un bagage de
+50x40x20cm sera toujours accepté. En particulier, chez les compagnies
+low-costs. En revanche, les grandes compagnies historiques (et non low-costs)
+affaiblissent cette pré-condition : on peut se s&#8217;enregistrer avec un bagage
+bien plus gros sans avoir à payer de supplément (certes il partira en soute).<br/>
+Il en va de même pour les post-conditions : nous n&#8217;avons aucune garantie
+d&#8217;estomac rempli sans surcouts une fois à bord de l&#8217;avion. Sauf chez les
+compagnies traditionnelles qui assurent en sortie un estomac non vide.<br/>
+On peut donc dire a priori qu&#8217;une compagnie low-cost est une compagnie, de même
+qu&#8217;une compagnie traditionnelle.</p>
+
+<p>Côté invariants, un rectangle immuable a tous ses côtés perpendiculaires, un
+carré immuable a en plus tous ses côtés de longueur égale.</p>
+
+<p>Parmi les conséquences du LSP, on pourra déduire qu&#8217;une <em>liste triée</em> n&#8217;est pas
+substituable à une <em>liste</em>, ou qu&#8217;un <em>carré non immuable</em> n&#8217;est pas un
+<em>rectangle non immuable</em>. Je vous renvoie à la littérature et/ou la FAQ pour
+plus d&#8217;informations sur le sujet.</p>
+
+<h2>V- Remerciements</h2>
+
+<p>Un grand merci à tous mes relecteurs, correcteurs et détracteurs. J&#8217;ai nommé:
+Julien Blanc,
+Guilhem Bonnefille,
+David Côme,
+Sébastien Dinot,
+Iradrille,
+Philippe Lacour,
+Cédric Poncet-Montange</p>
+
+<h2>VI- Références</h2>
+
+<p>[<em>NdA: Je réorganiserai les liens au fur et à mesure des sorties des articles</em>]</p>
+
+<ul>
+<li><a id="Meyer1988"> </a>[Meyer2000] &mdash; <a href="http://www.editions-eyrolles.com/Livre/9782212122701/conception-et-programmation-orientees-objet"><em>Conception et programmation orientées objet</em></a> de Bertrand Meyer, Eyrolles, 1988, Seconde Édition parue en 2000</li>
+<li><a id="Dunksi2014"></a>[Dunksi2014] &mdash; <a href="http://www.d-booker.fr/programmation-et-langage/157-coder-efficacement.html"><em>Coder Efficacement &mdash; Bonnes pratiques et erreurs à éviter (en C++)</em></a> de Philippe Dunski, D-Booker, Février 2014</li>
+<li><a id="IPCpp"></a>[Wilson2004] &mdash; <em>Imperfect C++</em> de Matthew Wilson, Addisson-Wesley Professionnal, Octobre 2004.</li>
+<li><a id="Wilson2006"></a>[Wilson2006] &mdash; <a href="http://www.artima.com/cppsource/deepspace3.html"><em>Contract Programming 101</em></a>, Matthew Wilson, artima, Janvier 2006.</li>
+<li><a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3753.pdf">n3753</a></li>
+<li>Billets d&#8217;Andrzej<br/>
+Il s&#8217;agit là d&#8217;une excellente série d&#8217;articles/billets sur la PpC.
+
+<ul>
+<li><a href="http://akrzemi1.wordpress.com/2013/01/04/preconditions-part-i/">http://akrzemi1.wordpress.com/2013/01/04/preconditions-part-i/</a></li>
+<li><a href="http://akrzemi1.wordpress.com/2013/02/11/preconditions-part-ii/">http://akrzemi1.wordpress.com/2013/02/11/preconditions-part-ii/</a></li>
+<li><a href="http://akrzemi1.wordpress.com/2013/03/13/preconditions-part-iii/">http://akrzemi1.wordpress.com/2013/03/13/preconditions-part-iii/</a></li>
+<li><a href="http://akrzemi1.wordpress.com/2013/04/18/preconditions-part-iv/">http://akrzemi1.wordpress.com/2013/04/18/preconditions-part-iv/</a></li>
+</ul>
+</li>
+<li>Autres articles
+
+<ul>
+<li><a href="http://www.drdobbs.com/when-and-how-to-use-exceptions/184401836"><em>When and How to Use Exception</em></a>, Herb Sutter, August 01, 2004</li>
+<li><a href="http://blog.regehr.org/archives/1091">http://blog.regehr.org/archives/1091</a></li>
+<li><a href="http://pempek.net/articles/2013/11/16/assertions-or-exceptions/">http://pempek.net/articles/2013/11/16/assertions-or-exceptions/</a></li>
+<li><a href="http://pempek.net/articles/2013/11/17/cross-platform-cpp-assertion-library/">http://pempek.net/articles/2013/11/17/cross-platform-cpp-assertion-library/</a></li>
+<li><a href="http://julien-blanc.developpez.com/articles/cpp/Programmation_par_contrat_cplusplus/"><em>Programmation par contrat, application en C++</em></a>, de Julien Blanc, 14 décembre 2009<br/>
+Vous trouverez d&#8217;autres explications et d&#8217;autres techniques dans son
+article.</li>
+</ul>
+</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Le C++ Moderne]]></title>
@@ -219,7 +905,7 @@ des types dans la continuité du RAII : des pointeurs dit intelligents.</p>
 </span></code></pre></td></tr></table></div></figure>
 
 
-
+<p>Ou en version C++14 :</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>

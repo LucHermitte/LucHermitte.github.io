@@ -58,6 +58,7 @@
 <ul class="main-navigation">
   <li><a href="/">Blog</a></li>
   <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/about">About</a></li>
 </ul>
 
 </nav>
@@ -85,6 +86,9 @@
 
 
 <time datetime="2012-04-04T11:44:47+02:00" pubdate data-updated="true">Apr 4<span>th</span>, 2012</time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://LucHermitte.github.io">Comments</a>
         
       </p>
     
@@ -292,7 +296,7 @@ des types dans la continuité du RAII : des pointeurs dit intelligents.</p>
 </span></code></pre></td></tr></table></div></figure>
 
 
-
+<p>Ou en version C++14 :</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -436,8 +440,6 @@ ressources manipulées.</p>
     
       <div class="sharing">
   
-  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://LucHermitte.github.io/blog/2012/04/04/le-c-plus-plus-moderne/" data-via="" data-counturl="http://LucHermitte.github.io/blog/2012/04/04/le-c-plus-plus-moderne/" >Tweet</a>
-  
   
   
 </div>
@@ -446,17 +448,40 @@ ressources manipulées.</p>
     <p class="meta">
       
       
+        <a class="basic-alignment right" href="/blog/2014/05/24/programmation-par-contrat-un-peu-de-theorie/" title="Next Post: Programmation par Contrat 1/3 -- un peu de théorie">Programmation par Contrat 1/3 -- un peu de théorie &raquo;</a>
+      
     </p>
   </footer>
 </article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
 
 </div>
 
 <aside class="sidebar">
   
     <section>
+  <h1>About Me</h1>
+  <p>I'm a French C++ developper, and a long time vimmer</p>
+</section>
+<section>
+  <h1>Categories</h1>
+  <ul id="categories">
+    <li class='category'><a href='/blog/categories/c-/'>C++ (2)</a></li>
+
+  </ul>
+</section>
+<section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/05/24/programmation-par-contrat-un-peu-de-theorie/">Programmation Par Contrat 1/3 -- Un Peu De Théorie</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2012/04/04/le-c-plus-plus-moderne/">Le C++ Moderne</a>
@@ -495,9 +520,6 @@ ressources manipulées.</p>
 </section>
 
 
-
-
-
   
 </aside>
 
@@ -513,21 +535,27 @@ ressources manipulées.</p>
 </footer>
   
 
+<script type="text/javascript">
+      var disqus_shortname = 'luchermittegithubio';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://LucHermitte.github.io/blog/2012/04/04/le-c-plus-plus-moderne/';
+        var disqus_url = 'http://LucHermitte.github.io/blog/2012/04/04/le-c-plus-plus-moderne/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
 
 
 
 
 
 
-  <script type="text/javascript">
-    (function(){
-      var twitterWidgets = document.createElement('script');
-      twitterWidgets.type = 'text/javascript';
-      twitterWidgets.async = true;
-      twitterWidgets.src = '//platform.twitter.com/widgets.js';
-      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
-    })();
-  </script>
 
 
 
