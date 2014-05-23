@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Programmation par Contrat 3/3 -- snippets pour le C++"
-date: 2014-05-26 11:33:15 +0200
+date: 2014-05-27 11:33:15 +0200
 comments: true
 categories: C++
 published: true
