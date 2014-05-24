@@ -139,8 +139,21 @@ permet bien à la fonction de se dérouler correctement.
 
 Le cas _"j'ai fait tous mes calculs, ils sont faux, et je ne sais pas
 pourquoi"_ ne justifie pas une exception. Il s'agit d'une erreur de
-programmation ou de logique. Nous le verrons plus loin, et dans le prochain
-billet, ce cas est mieux traité avec des assertions.
+programmation ou de logique.  
+Prenons [Vil Coyote](http://fr.wikipedia.org/wiki/Vil_Coyote). Il a un plan
+splendide pour attraper Bip Bip -- c'est d'ailleurs la post-condition de son
+plan. Il détourne une route pour la faire arriver au pied d'une falaise, et il
+peint un tunnel sur le rocher. C'est un algo simple et efficace, Bip Bip
+devrait s'écraser sur la roche, et Vil aura son repas. Sauf que. Il y a un bug
+avec la peinture qu'il a intégrée (ou avec Bip Bip) : le volatile emprunte le
+tunnel. Vous connaissez tous la suite, Vil se lance à sa poursuite et boum. La
+post-condition n'est pas respectée car il y a un bug totalement inattendu dans
+les pièces que Vil a intégrées. Il n'y avait ici pas de raison de lancer une
+exception. La seule exception plausible c'est si Bip Bip venait à ne pas
+vouloir emprunter cette route.
+
+Bref, nous le verrons plus loin, et dans le prochain billet, ce cas de bug non
+anticipé est mieux traité avec des assertions.
 
 #### Les invariants
 Il y a plusieurs natures d'invariants. On va parler d'invariants pour des zones
