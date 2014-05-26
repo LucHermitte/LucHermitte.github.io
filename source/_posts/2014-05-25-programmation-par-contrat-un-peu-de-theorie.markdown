@@ -585,7 +585,7 @@ Cédric Poncet-Montange
 
 [_NdA: Je réorganiserai les liens au fur et à mesure des sorties des articles_]
 
-- <a id="Meyer1988"> </a>[Meyer2000] -- [_Conception et programmation orientées objet_](http://www.editions-eyrolles.com/Livre/9782212122701/conception-et-programmation-orientees-objet) de Bertrand Meyer, Eyrolles, 1988, Seconde Édition parue en 2000
+- <a id="Meyer1988"></a>[Meyer2000] -- [_Conception et programmation orientées objet_](http://www.editions-eyrolles.com/Livre/9782212122701/conception-et-programmation-orientees-objet) de Bertrand Meyer, Eyrolles, 1988, Seconde Édition parue en 2000
 - <a id="Dunksi2014"></a>[Dunksi2014] -- [_Coder Efficacement -- Bonnes pratiques et erreurs à éviter (en C++)_](http://www.d-booker.fr/programmation-et-langage/157-coder-efficacement.html) de Philippe Dunski, D-Booker, Février 2014
 - <a id="IPCpp"></a>[Wilson2004] -- _Imperfect C++_ de Matthew Wilson, Addisson-Wesley Professionnal, Octobre 2004.
 - <a id="Wilson2006"></a>[Wilson2006] -- [_Contract Programming 101_](http://www.artima.com/cppsource/deepspace3.html), Matthew Wilson, artima, Janvier 2006.

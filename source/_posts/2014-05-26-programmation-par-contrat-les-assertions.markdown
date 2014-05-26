@@ -10,10 +10,9 @@ footer: true
 
 Dans ce second billet sur la _Programmation par Contrat_, nous allons voir que
 faire des contrats une fois établis, et en particulier je vais vous présenter
-l'outil par excellence pour détecter les erreurs de programmation : les
-_assertions_.
+un outil dédié à la détection les erreurs de programmation : les _assertions_.
 
-## <a id="Documentation"></a>Documentation
+## I- <a id="Documentation"></a>Documentation
 
 Comme je l'avais signalé dans le précédent billet, la première chose que l'on
 peut faire à partir des contrats, c'est de les documenter clairement.
@@ -25,7 +24,7 @@ L'outil [Doxygen](http://doxygen.org) met à notre disposition les tags `@pre`,
 vous conseiller d'en user et d'en abuser.
 
 
-## Comment prendre en compte les contrats dans le code ?
+## II- Comment prendre en compte les contrats dans le code ?
 
 À partir d'un contrat bien établi, nous avons techniquement plusieurs choix en
 C++. 
@@ -48,26 +47,27 @@ série de billets est de combattre cette habitude.
 
 À l'opposé, on peut prendre la voie de la _Programmation Défensive_ et vérifier
 chaque rupture potentielle de contrat pour lever une exception. Au delà des
-problèmes de conceptions et de déresponsabilisation évoqués dans le billet
-précédent, il y a un soucis technique.
+problèmes de conceptions et de déresponsabilisation évoqués dans le
+[billet précédent](%post_url 2014-05-25-programmation-par-contrat-un-peu-de-theorie.markdown%),
+il y a un soucis technique.
 
 En effet, en temps normal avec une exception en C++, on ne peut rien avoir de
 mieux que des informations sur le lieu de la détection. Et encore faut-il
 disposer de classes _exception_ qui stockent une telle information ; ce n'est
-par exemple par le cas des `std::logic_error` qui sont levées depuis des
+par exemple pas le cas des `std::logic_error` qui sont levées depuis des
 fonctions comme `std::vector<>::at()`.
 
-Par _rien de mieux que le lieu de la détection_, il faut comprendre que l'on ne
-disposera d'aucune autre information de contexte. En effet, une exception
+Par _"rien de mieux que le lieu de la détection"_, il faut comprendre que l'on
+ne disposera d'aucune autre information de contexte. En effet, une exception
 remonte jusqu'à un `catch` compatible ; or à l'endroit du `catch`, on ne peut
 plus avoir accès à l'état (de toutes les variables, dans tous les threads, ...)
 au moment de la détection du problème.
 
-En vérité, il y existe deux moyens peu ergonimiques d'y avoir accès. Le prémier
-consiste à mettre des points d'arrêt sur les levers ou les constructions
-d'exception, et à exécuter le programme depuis un débuggueur. Le second
-consiste à supprimer du code source tous les `catchs` qui sont compatibles avec
-l'erreur de logique.
+En vérité, il y existe deux moyens peu ergonimiques pour y avoir accès. Le
+prémier consiste à mettre des points d'arrêt sur les levers ou les
+constructions d'exceptions, et à exécuter le programme depuis un débuggueur. Le
+second consiste à supprimer du code source tous les `catchs` qui sont
+compatibles avec l'erreur de logique.
 
 Aucune des deux options n'est véritablement envisageable pour des tests
 automatisés. Elles le sont en revanche pour investiguer.
@@ -86,7 +86,8 @@ POSIX, on peut déclencher des _coredumps_ par programmation et ce sans
 interrompre le cours de l'exécution. Cela peut être fait depuis les
 constructeurs de nos exceptions de logique (Voir
 [ceci](http://stackoverflow.com/a/979297), ou
-[ceci](http://stackoverflow.com/a/18581317)).
+[celà](http://stackoverflow.com/a/18581317)).
+
 
 ### Option 3 : on formalise nos suppositions à l'aide d'assertions
 
@@ -220,35 +221,90 @@ avec son résultat.
 
 NB: l'équivalent existe pour d'autres environnements comme VC++.
 
-#### Un outil pour les phases de développement et de tests ...
+#### <a id="Phases"></a>Un outil pour les phases de développement et de tests ...
+
+Je vais paraphraser [[Wilson2006] §1.1.](Wilson2006), qui énonçait déjà des
+évidences : _"Plus tôt on détecte une erreur, mieux c'est"_.  C'est un adage
+que vous devez déjà connaitre. Concrêtement, cela veut dire que l'on va
+préférer trouver nos erreurs, dans l'ordre :
+
+1. lors de la phase de conception,
+2. lors la compilation,
+3. lors de l'analyse statique du code
+4. lors des tests unitaires,
+5. lors des tests en _debug_,
+6. en pré-release/phase béta,
+7. en production.
+
+Je traiterai rapidement de la phase 2. de compilation en
+[fin de ce billet](#VerificationsStatiques).  
+Les assertions pour leur part interviennent lors des phases 4. et 5.
 
 Les assertions ne sont vérifiées que si `NDEBUG` n'est pas défini au moment de
 la précompilation. Généralement, sa définition accompagne le mode _Release_ de
 VC++ et de CMake. Ce qui veut dire qu'en mode _Release_ aucune assertion n'est
-vérifiée, soit qu'en production, les assertions sont normalement ignorées. Le
+vérifiée. Soit qu'en production, les assertions sont normalement ignorées. Le
 corolaire de tout cela est que les assertions sont un outil de vérification de
 la logique applicative qui n'est utilisé qu'en phases de développement et de
 tests.
 
-détection en phase compilation > TU > Test intégration/validation > production
-(A rédiger...)
+Ce n'est certes pas le plus tôt que l'on puisse faire, mais c'est déjà quelque
+chose qui intervient avant que des utilisateurs manipulent le produit final.
 
 #### ... voire de production
 
-Prog def si vraiment on veut -> on définit comme il nous plait les macros.
-(A rédiger...)
+Bien que les assertions ne soient censées porter que sur ces phases 4. et 5., il
+est possible de les détourner en phases 6. et 7. pour tenter de rendre plus
+robuste le produit en le faisant résister aux erreurs de programmation qui ont
+échappé à notre vigilance lors des phases précédentes.
+
+On entre dans le royaume de la _Programmation Défensive_ que j'ai déjà
+abondamment décrit.
+
+Comment peut-on détourner les assertions ? Tout simplement en détournant leur
+définition. N'oublions pas que les assertions sont des macros dont le
+comportement exact dépend de la définition de `NDEBUG`.
+
+Une façon assez sale de faire serait p.ex.:
+```c++
+#if defined(NDEBUG)
+#   define my_assert(condition_, message_) \
+       if (!(condition_)) throw std::logic_error(message_)
+#else
+#   define my_assert(condition_, message_) \
+       assert(condition_ && message_)
+#endif
+```
+
 
 #### Techniques connexes
-paramètre -> message `assert(condition && "explications");` ou `assert(!"explications");`
-(A rédiger...)
 
+Il est possible de rendre les messages produits par `assert` un petit peu plus
+compréhensibles en profitant du fonctionnement interne de la macro.
+
+Exemples :
+```c++
+assert(n>=0 && "sqrt can't process negative numbers");
+```
+
+```c++
+switch (myEnum) {
+    case Enum::first: .... break;
+    case Enum::second: .... break;
+    default:
+        assert(!"Unexpected case");
+}
+```
 
 #### Exploitation des assertions par les outils d'analyse statique de code
 
-À mon grand regret, les outils d'analyse statique de code comme [clang
-analyzer](http://clang-analyzer.llvm.org/) ne semblent pas exploiter les
-assertions pour détecter statiquement des erreurs de logique. Au contraire, ils
-les utilisent pour inhiber l'analyse de certains chemins d'exécution.
+Les outils d'analyse statique de code comme
+[clang analyzer](http://clang-analyzer.llvm.org/) sont très intéressants. En
+effet, ils interviennent en [phase 3](#Phases). Seulement, à mon grand regret,
+ils ne semblent pas exploiter les assertions pour détecter statiquement des
+erreurs de logique.
+Au contraire, ils utilisent les assertions pour inhiber l'analyse de certains
+chemins d'exécution.
 
 Ainsi, dans l'exemple de `test-assert.cpp` que j'ai donné plus haut, les outils
 d'analyse statique de code ne feront pas le rapprochement entre la
@@ -256,7 +312,7 @@ post-condition de `my::sin` et la pré-conditon de `my::sqrt`, mais feront
 plutôt comme si les assertions étaient toujours vraies, c'est à dire comme si
 le code n'appelait jamais `my::sqrt` avec un nombre négatif.
 
-NB: Je généralise à partir de mon test avec clang analyzer. Peut-être que
+NB: Je généralise à partir de mon test avec _clang analyzer_. Peut-être que
 d'autres outils savent tirer parti des contrats déclarés à l'aide d'assertions,
 ou peut-être le sauront-ils demain.  
 Pour information, je n'ai pas eu l'occasion de tester des outils comme _Code
@@ -264,10 +320,10 @@ Contract_ (pour .NET), Ada2012 (si on sort du périmètre du C++) ni même
 _Polyspace_.
 
 
-### Le standard s'enrichira-t-il en 2014/2017 pour programmer avec des contrats ?
+## III- Le standard s'enrichira-t-il en 2017 pour programmer avec des contrats ?
 
 Il y a déjà eu des propositions de mots clés plus ou moins sémantiquement forts
-pour supporter en standard la PpC en C++. Dans la dernière en date, 
+pour supporter la PpC en standard en C++. Dans la dernière en date, 
 [n3753](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3753.pdf),
 John Lakos et Alexei Zakharov introduisent un ensemble de macros `pre_assert`
 assez flexible.
@@ -287,10 +343,11 @@ parfaitement applicable aux post-conditions et aux invariants.
 [bibliothèque BDE/BSL](https://github.com/bloomberg/bde) sous licence MIT.
 
 
-## Invariants statiques
+## IV- <a id="VerificationsStatiques"></a>Invariants statiques
 
-(A rédiger...)
+(TODO: A rédiger...)
 
+- assertions statiques
 - références
 - boost.unit
 - objet pertinent
