@@ -4,7 +4,7 @@
   <title><![CDATA[Category: C++ | Luc Hermitte's Blog]]></title>
   <link href="http://LucHermitte.github.io/blog/categories/c-plus-plus/atom.xml" rel="self"/>
   <link href="http://LucHermitte.github.io/"/>
-  <updated>2014-05-24T14:42:08+02:00</updated>
+  <updated>2014-05-27T11:58:26+02:00</updated>
   <id>http://LucHermitte.github.io/</id>
   <author>
     <name><![CDATA[Luc Hermitte]]></name>
@@ -307,7 +307,7 @@ les deux est subtile.</p>
 d'autres objectifs orthogonaux à ce qui est discuté dans ces billets : elle est
 aussi utilisée pour introduire une tolérance aux erreurs matérielles, limiter
 les conséquences de ces erreurs (comme les corruptions de mémoire).  C'est un
-aspect que je n'aborde pas dans le cadre de la comparaison avec le PpC.</em></p>
+aspect que je n'aborde pas dans le cadre de la comparaison avec la PpC.</em></p>
 
 <h3>III.1- Présentons la Programmation Défensive</h3>
 
@@ -525,11 +525,11 @@ se passe. Traditionnellement, les débutants tendent à être formés de la sort
 <p>Seulement, on complexifie grandement la base de code avec cette approche.
 Les erreurs (de programmations et logiques) sont mélangées aux cas dégradés du
 <em>runtime</em>. Nous avons une vision plus floue, des fonctions plus complexes qui
-propagent et rattrapent des exceptions qui ne sont censées se produire.<br/>
+propagent et rattrapent des exceptions qui ne sont pas censées se produire.<br/>
 Bref, nous avons une logique d'ensemble plus difficile à maîtriser.</p>
 
 <p>Les cas dégradés induits par nos métiers complexifient déjà grandement les
-applications. Rajouter au milieu du code de gestion des erreurs de
+applications. Rajouter, au milieu de cela, du code pour gérer les erreurs de
 programmation complexifie encore plus les systèmes. D'ailleurs, ne
 rajoutent-ils pas de nouveaux risques de bugs ?</p>
 
@@ -603,13 +603,14 @@ quelles,</li>
 bagages acceptés sans surcouts. Pour toutes les compagnies, un bagage de
 50x40x20cm sera toujours accepté. En particulier, chez les compagnies
 low-costs. En revanche, les grandes compagnies historiques (et non low-costs)
-affaiblissent cette pré-condition : on peut se s'enregistrer avec un bagage
+affaiblissent cette pré-condition : on peut s'enregistrer avec un bagage
 bien plus gros sans avoir à payer de supplément (certes il partira en soute).<br/>
 Il en va de même pour les post-conditions : nous n'avons aucune garantie
 d'estomac rempli sans surcouts une fois à bord de l'avion. Sauf chez les
 compagnies traditionnelles qui assurent en sortie un estomac non vide.<br/>
-On peut donc dire a priori qu'une compagnie low-cost est une compagnie, de même
-qu'une compagnie traditionnelle.</p>
+On peut donc dire a priori qu'une <em>compagnie low-cost</em> est une <em>compagnie
+aérienne</em>, de même qu'une <em>compagnie traditionnelle</em> est une <em>compagnie
+aérienne</em>.</p>
 
 <p>Côté invariants, un rectangle immuable a tous ses côtés perpendiculaires, un
 carré immuable a en plus tous ses côtés de longueur égale.</p>
@@ -635,7 +636,7 @@ Cédric Poncet-Montange</p>
 <p>[<em>NdA: Je réorganiserai les liens au fur et à mesure des sorties des articles</em>]</p>
 
 <ul>
-<li><a id="Meyer1988"> </a>[Meyer2000] &mdash; <a href="http://www.editions-eyrolles.com/Livre/9782212122701/conception-et-programmation-orientees-objet"><em>Conception et programmation orientées objet</em></a> de Bertrand Meyer, Eyrolles, 1988, Seconde Édition parue en 2000</li>
+<li><a id="Meyer1988"></a>[Meyer2000] &mdash; <a href="http://www.editions-eyrolles.com/Livre/9782212122701/conception-et-programmation-orientees-objet"><em>Conception et programmation orientées objet</em></a> de Bertrand Meyer, Eyrolles, 1988, Seconde Édition parue en 2000</li>
 <li><a id="Dunksi2014"></a>[Dunksi2014] &mdash; <a href="http://www.d-booker.fr/programmation-et-langage/157-coder-efficacement.html"><em>Coder Efficacement &mdash; Bonnes pratiques et erreurs à éviter (en C++)</em></a> de Philippe Dunski, D-Booker, Février 2014</li>
 <li><a id="IPCpp"></a>[Wilson2004] &mdash; <em>Imperfect C++</em> de Matthew Wilson, Addisson-Wesley Professionnal, Octobre 2004.</li>
 <li><a id="Wilson2006"></a>[Wilson2006] &mdash; <a href="http://www.artima.com/cppsource/deepspace3.html"><em>Contract Programming 101</em></a>, Matthew Wilson, artima, Janvier 2006.</li>
