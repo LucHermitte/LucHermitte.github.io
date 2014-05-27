@@ -445,6 +445,18 @@ constructeur, nous aurions à la place la garantie que soit l'objet existe et
 il est utilisable, soit l'objet n'existe pas et aucune question ne se pose,
 nulle part. 
 
+N.B. : il existe des infractions à cette règle. Une des plus visible vient du
+[C++ Style Guide de Google](http://google-styleguide.googlecode.com/svn/trunk/cppguide.xml?showone=Forward_Declarations#Doing_Work_in_Constructors).
+Dans la mesure où les exceptions sont interdites dans leur base de code (car la
+quantité de vieux code sans exceptions est trop importante), il ne reste plus
+aucun moyen de faire échouer des constructeurs. On perd l'invariant statique,
+il devient alors nécessaire de procéder à des initialisations en deux phases.  
+Si vous n'avez pas de telle contrainte de _"pas d'exceptions"_ sur vos projets,
+bannissez les fonctions `init()` de votre vocabulaire.
+
+Ceci dit, le recourt à des _factories_ permet de retrouver un semblant
+d'invariant statique.
+
 #### Choisir le bon type de pointeur
 
 Avec le C++11 nous avons l'embarras du choix pour choisir comment manipuler des
