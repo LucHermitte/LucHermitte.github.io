@@ -48,14 +48,15 @@ série de billets est de combattre cette habitude.
 À l'opposé, on peut prendre la voie de la _Programmation Défensive_ et vérifier
 chaque rupture potentielle de contrat pour lever une exception. Au delà des
 problèmes de conceptions et de déresponsabilisation évoqués dans le
-[billet précédent](%post_url 2014-05-25-programmation-par-contrat-un-peu-de-theorie.markdown%),
+[billet précédent]({%post_url 2014-05-24-programmation-par-contrat-un-peu-de-theorie%}),
 il y a un soucis technique.
 
 En effet, en temps normal avec une exception en C++, on ne peut rien avoir de
-mieux que des informations sur le lieu de la détection. Et encore faut-il
-disposer de classes _exception_ qui stockent une telle information ; ce n'est
-par exemple pas le cas des `std::logic_error` qui sont levées depuis des
-fonctions comme `std::vector<>::at()`.
+mieux que des informations sur le lieu de la détection (_i.e._ :` __FILE__` et
+`__LINE__`). Et encore faut-il disposer de classes _exception_ conçues pour
+stocker une telle information ; ce n'est par exemple pas le cas des
+`std::logic_error` qui sont levées depuis des fonctions comme
+`std::vector<>::at()`.
 
 Par _"rien de mieux que le lieu de la détection"_, il faut comprendre que l'on
 ne disposera d'aucune autre information de contexte. En effet, une exception
@@ -63,14 +64,15 @@ remonte jusqu'à un `catch` compatible ; or à l'endroit du `catch`, on ne peut
 plus avoir accès à l'état (de toutes les variables, dans tous les threads, ...)
 au moment de la détection du problème.
 
-En vérité, il y existe deux moyens peu ergonimiques pour y avoir accès. Le
-prémier consiste à mettre des points d'arrêt sur les levers ou les
+En vérité, il y existe deux moyens peu ergonomiques pour y avoir accès. Le
+premier consiste à mettre des points d'arrêt sur les levers ou les
 constructions d'exceptions, et à exécuter le programme depuis un débuggueur. Le
 second consiste à supprimer du code source tous les `catchs` qui sont
 compatibles avec l'erreur de logique.
 
-Aucune des deux options n'est véritablement envisageable pour des tests
-automatisés. Elles le sont en revanche pour investiguer.
+Aucune de ces deux options n'est véritablement envisageable pour des tests
+automatisés ; et la seconde l'est encore moins pour du code qui va aller en
+production. Ces options sont en revanche envisageables pour investiguer. 
 
 À noter aussi qu'avec cette approche, on paie tout le temps un coût de
 vérification des contrats, que cela soit en phase de tests comme en phase de
@@ -96,7 +98,7 @@ les erreurs de programmation : les assertions.
 
 En effet, compilé sans la directive de précompilation `NDEBUG`, une assertion
 va arrêter un programme et créer un fichier _core_. Il est ensuite possible
-d'ouvrir le fichier _core_ depuis le debuggueur pour pouvoir explorer l'état du
+d'ouvrir le fichier _core_ depuis le débuggueur pour pouvoir explorer l'état du
 programme au moment de la détection de l'erreur.
 
 #### Exemple d'exploitation des assertions
@@ -219,13 +221,13 @@ comprendre que la fonction fautive n'était pas `sin` mais ce que l'on faisait
 avec son résultat.
 
 
-NB: l'équivalent existe pour d'autres environnements comme VC++.
+N.B.: l'équivalent existe pour d'autres environnements comme VC++.
 
 #### <a id="Phases"></a>Un outil pour les phases de développement et de tests ...
 
 Je vais paraphraser [[Wilson2006] §1.1.](Wilson2006), qui énonçait déjà des
 évidences : _"Plus tôt on détecte une erreur, mieux c'est"_.  C'est un adage
-que vous devez déjà connaitre. Concrêtement, cela veut dire que l'on va
+que vous devez déjà connaitre. Concrètement, cela veut dire que l'on va
 préférer trouver nos erreurs, dans l'ordre :
 
 1. lors de la phase de conception,
@@ -300,7 +302,7 @@ switch (myEnum) {
 
 Les outils d'analyse statique de code comme
 [clang analyzer](http://clang-analyzer.llvm.org/) sont très intéressants. En
-effet, ils interviennent en [phase 3](#Phases). Seulement, à mon grand regret,
+plus, ils interviennent en [phase 3](#Phases)! Seulement, à mon grand regret,
 ils ne semblent pas exploiter les assertions pour détecter statiquement des
 erreurs de logique.
 Au contraire, ils utilisent les assertions pour inhiber l'analyse de certains
@@ -308,11 +310,11 @@ chemins d'exécution.
 
 Ainsi, dans l'exemple de `test-assert.cpp` que j'ai donné plus haut, les outils
 d'analyse statique de code ne feront pas le rapprochement entre la
-post-condition de `my::sin` et la pré-conditon de `my::sqrt`, mais feront
+post-condition de `my::sin` et la pré-condition de `my::sqrt`, mais feront
 plutôt comme si les assertions étaient toujours vraies, c'est à dire comme si
 le code n'appelait jamais `my::sqrt` avec un nombre négatif.
 
-NB: Je généralise à partir de mon test avec _clang analyzer_. Peut-être que
+N.B.: Je généralise à partir de mon test avec _clang analyzer_. Peut-être que
 d'autres outils savent tirer parti des contrats déclarés à l'aide d'assertions,
 ou peut-être le sauront-ils demain.  
 Pour information, je n'ai pas eu l'occasion de tester des outils comme _Code
@@ -345,12 +347,122 @@ parfaitement applicable aux post-conditions et aux invariants.
 
 ## IV- <a id="VerificationsStatiques"></a>Invariants statiques
 
-(TODO: A rédiger...)
+Pour conclure, il est important de remarquer que certains contrats peuvent être
+retranscrit de manière plus forte qu'une assertion qui ne sera vérifiée qu'en
+phase de tests.
 
-- assertions statiques
-- références
-- boost.unit
-- objet pertinent
-- les divers types de pointeurs (cf. prochain billet)
-- init vs constructeur
+En effet, le compilateur peut en prendre certains à sa charge.
+
+#### Les assertions statiques sont nos amies
+Elles sont beaucoup utilisées lors de l'écriture de classes et fonctions
+génériques pour s'assurer que les arguments _templates_ vérifient certaines
+contraintes.  
+Mais c'est loin d'être le seul cas d'utilisation. Je m'en sers
+également pour vérifier que j'ai autant de chaines de caractères que de valeurs
+dans un énuméré. Avec mes [plugins pour vim](https://code.google.com/p/lh-vim/wiki/lhCpp),
+je génère automatiquement ce genre de choses avec `:InsertEnum MyEnum one two
+three` :
+
+```c++
+// .h
+... includes qui vont bien
+struct MyEnum {
+    enum Type { one, two, three, MAX__, UNDEFINED__, FIRST__=0 };
+    ...
+    MyEnum(std::string const& s);
+    char const* toString() const;
+    ...
+private:
+    Type m_value;
+};
+
+// .cpp
+... includes qui vont bien
+namespace  { // Anonymous namespace
+    typedef char const* const* strings_iterator;
+    static char const* const MYENUM_STRINGS[] =
+    { "one", "two", "three" };
+} // Anonymous namespace
+...
+char const* MyEnum::toString() const
+{
+    // v-- Ici se trouve l'assertion statique
+    static_assert(MAX__ == std::extent<decltype(::MYENUM_STRINGS)>::value, "Array size mismatches number of elements in enum");
+    assert(m_value != UNDEFINED__); // Yes, I know UNDEFINED__ > MAX__
+    assert(m_value < MAX__);
+    return MYENUM_STRINGS[m_value];
+}
+```
+
+#### Préférez les références aux pointeurs
+Dans la signature d'une fonction, les références posent une pré-condition : la
+valeur passée en paramètre par référence doit être non nulle -- à charge au
+code client de vérifier cela.
+
+Dans le corps de la fonction, elles deviennent pratiquement un invariant : à
+partir de là, il est certain que la chose manipulée indirectement est censée
+exister. Il n'y a plus besoin de tester un pointeur, que cela soit avec une
+assertion (PpC), ou avec un test dynamique (Programmation Défensive).  
+Certes, cela ne protège pas des cas où la donnée est partagée depuis un
+autre thread où elle pourrait être détruite.
+
+John Carmack recommande leur utilisation (en place de pointeurs) dans un
+[billet sur l'analyse statique de code](http://www.altdevblogaday.com/2011/12/24/static-code-analysis/)
+publié sur #AltDevBlog.
+
+#### boost.unit
+[boost.unit](http://boost.org/libs/units) est le genre de bibliothèque qui
+aurait pu sauver une fusée. L'idée est de ne plus manipuler de simples valeurs
+numériques, mais des quantités physiques. Non seulement on ne peut pas additionner des
+masses à des longueurs, mais en plus l'addition de masses va prendre en compte
+les ordres de grandeur.  
+Bref, on type fortement toutes les quantités numériques selon les unités du
+[Système International](http://fr.wikipedia.org/wiki/Syst%C3%A8me_international_d%27unit%C3%A9s).
+
+#### Une variable devrait toujours être pertinente et utilisable
+Un objet devrait toujours avoir pour invariant : _est dans un état pertinent et
+utilisable_. Concrètement, cela implique deux choses pour le développeur.
+
+1. Un tel invariant se positionne à la sortie du constructeur de l'objet.
+2. On doit retarder la définition/déclaration d'une variable jusqu'à ce que
+   l'on soit capable de lui donner valeur pertinente, et préférentiellement
+   définitive.
+
+Un futur point de la FAQ C++ de développez traitera plus en détails de cela. Je
+donnerai le lien quand nous aurons finalisé cette entrée.  
+_[N.B.: pour ceux qui ont les droits d'accès, la discussion se passe par [là](http://www.developpez.net/forums/d1422877-2/c-cpp/cpp/priv-ressources-cpp/faq-cpp/dois-declarer-variables-locales/).]_
+
+#### Corolaire : préférez les constructeurs aux fonctions `init()` et autres _setters_
+Dans la continuité du point précédent, il faut éviter toute initialisation qui
+se produit après la construction d'un objet. En effet, si l'objet nécessite
+deux appels de fonction pour être correctement initialisé, il y a de grands
+risques que le second appel soit purement et simplement oublié. Il faut de fait
+tester dynamiquement dans chaque fonction de l'objet s'il a bien été initialisé
+avant de tenter de s'en servir.
+
+Si le positionnement de l'invariant d'_utilisabilité_ se fait en sortie du
+constructeur, nous aurions à la place la garantie que soit l'objet existe et
+il est utilisable, soit l'objet n'existe pas et aucune question ne se pose,
+nulle part. 
+
+#### Choisir le bon type de pointeur
+
+Avec le C++11 nous avons l'embarras du choix pour choisir comment manipuler des
+entités ou des données dynamiques. Entre, `std::unique_ptr<>`,
+`std::shared_ptr`, `boost::ptr_vector`, les références, les pointeurs bruts
+(/nus), `std::optional<>` (C++14), _etc._, on peut avoir l'impression que c'est
+la jungle.
+
+Quel rapport avec les invariants statiques ? Et bien, comme pour les références
+`std::unique_ptr<>`, apporte une garantie supplémentaire par rapport à un
+simple pointeur brut.
+Ce type assure que la fonction qui réceptionne le pointeur en devient
+responsable alors que l'émetteur s'est débarrassé de la patate chaude. Et le
+compilateur est là pour entériner la transaction et faire en sorte que les deux
+intervenants respectent bien ce contrat de passation de responsabilité.
+
+Je pense que j'y reviendrai dans un prochain billet. En attendant, je ne peux
+que vous conseiller la lecture de cette
+[présentation](http://exceptionsafecode.com/slides/svcc/2013/shared_ptr.pdf)
+assez exhaustive d'Ahmed Charles.
 
