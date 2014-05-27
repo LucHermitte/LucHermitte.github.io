@@ -286,7 +286,7 @@ _Tout d'abord une petite remarque importante, la Programmation Défensive a
 d'autres objectifs orthogonaux à ce qui est discuté dans ces billets : elle est
 aussi utilisée pour introduire une tolérance aux erreurs matérielles, limiter
 les conséquences de ces erreurs (comme les corruptions de mémoire).  C'est un
-aspect que je n'aborde pas dans le cadre de la comparaison avec le PpC._
+aspect que je n'aborde pas dans le cadre de la comparaison avec la PpC._
 
 ### III.1- Présentons la Programmation Défensive
 
@@ -483,11 +483,11 @@ se passe. Traditionnellement, les débutants tendent à être formés de la sort
 Seulement, on complexifie grandement la base de code avec cette approche.
 Les erreurs (de programmations et logiques) sont mélangées aux cas dégradés du
 _runtime_. Nous avons une vision plus floue, des fonctions plus complexes qui
-propagent et rattrapent des exceptions qui ne sont censées se produire.  
+propagent et rattrapent des exceptions qui ne sont pas censées se produire.  
 Bref, nous avons une logique d'ensemble plus difficile à maîtriser.
 
 Les cas dégradés induits par nos métiers complexifient déjà grandement les
-applications. Rajouter au milieu du code de gestion des erreurs de
+applications. Rajouter, au milieu de cela, du code pour gérer les erreurs de
 programmation complexifie encore plus les systèmes. D'ailleurs, ne
 rajoutent-ils pas de nouveaux risques de bugs ?
 
@@ -554,13 +554,14 @@ Prenons par exemple, une compagnie aérienne. Elle a des pré-requis sur les
 bagages acceptés sans surcouts. Pour toutes les compagnies, un bagage de
 50x40x20cm sera toujours accepté. En particulier, chez les compagnies
 low-costs. En revanche, les grandes compagnies historiques (et non low-costs)
-affaiblissent cette pré-condition : on peut se s'enregistrer avec un bagage
+affaiblissent cette pré-condition : on peut s'enregistrer avec un bagage
 bien plus gros sans avoir à payer de supplément (certes il partira en soute).  
 Il en va de même pour les post-conditions : nous n'avons aucune garantie
 d'estomac rempli sans surcouts une fois à bord de l'avion. Sauf chez les
 compagnies traditionnelles qui assurent en sortie un estomac non vide.  
-On peut donc dire a priori qu'une compagnie low-cost est une compagnie, de même
-qu'une compagnie traditionnelle.
+On peut donc dire a priori qu'une _compagnie low-cost_ est une _compagnie
+aérienne_, de même qu'une _compagnie traditionnelle_ est une _compagnie
+aérienne_.
 
 Côté invariants, un rectangle immuable a tous ses côtés perpendiculaires, un
 carré immuable a en plus tous ses côtés de longueur égale.

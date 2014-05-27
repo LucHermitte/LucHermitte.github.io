@@ -197,7 +197,7 @@ private:
 }
 ```
 
-NB: je vois à la relecture d'_Imperfect C++_ que c'est très proche de ce que
+N.B.: je vois à la relecture d'_Imperfect C++_ que c'est très proche de ce que
 suggérait Matthew Wilson. Au détail qu'il passe par une fonction `is_valid`
 renvoyant un booléen et que l'`InvariantChecker` s'occupe de vérifier
 l'assertion si `MYLIB_DBC_ACTIVATED` est bien défini -- il découple la
@@ -220,8 +220,11 @@ Dans le même genre d'idée, nous nous retrouverions dans la même situation que
 si on utilisait des constructeurs qui ne garantissent pas l'invariant de leurs
 classes, et qui sont utilisés conjointement avec des fonctions `init()`. En
 effet, si l'invariant ne peut plus être assuré statiquement par programmation,
-il est nécessaire de l'assurer dynamiquement en vérifiant en debut de chaque
+il est nécessaire de l'assurer dynamiquement en vérifiant en début de chaque
 fonction membre (/amie) si l'objet est bien valide.
 
 C'est pour tout ces raisons que je ne suis pas d'accord avec cette critique.
 (TODO: à reformuler)
+
+#### Les objets cassé
+TODO:
