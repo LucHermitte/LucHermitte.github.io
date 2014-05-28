@@ -4,7 +4,7 @@
   <title><![CDATA[Category: C++ | Luc Hermitte's Blog]]></title>
   <link href="http://LucHermitte.github.io/blog/categories/c-plus-plus/atom.xml" rel="self"/>
   <link href="http://LucHermitte.github.io/"/>
-  <updated>2014-05-27T11:58:26+02:00</updated>
+  <updated>2014-05-28T19:20:59+02:00</updated>
   <id>http://LucHermitte.github.io/</id>
   <author>
     <name><![CDATA[Luc Hermitte]]></name>
@@ -14,6 +14,534 @@
 
   
   <entry>
+    <title type="html"><![CDATA[Programmation Par Contrat 2/3 -- Les Assertions]]></title>
+    <link href="http://LucHermitte.github.io/blog/2014/05/28/programmation-par-contrat-les-assertions/"/>
+    <updated>2014-05-28T12:07:42+02:00</updated>
+    <id>http://LucHermitte.github.io/blog/2014/05/28/programmation-par-contrat-les-assertions</id>
+    <content type="html"><![CDATA[<p>Dans ce second billet sur la <em>Programmation par Contrat</em>, nous allons voir que
+faire des contrats une fois établis, et en particulier je vais vous présenter
+un outil dédié à la détection les erreurs de programmation : les <em>assertions</em>.</p>
+
+<h2>I- <a id="Documentation"></a>Documentation</h2>
+
+<p>Comme je l'avais signalé dans le précédent billet, la première chose que l'on
+peut faire à partir des contrats, c'est de les documenter clairement.
+Il s'agit probablement d'une des choses les plus importantes à documenter dans
+un code source. Et malheureusement trop souvent c'est négligé.</p>
+
+<p>L'outil <a href="http://doxygen.org">Doxygen</a> met à notre disposition les tags <code>@pre</code>,
+<code>@post</code>, et <code>@invariant</code> pour documenter nos contrats. Je ne peux que
+vous conseiller d'en user et d'en abuser.</p>
+
+<h2>II- Comment prendre en compte les contrats dans le code ?</h2>
+
+<p>À partir d'un contrat bien établi, nous avons techniquement plusieurs choix en
+C++.</p>
+
+<h3>Option 1 : on ne fait rien</h3>
+
+<p>Il est tout d'abord possible de totalement ignorer les ruptures de
+contrats et de ne jamais rien vérifier.</p>
+
+<p>Quand une erreur de programmation survient, quand on est chanceux, on détecte
+le problème au plus proche de l'erreur. Malheureusement, en C et en C++, les
+problèmes tendent à survenir bien plus tard.</p>
+
+<p>Cette mauvaise pratique consistant à ignorer les contrats (ou à ne pas s'en
+préoccuper) est assez répandue. Je ne cache pas que l'un des objectifs de cette
+série de billets est de combattre cette habitude.</p>
+
+<h3>Option 2 : on lance des exceptions dans la tradition de la Programmation Défensive</h3>
+
+<p>À l'opposé, on peut prendre la voie de la <em>Programmation Défensive</em> et vérifier
+chaque rupture potentielle de contrat pour lever une exception. Au delà des
+problèmes de conceptions et de déresponsabilisation évoqués dans le
+<a href="/blog/2014/05/24/programmation-par-contrat-un-peu-de-theorie/">billet précédent</a>,
+il y a un soucis technique.</p>
+
+<p>En effet, en temps normal avec une exception en C++, on ne peut rien avoir de
+mieux que des informations sur le lieu de la détection (<em>i.e.</em> :<code>__FILE__</code> et
+<code>__LINE__</code>). Et encore faut-il disposer de classes <em>exception</em> conçues pour
+stocker une telle information ; ce n'est par exemple pas le cas des
+<code>std::logic_error</code> qui sont levées depuis des fonctions comme
+<code>std::vector&lt;&gt;::at()</code>.</p>
+
+<p>Par <em>&ldquo;rien de mieux que le lieu de la détection&rdquo;</em>, il faut comprendre que l'on
+ne disposera d'aucune autre information de contexte. En effet, une exception
+remonte jusqu'à un <code>catch</code> compatible ; or à l'endroit du <code>catch</code>, on ne peut
+plus avoir accès à l'état (de toutes les variables, dans tous les threads, &hellip;)
+au moment de la détection du problème.</p>
+
+<p>En vérité, il y existe deux moyens peu ergonomiques pour y avoir accès. Le
+premier consiste à mettre des points d'arrêt sur les levers ou les
+constructions d'exceptions, et à exécuter le programme depuis un débuggueur. Le
+second consiste à supprimer du code source tous les <code>catchs</code> qui sont
+compatibles avec l'erreur de logique.</p>
+
+<p>Aucune de ces deux options n'est véritablement envisageable pour des tests
+automatisés ; et la seconde l'est encore moins pour du code qui va aller en
+production. Ces options sont en revanche envisageables pour investiguer.</p>
+
+<p>À noter aussi qu'avec cette approche, on paie tout le temps un coût de
+vérification des contrats, que cela soit en phase de tests comme en phase de
+production.  Et ce, même pour des morceaux de code où il est certain qu'il n'y
+a pas d'erreur de programmation.<br/>
+Par exemple, <code>sqrt(1-sin(x))</code> ne devrait poser aucun soucis. Une fonction sinus
+renvoie en théorie un nombre entre -1 et 1, ce qui constitue une post-condition
+toute indiquée. De fait par construction, <code>1-sin(x)</code> est positif, et donc
+compatible avec le contrat de <code>sqrt</code>.</p>
+
+<p>En vérité, il existe une troisième façon de s'y prendre. Sous des systèmes
+POSIX, on peut déclencher des <em>coredumps</em> par programmation et ce sans
+interrompre le cours de l'exécution. Cela peut être fait depuis les
+constructeurs de nos exceptions de logique (Voir
+<a href="http://stackoverflow.com/a/979297">ceci</a>, ou
+<a href="http://stackoverflow.com/a/18581317">celà</a>).</p>
+
+<h3>Option 3 : on formalise nos suppositions à l'aide d'assertions</h3>
+
+<p>Le C, et par extension le C++, nous offrent un outil tout indiqué pour traquer
+les erreurs de programmation : les assertions.</p>
+
+<p>En effet, compilé sans la directive de précompilation <code>NDEBUG</code>, une assertion
+va arrêter un programme et créer un fichier <em>core</em>. Il est ensuite possible
+d'ouvrir le fichier <em>core</em> depuis le débuggueur pour pouvoir explorer l'état du
+programme au moment de la détection de l'erreur.</p>
+
+<h4>Exemple d'exploitation des assertions</h4>
+
+<p>Sans faire un cours sur gdb, regardons ce qu'il se passe sur ce petit programme :</p>
+
+<p>```c++
+// test-assert.cpp</p>
+
+<h1>include <iostream></h1>
+
+<h1>include <cmath></h1>
+
+<h1>include <cassert></h1>
+
+<h1>include <limits></h1>
+
+<p>namespace my {</p>
+
+<pre><code>/** Computes square root.
+ * @pre \c n must be positive, checked with an assertion
+ * @post &lt;tt&gt;result * result == n&lt;/tt&gt;, checked with an assertion
+ */
+double sqrt(double n) {
+    assert(n &gt;=0);
+    const double result = std::sqrt(n);
+    assert(std::abs(result*result - n) &lt; std::numeric_limits&lt;double&gt;::epsilon() * 100);
+    return result;
+}
+
+/** Computes sinus.
+ * @post \c n belongs to [-1, 1], checked with an assertion
+ */
+double sin(double n) {
+    const double r = std::sin(n);
+    assert(r &lt;= 1 &amp;&amp; r &gt;= -1);
+    return r;
+}
+</code></pre>
+
+<p>} // my namespace</p>
+
+<p>int main ()
+{</p>
+
+<pre><code>std::cout &lt;&lt; my::sqrt(my::sin(0)-1) &lt;&lt; std::endl;
+</code></pre>
+
+<p>}
+// Vim: let $CXXFLAGS=&lsquo;-g&rsquo;</p>
+
+<p>```</p>
+
+<p>Exécuté en console, on verra juste :
+<code>
+$ ./test-assert
+assertion "n &gt;=0" failed: file "test-assert.cpp", line 14, function: double my::sqrt(double)
+Aborted (core dumped)
+</code></p>
+
+<p>On dispose de suite de l'indication où l'erreur a été détectée.
+Mais investiguons plus en avant. Si on lance <code>gdb ./test-assert core.pid42</code>
+(cela peut nécessiter de demander à <code>ulimit</code> d'autoriser les <em>coredumps</em> sur
+votre plateforme, faites un <code>ulimit -c unlimited</code> pour cela), ou <code>gdb
+./test-assert</code> puis <code>run</code> pour une investigation pseudo-interactive, on observe
+ceci :</p>
+
+<p>```
+$ gdb test-assert
+GNU gdb (GDB) 7.6.50.20130728-cvs (cygwin-special)
+Copyright &copy; 2013 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <a href="http://gnu.org/licenses/gpl.html">http://gnu.org/licenses/gpl.html</a>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type &ldquo;show copying&rdquo;
+and &ldquo;show warranty&rdquo; for details.
+This GDB was configured as &ldquo;i686-pc-cygwin&rdquo;.
+Type &ldquo;show configuration&rdquo; for configuration details.
+For bug reporting instructions, please see:
+<a href="http://www.gnu.org/software/gdb/bugs/">http://www.gnu.org/software/gdb/bugs/</a>.
+Find the GDB manual and other documentation resources online at:
+<a href="http://www.gnu.org/software/gdb/documentation/">http://www.gnu.org/software/gdb/documentation/</a>.
+For help, type &ldquo;help&rdquo;.
+Type &ldquo;apropos word&rdquo; to search for commands related to &ldquo;word&rdquo;.
+..
+Reading symbols from /cygdrive/c/Dev/blog/source/<em>posts/test-assert&hellip;done.
+(gdb) run
+Starting program: /cygdrive/c/Dev/blog/source/</em>posts/test-assert
+[New Thread 5264.0xe2c]
+[New Thread 5264.0x6fc]
+assertion &ldquo;n >=0&rdquo; failed: file &ldquo;test-assert.cpp&rdquo;, line 14, function: double my::sqrt(double)</p>
+
+<p>Program received signal SIGABRT, Aborted.
+0x0022da18 in ?? ()
+```</p>
+
+<p>La pile d'appels (<em>back trace</em>) contient :
+```
+(gdb) bt</p>
+
+<h1>0  0x0022da18 in ?? ()</h1>
+
+<h1>1  0x7c802542 in WaitForSingleObject () from /cygdrive/c/WINDOWS/system32/kernel32.dll</h1>
+
+<h1>2  0x610da840 in sig_send(<em>pinfo*, siginfo_t&amp;, </em>cygtls*) () from /usr/bin/cygwin1.dll</h1>
+
+<h1>3  0x610d7c7c in _pinfo::kill(siginfo_t&amp;) () from /usr/bin/cygwin1.dll</h1>
+
+<h1>4  0x610d8146 in kill0(int, siginfo_t&amp;) () from /usr/bin/cygwin1.dll</h1>
+
+<h1>5  0x610d8312 in raise () from /usr/bin/cygwin1.dll</h1>
+
+<h1>6  0x610d85b3 in abort () from /usr/bin/cygwin1.dll</h1>
+
+<h1>7  0x61001aed in __assert_func () from /usr/bin/cygwin1.dll</h1>
+
+<h1>8  0x004011d3 in my::sqrt (n=-1) at test-assert.cpp:14</h1>
+
+<h1>9  0x0040125a in main () at test-assert.cpp:33</h1>
+
+<p>```</p>
+
+<p>Avec un <code>up 8</code> pour se positionner au niveau où l'assertion est fausse, on peut
+regarder le code source local avec un <code>list</code>, ou de façon plus intéressante,
+demander ce que vaut ce fameux <code>n</code>.</p>
+
+<p>```
+(gdb) up 8</p>
+
+<h1>8  0x004011d3 in my::sqrt (n=-1) at test-assert.cpp:14</h1>
+
+<p>7               assert(n >=0);
+(gdb) p n
+$1 = -1
+```</p>
+
+<p>On voit que <code>my::sqrt</code> a été appelée avec <code>-1</code> comme paramètre. Avec un <code>up</code> on
+peut investiguer le contexte de la fonction appelante &mdash; avec <code>down</code> on
+progresse dans l'autre sens. Ici, la raison de l'erreur est triviale. Dans un
+programme plus complexe, on aurait pu imaginer que <code>sin</code> était appelée avec une
+donnée non constante, et on aurait peut-être passé un peu plus de temps à
+comprendre que la fonction fautive n'était pas <code>sin</code> mais ce que l'on faisait
+avec son résultat.</p>
+
+<p>N.B.: l'équivalent existe pour d'autres environnements comme VC++.</p>
+
+<h4><a id="Phases"></a>Un outil pour les phases de développement et de tests &hellip;</h4>
+
+<p>Je vais paraphraser <a href="/blog/2014/05/24/programmation-par-contrat-un-peu-de-theorie/#Wilson2006">[Wilson2006] §1.1.</a>, qui énonçait déjà des
+évidences : <em>&ldquo;Plus tôt on détecte une erreur, mieux c'est&rdquo;</em>.  C'est un adage
+que vous devez déjà connaitre. Concrètement, cela veut dire que l'on va
+préférer trouver nos erreurs, dans l'ordre :</p>
+
+<ol>
+<li>lors de la phase de conception,</li>
+<li>lors la compilation,</li>
+<li>lors de l'analyse statique du code</li>
+<li>lors des tests unitaires,</li>
+<li>lors des tests en <em>debug</em>,</li>
+<li>en pré-release/phase béta,</li>
+<li>en production.</li>
+</ol>
+
+
+<p>Je traiterai rapidement de la phase 2. de compilation en
+<a href="#VerificationsStatiques">fin de ce billet</a>.<br/>
+Les assertions pour leur part interviennent lors des phases 4. et 5.</p>
+
+<p>Les assertions ne sont vérifiées que si <code>NDEBUG</code> n'est pas défini au moment de
+la précompilation. Généralement, sa définition accompagne le mode <em>Release</em> de
+VC++ et de CMake. Ce qui veut dire qu'en mode <em>Release</em> aucune assertion n'est
+vérifiée. Soit qu'en production, les assertions sont normalement ignorées. Le
+corolaire de tout cela est que les assertions sont un outil de vérification de
+la logique applicative qui n'est utilisé qu'en phases de développement et de
+tests.</p>
+
+<p>Ce n'est certes pas le plus tôt que l'on puisse faire, mais c'est déjà quelque
+chose qui intervient avant que des utilisateurs manipulent le produit final.</p>
+
+<h4>&hellip; voire de production</h4>
+
+<p>Bien que les assertions ne soient censées porter que sur ces phases 4. et 5., il
+est possible de les détourner en phases 6. et 7. pour tenter de rendre plus
+robuste le produit en le faisant résister aux erreurs de programmation qui ont
+échappé à notre vigilance lors des phases précédentes.</p>
+
+<p>On entre dans le royaume de la <em>Programmation Défensive</em> que j'ai déjà
+abondamment décrit.</p>
+
+<p>Comment peut-on détourner les assertions ? Tout simplement en détournant leur
+définition. N'oublions pas que les assertions sont des macros dont le
+comportement exact dépend de la définition de <code>NDEBUG</code>.</p>
+
+<p>Une façon assez sale de faire serait p.ex.:
+```c++</p>
+
+<h1>if defined(NDEBUG)</h1>
+
+<h1>define my_assert(condition<em>, message</em>) \</h1>
+
+<pre><code>   if (!(condition_)) throw std::logic_error(message_)
+</code></pre>
+
+<h1>else</h1>
+
+<h1>define my_assert(condition<em>, message</em>) \</h1>
+
+<pre><code>   assert(condition_ &amp;&amp; message_)
+</code></pre>
+
+<h1>endif</h1>
+
+<p>```</p>
+
+<h4>Techniques connexes</h4>
+
+<p>Il est possible de rendre les messages produits par <code>assert</code> un petit peu plus
+compréhensibles en profitant du fonctionnement interne de la macro.</p>
+
+<p>Exemples :
+<code>c++
+assert(n&gt;=0 &amp;&amp; "sqrt can't process negative numbers");
+</code></p>
+
+<p>```c++
+switch (myEnum) {</p>
+
+<pre><code>case Enum::first: .... break;
+case Enum::second: .... break;
+default:
+    assert(!"Unexpected case");
+</code></pre>
+
+<p>}
+```</p>
+
+<h4>Exploitation des assertions par les outils d'analyse statique de code</h4>
+
+<p>Les outils d'analyse statique de code comme
+<a href="http://clang-analyzer.llvm.org/">clang analyzer</a> sont très intéressants. En
+plus, ils interviennent en <a href="#Phases">phase 3</a>! Seulement, à mon grand regret,
+ils ne semblent pas exploiter les assertions pour détecter statiquement des
+erreurs de logique.
+Au contraire, ils utilisent les assertions pour inhiber l'analyse de certains
+chemins d'exécution.</p>
+
+<p>Ainsi, dans l'exemple de <code>test-assert.cpp</code> que j'ai donné plus haut, les outils
+d'analyse statique de code ne feront pas le rapprochement entre la
+post-condition de <code>my::sin</code> et la pré-condition de <code>my::sqrt</code>, mais feront
+plutôt comme si les assertions étaient toujours vraies, c'est à dire comme si
+le code n'appelait jamais <code>my::sqrt</code> avec un nombre négatif.</p>
+
+<p>N.B.: Je généralise à partir de mon test avec <em>clang analyzer</em>. Peut-être que
+d'autres outils savent tirer parti des contrats déclarés à l'aide d'assertions,
+ou peut-être le sauront-ils demain.<br/>
+Pour information, je n'ai pas eu l'occasion de tester des outils comme <em>Code
+Contract</em> (pour .NET), Ada2012 (si on sort du périmètre du C++) ni même
+<em>Polyspace</em>.</p>
+
+<h2>III- Le standard s'enrichira-t-il en 2017 pour programmer avec des contrats ?</h2>
+
+<p>Il y a déjà eu des propositions de mots clés plus ou moins sémantiquement forts
+pour supporter la PpC en standard en C++. Dans la dernière en date,
+<a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3753.pdf">n3753</a>,
+John Lakos et Alexei Zakharov introduisent un ensemble de macros <code>pre_assert</code>
+assez flexible.</p>
+
+<p>Elles supportent des niveaux d'importance de vérification (<em>toujours</em>,
+<em>parfois</em>) un peu à l'image des niveaux <em>Error</em>/<em>Warning</em>/<em>Info</em>/<em>Debug</em> dans
+les frameworks de log.  Elle permet de faire de la programmation défensive
+(i.e. de lever des exceptions au lieu de simples assertions). Elle permet
+également de transformer les assertions en assertions de frameworks de tests
+unitaires.</p>
+
+<p>S'il fallait lui trouver un défaut, je dirai que sémantiquement le nom
+<code>pre_assert</code> est trop restrictif, en effet cette proposition serait également
+parfaitement applicable aux post-conditions et aux invariants.</p>
+
+<p>À noter qu'elle est déjà implémentée et disponible à l'intérieur de la
+<a href="https://github.com/bloomberg/bde">bibliothèque BDE/BSL</a> sous licence MIT.</p>
+
+<h2>IV- <a id="VerificationsStatiques"></a>Invariants statiques</h2>
+
+<p>Pour conclure, il est important de remarquer que certains contrats peuvent être
+retranscrit de manière plus forte qu'une assertion qui ne sera vérifiée qu'en
+phase de tests.</p>
+
+<p>En effet, le compilateur peut en prendre certains à sa charge.</p>
+
+<h4>Les assertions statiques sont nos amies</h4>
+
+<p>Elles sont beaucoup utilisées lors de l'écriture de classes et fonctions
+génériques pour s'assurer que les arguments <em>templates</em> vérifient certaines
+contraintes.<br/>
+Mais c'est loin d'être le seul cas d'utilisation. Je m'en sers
+également pour vérifier que j'ai autant de chaines de caractères que de valeurs
+dans un énuméré. Avec mes <a href="https://code.google.com/p/lh-vim/wiki/lhCpp">plugins pour vim</a>,
+je génère automatiquement ce genre de choses avec <code>:InsertEnum MyEnum one two
+three</code> :</p>
+
+<p>```c++
+// .h
+&hellip; includes qui vont bien
+struct MyEnum {</p>
+
+<pre><code>enum Type { one, two, three, MAX__, UNDEFINED__, FIRST__=0 };
+...
+MyEnum(std::string const&amp; s);
+char const* toString() const;
+...
+</code></pre>
+
+<p>private:</p>
+
+<pre><code>Type m_value;
+</code></pre>
+
+<p>};</p>
+
+<p>// .cpp
+&hellip; includes qui vont bien
+namespace  { // Anonymous namespace</p>
+
+<pre><code>typedef char const* const* strings_iterator;
+static char const* const MYENUM_STRINGS[] =
+{ "one", "two", "three" };
+</code></pre>
+
+<p>} // Anonymous namespace
+&hellip;
+char const* MyEnum::toString() const
+{</p>
+
+<pre><code>// v-- Ici se trouve l'assertion statique
+static_assert(MAX__ == std::extent&lt;decltype(::MYENUM_STRINGS)&gt;::value, "Array size mismatches number of elements in enum");
+assert(m_value != UNDEFINED__); // Yes, I know UNDEFINED__ &gt; MAX__
+assert(m_value &lt; MAX__);
+return MYENUM_STRINGS[m_value];
+</code></pre>
+
+<p>}
+```</p>
+
+<h4>Préférez les références aux pointeurs</h4>
+
+<p>Dans la signature d'une fonction, les références posent une pré-condition : la
+valeur passée en paramètre par référence doit être non nulle &mdash; à charge au
+code client de vérifier cela.</p>
+
+<p>Dans le corps de la fonction, elles deviennent pratiquement un invariant : à
+partir de là, il est certain que la chose manipulée indirectement est censée
+exister. Il n'y a plus besoin de tester un pointeur, que cela soit avec une
+assertion (PpC), ou avec un test dynamique (Programmation Défensive).<br/>
+Certes, cela ne protège pas des cas où la donnée est partagée depuis un
+autre thread où elle pourrait être détruite.</p>
+
+<p>John Carmack recommande leur utilisation (en place de pointeurs) dans un
+<a href="http://www.altdevblogaday.com/2011/12/24/static-code-analysis/">billet sur l'analyse statique de code</a>
+publié sur #AltDevBlog.</p>
+
+<h4>boost.unit</h4>
+
+<p><a href="http://boost.org/libs/units">boost.unit</a> est le genre de bibliothèque qui
+aurait pu sauver une fusée. L'idée est de ne plus manipuler de simples valeurs
+numériques, mais des quantités physiques. Non seulement on ne peut pas additionner des
+masses à des longueurs, mais en plus l'addition de masses va prendre en compte
+les ordres de grandeur.<br/>
+Bref, on type fortement toutes les quantités numériques selon les unités du
+<a href="http://fr.wikipedia.org/wiki/Syst%C3%A8me_international_d%27unit%C3%A9s">Système International</a>.</p>
+
+<h4>Une variable devrait toujours être pertinente et utilisable</h4>
+
+<p>Un objet devrait toujours avoir pour invariant : <em>est dans un état pertinent et
+utilisable</em>. Concrètement, cela implique deux choses pour le développeur.</p>
+
+<ol>
+<li>Un tel invariant se positionne à la sortie du constructeur de l'objet.</li>
+<li>On doit retarder la définition/déclaration d'une variable jusqu'à ce que
+l'on soit capable de lui donner valeur pertinente, et préférentiellement
+définitive.</li>
+</ol>
+
+
+<p>Un futur point de la FAQ C++ de développez traitera plus en détails de cela. Je
+donnerai le lien quand nous aurons finalisé cette entrée.<br/>
+<em>[N.B.: pour ceux qui ont les droits d'accès, la discussion se passe par <a href="http://www.developpez.net/forums/d1422877-2/c-cpp/cpp/priv-ressources-cpp/faq-cpp/dois-declarer-variables-locales/">là</a>.]</em></p>
+
+<h4>Corolaire : préférez les constructeurs aux fonctions <code>init()</code> et autres <em>setters</em></h4>
+
+<p>Dans la continuité du point précédent, il faut éviter toute initialisation qui
+se produit après la construction d'un objet. En effet, si l'objet nécessite
+deux appels de fonction pour être correctement initialisé, il y a de grands
+risques que le second appel soit purement et simplement oublié. Il faut de fait
+tester dynamiquement dans chaque fonction de l'objet s'il a bien été initialisé
+avant de tenter de s'en servir.</p>
+
+<p>Si le positionnement de l'invariant d'<em>utilisabilité</em> se fait en sortie du
+constructeur, nous aurions à la place la garantie que soit l'objet existe et
+il est utilisable, soit l'objet n'existe pas et aucune question ne se pose,
+nulle part.</p>
+
+<p>N.B. : il existe des infractions à cette règle. Une des plus visible vient du
+<a href="http://google-styleguide.googlecode.com/svn/trunk/cppguide.xml?showone=Forward_Declarations#Doing_Work_in_Constructors">C++ Style Guide de Google</a>.
+Dans la mesure où les exceptions sont interdites dans leur base de code (car la
+quantité de vieux code sans exceptions est trop importante), il ne reste plus
+aucun moyen de faire échouer des constructeurs. On perd l'invariant statique,
+il devient alors nécessaire de procéder à des initialisations en deux phases.<br/>
+Si vous n'avez pas de telle contrainte de <em>&ldquo;pas d'exceptions&rdquo;</em> sur vos projets,
+bannissez les fonctions <code>init()</code> de votre vocabulaire.</p>
+
+<p>Ceci dit, le recourt à des <em>factories</em> permet de retrouver un semblant
+d'invariant statique.</p>
+
+<h4>Choisir le bon type de pointeur</h4>
+
+<p>Avec le C++11 nous avons l'embarras du choix pour choisir comment manipuler des
+entités ou des données dynamiques. Entre, <code>std::unique_ptr&lt;&gt;</code>,
+<code>std::shared_ptr</code>, <code>boost::ptr_vector</code>, les références, les pointeurs bruts
+(/nus), <code>std::optional&lt;&gt;</code> (C++14), <em>etc.</em>, on peut avoir l'impression que c'est
+la jungle.</p>
+
+<p>Quel rapport avec les invariants statiques ? Et bien, comme pour les références
+<code>std::unique_ptr&lt;&gt;</code>, apporte une garantie supplémentaire par rapport à un
+simple pointeur brut.
+Ce type assure que la fonction qui réceptionne le pointeur en devient
+responsable alors que l'émetteur s'est débarrassé de la patate chaude. Et le
+compilateur est là pour entériner la transaction et faire en sorte que les deux
+intervenants respectent bien ce contrat de passation de responsabilité.</p>
+
+<p>Je pense que j'y reviendrai dans un prochain billet. En attendant, je ne peux
+que vous conseiller la lecture de cette
+<a href="http://exceptionsafecode.com/slides/svcc/2013/shared_ptr.pdf">présentation</a>
+assez exhaustive d'Ahmed Charles.</p>
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[Programmation Par Contrat 1/3 -- Un Peu De Théorie]]></title>
     <link href="http://LucHermitte.github.io/blog/2014/05/24/programmation-par-contrat-un-peu-de-theorie/"/>
     <updated>2014-05-24T02:00:00+02:00</updated>
@@ -21,7 +549,7 @@
     <content type="html"><![CDATA[<p>Cela faisait un moment que je voulais partager mes conclusions sur la
 <em>Programmation par Contrat</em>, et en particulier comment l'appliquer au C++.</p>
 
-<p>Voici un premier billet qui aborde l'aspect théorique. Dans un <a href="#">second billet</a>,
+<p>Voici un premier billet qui aborde l'aspect théorique. Dans un <a href="/blog/2014/05/28/programmation-par-contrat-les-assertions/">second billet</a>,
 je traiterai des <em>assertions</em>. En guise de conclusion, je présenterai des
 <a href="#">techniques d'application de la PpC au C++</a>
 que j'ai croisées au fil des ans.</p>
@@ -85,7 +613,7 @@ Les assertions permettent d'installer des points de contrôle dans un programme
 pour vérifier que les traitements se passent bien. Ces points de contrôles
 seront utilisés pour vérifier les contrats préalablement définis.
 Nous les détaillerons dans
-<a href="#">le prochain billet</a>.</p>
+<a href="/blog/2014/05/28/programmation-par-contrat-les-assertions/">le prochain billet</a>.</p>
 
 <h2>II- La programmation par contrat</h2>
 
@@ -106,7 +634,7 @@ comme elle l'entend.</p>
 <code>sqrt</code> et qu'elle plante, on n'est pas plus avancés. Le bug est toujours là. Et
 pourtant, nous avons fait un énorme pas en avant : nous avons formalisé les
 contrats de <code>sqrt</code>. Nous disposons de spécifications précises, et d'une
-<a href="##Documentation">documentation</a> qui pourra accompagner le code.</p>
+<a href="/blog/2014/05/28/programmation-par-contrat-les-assertions/#Documentation">documentation</a> qui pourra accompagner le code.</p>
 
 <p>Heureusement, nous pouvons aller bien plus loin. Nous pouvons aussi marquer le
 code avec des assertions représentatives des contrats identifiés pour repérer
@@ -556,7 +1084,7 @@ leurs devoirs.</li>
 <li>Toutefois, il est possible de détourner la PpC  basée sur des assertions en C
 et C++ pour faire de la Programmation Défensive ; p.ex. l'assertion pourrait
 être détournée en <em>Release</em> pour lever une exception. J'y reviendrai dans le
-<a href="#">prochain billet</a>.</li>
+<a href="/blog/2014/05/28/programmation-par-contrat-les-assertions/">prochain billet</a>.</li>
 </ul>
 
 

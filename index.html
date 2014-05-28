@@ -9,8 +9,8 @@
   <meta name="author" content="Luc Hermitte">
 
   
-  <meta name="description" content="Cela faisait un moment que je voulais partager mes conclusions sur la
-Programmation par Contrat, et en particulier comment l&#8217;appliquer au C++. &hellip;">
+  <meta name="description" content="Dans ce second billet sur la Programmation par Contrat, nous allons voir que
+faire des contrats une fois établis, et en particulier je vais vous &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -73,6 +73,644 @@ Programmation par Contrat, et en particulier comment l&#8217;appliquer au C++. &
       
   <header>
     
+      <h1 class="entry-title"><a href="/blog/2014/05/28/programmation-par-contrat-les-assertions/">Programmation Par Contrat 2/3 &#8211; Les Assertions</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-05-28T12:07:42+02:00" pubdate data-updated="true">May 28<span>th</span>, 2014</time>
+        
+           | <a href="/blog/2014/05/28/programmation-par-contrat-les-assertions/#disqus_thread"
+             data-disqus-identifier="http://LucHermitte.github.io/blog/2014/05/28/programmation-par-contrat-les-assertions/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Dans ce second billet sur la <em>Programmation par Contrat</em>, nous allons voir que
+faire des contrats une fois établis, et en particulier je vais vous présenter
+un outil dédié à la détection les erreurs de programmation : les <em>assertions</em>.</p>
+
+<h2>I- <a id="Documentation"></a>Documentation</h2>
+
+<p>Comme je l&#8217;avais signalé dans le précédent billet, la première chose que l&#8217;on
+peut faire à partir des contrats, c&#8217;est de les documenter clairement.
+Il s&#8217;agit probablement d&#8217;une des choses les plus importantes à documenter dans
+un code source. Et malheureusement trop souvent c&#8217;est négligé.</p>
+
+<p>L&#8217;outil <a href="http://doxygen.org">Doxygen</a> met à notre disposition les tags <code>@pre</code>,
+<code>@post</code>, et <code>@invariant</code> pour documenter nos contrats. Je ne peux que
+vous conseiller d&#8217;en user et d&#8217;en abuser.</p>
+
+<h2>II- Comment prendre en compte les contrats dans le code ?</h2>
+
+<p>À partir d&#8217;un contrat bien établi, nous avons techniquement plusieurs choix en
+C++.</p>
+
+<h3>Option 1 : on ne fait rien</h3>
+
+<p>Il est tout d&#8217;abord possible de totalement ignorer les ruptures de
+contrats et de ne jamais rien vérifier.</p>
+
+<p>Quand une erreur de programmation survient, quand on est chanceux, on détecte
+le problème au plus proche de l&#8217;erreur. Malheureusement, en C et en C++, les
+problèmes tendent à survenir bien plus tard.</p>
+
+<p>Cette mauvaise pratique consistant à ignorer les contrats (ou à ne pas s&#8217;en
+préoccuper) est assez répandue. Je ne cache pas que l&#8217;un des objectifs de cette
+série de billets est de combattre cette habitude.</p>
+
+<h3>Option 2 : on lance des exceptions dans la tradition de la Programmation Défensive</h3>
+
+<p>À l&#8217;opposé, on peut prendre la voie de la <em>Programmation Défensive</em> et vérifier
+chaque rupture potentielle de contrat pour lever une exception. Au delà des
+problèmes de conceptions et de déresponsabilisation évoqués dans le
+<a href="/blog/2014/05/24/programmation-par-contrat-un-peu-de-theorie/">billet précédent</a>,
+il y a un soucis technique.</p>
+
+<p>En effet, en temps normal avec une exception en C++, on ne peut rien avoir de
+mieux que des informations sur le lieu de la détection (<em>i.e.</em> :<code>__FILE__</code> et
+<code>__LINE__</code>). Et encore faut-il disposer de classes <em>exception</em> conçues pour
+stocker une telle information ; ce n&#8217;est par exemple pas le cas des
+<code>std::logic_error</code> qui sont levées depuis des fonctions comme
+<code>std::vector&lt;&gt;::at()</code>.</p>
+
+<p>Par <em>&ldquo;rien de mieux que le lieu de la détection&rdquo;</em>, il faut comprendre que l&#8217;on
+ne disposera d&#8217;aucune autre information de contexte. En effet, une exception
+remonte jusqu&#8217;à un <code>catch</code> compatible ; or à l&#8217;endroit du <code>catch</code>, on ne peut
+plus avoir accès à l&#8217;état (de toutes les variables, dans tous les threads, &hellip;)
+au moment de la détection du problème.</p>
+
+<p>En vérité, il y existe deux moyens peu ergonomiques pour y avoir accès. Le
+premier consiste à mettre des points d&#8217;arrêt sur les levers ou les
+constructions d&#8217;exceptions, et à exécuter le programme depuis un débuggueur. Le
+second consiste à supprimer du code source tous les <code>catchs</code> qui sont
+compatibles avec l&#8217;erreur de logique.</p>
+
+<p>Aucune de ces deux options n&#8217;est véritablement envisageable pour des tests
+automatisés ; et la seconde l&#8217;est encore moins pour du code qui va aller en
+production. Ces options sont en revanche envisageables pour investiguer.</p>
+
+<p>À noter aussi qu&#8217;avec cette approche, on paie tout le temps un coût de
+vérification des contrats, que cela soit en phase de tests comme en phase de
+production.  Et ce, même pour des morceaux de code où il est certain qu&#8217;il n&#8217;y
+a pas d&#8217;erreur de programmation.<br/>
+Par exemple, <code>sqrt(1-sin(x))</code> ne devrait poser aucun soucis. Une fonction sinus
+renvoie en théorie un nombre entre -1 et 1, ce qui constitue une post-condition
+toute indiquée. De fait par construction, <code>1-sin(x)</code> est positif, et donc
+compatible avec le contrat de <code>sqrt</code>.</p>
+
+<p>En vérité, il existe une troisième façon de s&#8217;y prendre. Sous des systèmes
+POSIX, on peut déclencher des <em>coredumps</em> par programmation et ce sans
+interrompre le cours de l&#8217;exécution. Cela peut être fait depuis les
+constructeurs de nos exceptions de logique (Voir
+<a href="http://stackoverflow.com/a/979297">ceci</a>, ou
+<a href="http://stackoverflow.com/a/18581317">celà</a>).</p>
+
+<h3>Option 3 : on formalise nos suppositions à l&#8217;aide d&#8217;assertions</h3>
+
+<p>Le C, et par extension le C++, nous offrent un outil tout indiqué pour traquer
+les erreurs de programmation : les assertions.</p>
+
+<p>En effet, compilé sans la directive de précompilation <code>NDEBUG</code>, une assertion
+va arrêter un programme et créer un fichier <em>core</em>. Il est ensuite possible
+d&#8217;ouvrir le fichier <em>core</em> depuis le débuggueur pour pouvoir explorer l&#8217;état du
+programme au moment de la détection de l&#8217;erreur.</p>
+
+<h4>Exemple d&#8217;exploitation des assertions</h4>
+
+<p>Sans faire un cours sur gdb, regardons ce qu&#8217;il se passe sur ce petit programme :</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="c1">// test-assert.cpp</span>
+</span><span class='line'><span class="cp">#include &lt;iostream&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;cmath&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;cassert&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;limits&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">namespace</span> <span class="n">my</span> <span class="p">{</span>
+</span><span class='line'>    <span class="cm">/** Computes square root.</span>
+</span><span class='line'><span class="cm">     * @pre \c n must be positive, checked with an assertion</span>
+</span><span class='line'><span class="cm">     * @post &lt;tt&gt;result * result == n&lt;/tt&gt;, checked with an assertion</span>
+</span><span class='line'><span class="cm">     */</span>
+</span><span class='line'>    <span class="kt">double</span> <span class="n">sqrt</span><span class="p">(</span><span class="kt">double</span> <span class="n">n</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="n">assert</span><span class="p">(</span><span class="n">n</span> <span class="o">&gt;=</span><span class="mi">0</span><span class="p">);</span>
+</span><span class='line'>        <span class="k">const</span> <span class="kt">double</span> <span class="n">result</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">sqrt</span><span class="p">(</span><span class="n">n</span><span class="p">);</span>
+</span><span class='line'>        <span class="n">assert</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">abs</span><span class="p">(</span><span class="n">result</span><span class="o">*</span><span class="n">result</span> <span class="o">-</span> <span class="n">n</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">numeric_limits</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;::</span><span class="n">epsilon</span><span class="p">()</span> <span class="o">*</span> <span class="mi">100</span><span class="p">);</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">result</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="cm">/** Computes sinus.</span>
+</span><span class='line'><span class="cm">     * @post \c n belongs to [-1, 1], checked with an assertion</span>
+</span><span class='line'><span class="cm">     */</span>
+</span><span class='line'>    <span class="kt">double</span> <span class="n">sin</span><span class="p">(</span><span class="kt">double</span> <span class="n">n</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">const</span> <span class="kt">double</span> <span class="n">r</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">sin</span><span class="p">(</span><span class="n">n</span><span class="p">);</span>
+</span><span class='line'>        <span class="n">assert</span><span class="p">(</span><span class="n">r</span> <span class="o">&lt;=</span> <span class="mi">1</span> <span class="o">&amp;&amp;</span> <span class="n">r</span> <span class="o">&gt;=</span> <span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">r</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span> <span class="c1">// my namespace</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="kt">int</span> <span class="n">main</span> <span class="p">()</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">my</span><span class="o">::</span><span class="n">sqrt</span><span class="p">(</span><span class="n">my</span><span class="o">::</span><span class="n">sin</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="c1">// Vim: let $CXXFLAGS=&#39;-g&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Exécuté en console, on verra juste :</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="err">$</span> <span class="p">.</span><span class="o">/</span><span class="n">test</span><span class="o">-</span><span class="n">assert</span>
+</span><span class='line'><span class="n">assertion</span> <span class="s">&quot;n &gt;=0&quot;</span> <span class="nl">failed:</span> <span class="n">file</span> <span class="s">&quot;test-assert.cpp&quot;</span><span class="p">,</span> <span class="n">line</span> <span class="mi">14</span><span class="p">,</span> <span class="nl">function:</span> <span class="kt">double</span> <span class="n">my</span><span class="o">::</span><span class="n">sqrt</span><span class="p">(</span><span class="kt">double</span><span class="p">)</span>
+</span><span class='line'><span class="n">Aborted</span> <span class="p">(</span><span class="n">core</span> <span class="n">dumped</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>On dispose de suite de l&#8217;indication où l&#8217;erreur a été détectée.
+Mais investiguons plus en avant. Si on lance <code>gdb ./test-assert core.pid42</code>
+(cela peut nécessiter de demander à <code>ulimit</code> d&#8217;autoriser les <em>coredumps</em> sur
+votre plateforme, faites un <code>ulimit -c unlimited</code> pour cela), ou <code>gdb
+./test-assert</code> puis <code>run</code> pour une investigation pseudo-interactive, on observe
+ceci :</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="err">$</span> <span class="n">gdb</span> <span class="n">test</span><span class="o">-</span><span class="n">assert</span>
+</span><span class='line'><span class="n">GNU</span> <span class="n">gdb</span> <span class="p">(</span><span class="n">GDB</span><span class="p">)</span> <span class="mf">7.6.50.20130728</span><span class="o">-</span><span class="n">cvs</span> <span class="p">(</span><span class="n">cygwin</span><span class="o">-</span><span class="n">special</span><span class="p">)</span>
+</span><span class='line'><span class="n">Copyright</span> <span class="p">(</span><span class="n">C</span><span class="p">)</span> <span class="mi">2013</span> <span class="n">Free</span> <span class="n">Software</span> <span class="n">Foundation</span><span class="p">,</span> <span class="n">Inc</span><span class="p">.</span>
+</span><span class='line'><span class="n">License</span> <span class="n">GPLv3</span><span class="o">+:</span> <span class="n">GNU</span> <span class="n">GPL</span> <span class="n">version</span> <span class="mi">3</span> <span class="n">or</span> <span class="n">later</span> <span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//gnu.org/licenses/gpl.html&gt;</span>
+</span><span class='line'><span class="n">This</span> <span class="n">is</span> <span class="n">free</span> <span class="nl">software:</span> <span class="n">you</span> <span class="n">are</span> <span class="n">free</span> <span class="n">to</span> <span class="n">change</span> <span class="n">and</span> <span class="n">redistribute</span> <span class="n">it</span><span class="p">.</span>
+</span><span class='line'><span class="n">There</span> <span class="n">is</span> <span class="n">NO</span> <span class="n">WARRANTY</span><span class="p">,</span> <span class="n">to</span> <span class="n">the</span> <span class="n">extent</span> <span class="n">permitted</span> <span class="n">by</span> <span class="n">law</span><span class="p">.</span>  <span class="n">Type</span> <span class="s">&quot;show copying&quot;</span>
+</span><span class='line'><span class="n">and</span> <span class="s">&quot;show warranty&quot;</span> <span class="k">for</span> <span class="n">details</span><span class="p">.</span>
+</span><span class='line'><span class="n">This</span> <span class="n">GDB</span> <span class="n">was</span> <span class="n">configured</span> <span class="n">as</span> <span class="s">&quot;i686-pc-cygwin&quot;</span><span class="p">.</span>
+</span><span class='line'><span class="n">Type</span> <span class="s">&quot;show configuration&quot;</span> <span class="k">for</span> <span class="n">configuration</span> <span class="n">details</span><span class="p">.</span>
+</span><span class='line'><span class="n">For</span> <span class="n">bug</span> <span class="n">reporting</span> <span class="n">instructions</span><span class="p">,</span> <span class="n">please</span> <span class="nl">see:</span>
+</span><span class='line'><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//www.gnu.org/software/gdb/bugs/&gt;.</span>
+</span><span class='line'><span class="n">Find</span> <span class="n">the</span> <span class="n">GDB</span> <span class="n">manual</span> <span class="n">and</span> <span class="n">other</span> <span class="n">documentation</span> <span class="n">resources</span> <span class="n">online</span> <span class="nl">at:</span>
+</span><span class='line'><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//www.gnu.org/software/gdb/documentation/&gt;.</span>
+</span><span class='line'><span class="n">For</span> <span class="n">help</span><span class="p">,</span> <span class="n">type</span> <span class="s">&quot;help&quot;</span><span class="p">.</span>
+</span><span class='line'><span class="n">Type</span> <span class="s">&quot;apropos word&quot;</span> <span class="n">to</span> <span class="n">search</span> <span class="k">for</span> <span class="n">commands</span> <span class="n">related</span> <span class="n">to</span> <span class="s">&quot;word&quot;</span><span class="p">.</span>
+</span><span class='line'><span class="p">..</span>
+</span><span class='line'><span class="n">Reading</span> <span class="n">symbols</span> <span class="n">from</span> <span class="o">/</span><span class="n">cygdrive</span><span class="o">/</span><span class="n">c</span><span class="o">/</span><span class="n">Dev</span><span class="o">/</span><span class="n">blog</span><span class="o">/</span><span class="n">source</span><span class="o">/</span><span class="n">_posts</span><span class="o">/</span><span class="n">test</span><span class="o">-</span><span class="n">assert</span><span class="p">...</span><span class="n">done</span><span class="p">.</span>
+</span><span class='line'><span class="p">(</span><span class="n">gdb</span><span class="p">)</span> <span class="n">run</span>
+</span><span class='line'><span class="n">Starting</span> <span class="nl">program:</span> <span class="o">/</span><span class="n">cygdrive</span><span class="o">/</span><span class="n">c</span><span class="o">/</span><span class="n">Dev</span><span class="o">/</span><span class="n">blog</span><span class="o">/</span><span class="n">source</span><span class="o">/</span><span class="n">_posts</span><span class="o">/</span><span class="n">test</span><span class="o">-</span><span class="n">assert</span>
+</span><span class='line'><span class="p">[</span><span class="n">New</span> <span class="n">Thread</span> <span class="mf">5264.0</span><span class="n">xe2c</span><span class="p">]</span>
+</span><span class='line'><span class="p">[</span><span class="n">New</span> <span class="n">Thread</span> <span class="mf">5264.0</span><span class="n">x6fc</span><span class="p">]</span>
+</span><span class='line'><span class="n">assertion</span> <span class="s">&quot;n &gt;=0&quot;</span> <span class="nl">failed:</span> <span class="n">file</span> <span class="s">&quot;test-assert.cpp&quot;</span><span class="p">,</span> <span class="n">line</span> <span class="mi">14</span><span class="p">,</span> <span class="nl">function:</span> <span class="kt">double</span> <span class="n">my</span><span class="o">::</span><span class="n">sqrt</span><span class="p">(</span><span class="kt">double</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">Program</span> <span class="n">received</span> <span class="n">signal</span> <span class="n">SIGABRT</span><span class="p">,</span> <span class="n">Aborted</span><span class="p">.</span>
+</span><span class='line'><span class="mh">0x0022da18</span> <span class="n">in</span> <span class="o">??</span> <span class="p">()</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>La pile d&#8217;appels (<em>back trace</em>) contient :</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="p">(</span><span class="n">gdb</span><span class="p">)</span> <span class="n">bt</span>
+</span><span class='line'><span class="cp">#0  0x0022da18 in ?? ()</span>
+</span><span class='line'><span class="cp">#1  0x7c802542 in WaitForSingleObject () from /cygdrive/c/WINDOWS/system32/kernel32.dll</span>
+</span><span class='line'><span class="cp">#2  0x610da840 in sig_send(_pinfo*, siginfo_t&amp;, _cygtls*) () from /usr/bin/cygwin1.dll</span>
+</span><span class='line'><span class="cp">#3  0x610d7c7c in _pinfo::kill(siginfo_t&amp;) () from /usr/bin/cygwin1.dll</span>
+</span><span class='line'><span class="cp">#4  0x610d8146 in kill0(int, siginfo_t&amp;) () from /usr/bin/cygwin1.dll</span>
+</span><span class='line'><span class="cp">#5  0x610d8312 in raise () from /usr/bin/cygwin1.dll</span>
+</span><span class='line'><span class="cp">#6  0x610d85b3 in abort () from /usr/bin/cygwin1.dll</span>
+</span><span class='line'><span class="cp">#7  0x61001aed in __assert_func () from /usr/bin/cygwin1.dll</span>
+</span><span class='line'><span class="cp">#8  0x004011d3 in my::sqrt (n=-1) at test-assert.cpp:14</span>
+</span><span class='line'><span class="cp">#9  0x0040125a in main () at test-assert.cpp:33</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Avec un <code>up 8</code> pour se positionner au niveau où l&#8217;assertion est fausse, on peut
+regarder le code source local avec un <code>list</code>, ou de façon plus intéressante,
+demander ce que vaut ce fameux <code>n</code>.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="p">(</span><span class="n">gdb</span><span class="p">)</span> <span class="n">up</span> <span class="mi">8</span>
+</span><span class='line'><span class="cp">#8  0x004011d3 in my::sqrt (n=-1) at test-assert.cpp:14</span>
+</span><span class='line'><span class="mi">7</span>               <span class="n">assert</span><span class="p">(</span><span class="n">n</span> <span class="o">&gt;=</span><span class="mi">0</span><span class="p">);</span>
+</span><span class='line'><span class="p">(</span><span class="n">gdb</span><span class="p">)</span> <span class="n">p</span> <span class="n">n</span>
+</span><span class='line'><span class="err">$</span><span class="mi">1</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<p>On voit que <code>my::sqrt</code> a été appelée avec <code>-1</code> comme paramètre. Avec un <code>up</code> on
+peut investiguer le contexte de la fonction appelante &mdash; avec <code>down</code> on
+progresse dans l&#8217;autre sens. Ici, la raison de l&#8217;erreur est triviale. Dans un
+programme plus complexe, on aurait pu imaginer que <code>sin</code> était appelée avec une
+donnée non constante, et on aurait peut-être passé un peu plus de temps à
+comprendre que la fonction fautive n&#8217;était pas <code>sin</code> mais ce que l&#8217;on faisait
+avec son résultat.</p>
+
+<p>N.B.: l&#8217;équivalent existe pour d&#8217;autres environnements comme VC++.</p>
+
+<h4><a id="Phases"></a>Un outil pour les phases de développement et de tests &hellip;</h4>
+
+<p>Je vais paraphraser <a href="/blog/2014/05/24/programmation-par-contrat-un-peu-de-theorie/#Wilson2006">[Wilson2006] §1.1.</a>, qui énonçait déjà des
+évidences : <em>&ldquo;Plus tôt on détecte une erreur, mieux c&#8217;est&rdquo;</em>.  C&#8217;est un adage
+que vous devez déjà connaitre. Concrètement, cela veut dire que l&#8217;on va
+préférer trouver nos erreurs, dans l&#8217;ordre :</p>
+
+<ol>
+<li>lors de la phase de conception,</li>
+<li>lors la compilation,</li>
+<li>lors de l&#8217;analyse statique du code</li>
+<li>lors des tests unitaires,</li>
+<li>lors des tests en <em>debug</em>,</li>
+<li>en pré-release/phase béta,</li>
+<li>en production.</li>
+</ol>
+
+
+<p>Je traiterai rapidement de la phase 2. de compilation en
+<a href="#VerificationsStatiques">fin de ce billet</a>.<br/>
+Les assertions pour leur part interviennent lors des phases 4. et 5.</p>
+
+<p>Les assertions ne sont vérifiées que si <code>NDEBUG</code> n&#8217;est pas défini au moment de
+la précompilation. Généralement, sa définition accompagne le mode <em>Release</em> de
+VC++ et de CMake. Ce qui veut dire qu&#8217;en mode <em>Release</em> aucune assertion n&#8217;est
+vérifiée. Soit qu&#8217;en production, les assertions sont normalement ignorées. Le
+corolaire de tout cela est que les assertions sont un outil de vérification de
+la logique applicative qui n&#8217;est utilisé qu&#8217;en phases de développement et de
+tests.</p>
+
+<p>Ce n&#8217;est certes pas le plus tôt que l&#8217;on puisse faire, mais c&#8217;est déjà quelque
+chose qui intervient avant que des utilisateurs manipulent le produit final.</p>
+
+<h4>&hellip; voire de production</h4>
+
+<p>Bien que les assertions ne soient censées porter que sur ces phases 4. et 5., il
+est possible de les détourner en phases 6. et 7. pour tenter de rendre plus
+robuste le produit en le faisant résister aux erreurs de programmation qui ont
+échappé à notre vigilance lors des phases précédentes.</p>
+
+<p>On entre dans le royaume de la <em>Programmation Défensive</em> que j&#8217;ai déjà
+abondamment décrit.</p>
+
+<p>Comment peut-on détourner les assertions ? Tout simplement en détournant leur
+définition. N&#8217;oublions pas que les assertions sont des macros dont le
+comportement exact dépend de la définition de <code>NDEBUG</code>.</p>
+
+<p>Une façon assez sale de faire serait p.ex.:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="cp">#if defined(NDEBUG)</span>
+</span><span class='line'><span class="cp">#   define my_assert(condition_, message_) \</span>
+</span><span class='line'><span class="cp">       if (!(condition_)) throw std::logic_error(message_)</span>
+</span><span class='line'><span class="cp">#else</span>
+</span><span class='line'><span class="cp">#   define my_assert(condition_, message_) \</span>
+</span><span class='line'><span class="cp">       assert(condition_ &amp;&amp; message_)</span>
+</span><span class='line'><span class="cp">#endif</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>Techniques connexes</h4>
+
+<p>Il est possible de rendre les messages produits par <code>assert</code> un petit peu plus
+compréhensibles en profitant du fonctionnement interne de la macro.</p>
+
+<p>Exemples :</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="n">assert</span><span class="p">(</span><span class="n">n</span><span class="o">&gt;=</span><span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="s">&quot;sqrt can&#39;t process negative numbers&quot;</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="k">switch</span> <span class="p">(</span><span class="n">myEnum</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">case</span> <span class="n">Enum</span><span class="o">::</span><span class="nl">first:</span> <span class="p">....</span> <span class="k">break</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">case</span> <span class="n">Enum</span><span class="o">::</span><span class="nl">second:</span> <span class="p">....</span> <span class="k">break</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">default</span><span class="o">:</span>
+</span><span class='line'>        <span class="n">assert</span><span class="p">(</span><span class="o">!</span><span class="s">&quot;Unexpected case&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>Exploitation des assertions par les outils d&#8217;analyse statique de code</h4>
+
+<p>Les outils d&#8217;analyse statique de code comme
+<a href="http://clang-analyzer.llvm.org/">clang analyzer</a> sont très intéressants. En
+plus, ils interviennent en <a href="#Phases">phase 3</a>! Seulement, à mon grand regret,
+ils ne semblent pas exploiter les assertions pour détecter statiquement des
+erreurs de logique.
+Au contraire, ils utilisent les assertions pour inhiber l&#8217;analyse de certains
+chemins d&#8217;exécution.</p>
+
+<p>Ainsi, dans l&#8217;exemple de <code>test-assert.cpp</code> que j&#8217;ai donné plus haut, les outils
+d&#8217;analyse statique de code ne feront pas le rapprochement entre la
+post-condition de <code>my::sin</code> et la pré-condition de <code>my::sqrt</code>, mais feront
+plutôt comme si les assertions étaient toujours vraies, c&#8217;est à dire comme si
+le code n&#8217;appelait jamais <code>my::sqrt</code> avec un nombre négatif.</p>
+
+<p>N.B.: Je généralise à partir de mon test avec <em>clang analyzer</em>. Peut-être que
+d&#8217;autres outils savent tirer parti des contrats déclarés à l&#8217;aide d&#8217;assertions,
+ou peut-être le sauront-ils demain.<br/>
+Pour information, je n&#8217;ai pas eu l&#8217;occasion de tester des outils comme <em>Code
+Contract</em> (pour .NET), Ada2012 (si on sort du périmètre du C++) ni même
+<em>Polyspace</em>.</p>
+
+<h2>III- Le standard s&#8217;enrichira-t-il en 2017 pour programmer avec des contrats ?</h2>
+
+<p>Il y a déjà eu des propositions de mots clés plus ou moins sémantiquement forts
+pour supporter la PpC en standard en C++. Dans la dernière en date,
+<a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3753.pdf">n3753</a>,
+John Lakos et Alexei Zakharov introduisent un ensemble de macros <code>pre_assert</code>
+assez flexible.</p>
+
+<p>Elles supportent des niveaux d&#8217;importance de vérification (<em>toujours</em>,
+<em>parfois</em>) un peu à l&#8217;image des niveaux <em>Error</em>/<em>Warning</em>/<em>Info</em>/<em>Debug</em> dans
+les frameworks de log.  Elle permet de faire de la programmation défensive
+(i.e. de lever des exceptions au lieu de simples assertions). Elle permet
+également de transformer les assertions en assertions de frameworks de tests
+unitaires.</p>
+
+<p>S&#8217;il fallait lui trouver un défaut, je dirai que sémantiquement le nom
+<code>pre_assert</code> est trop restrictif, en effet cette proposition serait également
+parfaitement applicable aux post-conditions et aux invariants.</p>
+
+<p>À noter qu&#8217;elle est déjà implémentée et disponible à l&#8217;intérieur de la
+<a href="https://github.com/bloomberg/bde">bibliothèque BDE/BSL</a> sous licence MIT.</p>
+
+<h2>IV- <a id="VerificationsStatiques"></a>Invariants statiques</h2>
+
+<p>Pour conclure, il est important de remarquer que certains contrats peuvent être
+retranscrit de manière plus forte qu&#8217;une assertion qui ne sera vérifiée qu&#8217;en
+phase de tests.</p>
+
+<p>En effet, le compilateur peut en prendre certains à sa charge.</p>
+
+<h4>Les assertions statiques sont nos amies</h4>
+
+<p>Elles sont beaucoup utilisées lors de l&#8217;écriture de classes et fonctions
+génériques pour s&#8217;assurer que les arguments <em>templates</em> vérifient certaines
+contraintes.<br/>
+Mais c&#8217;est loin d&#8217;être le seul cas d&#8217;utilisation. Je m&#8217;en sers
+également pour vérifier que j&#8217;ai autant de chaines de caractères que de valeurs
+dans un énuméré. Avec mes <a href="https://code.google.com/p/lh-vim/wiki/lhCpp">plugins pour vim</a>,
+je génère automatiquement ce genre de choses avec <code>:InsertEnum MyEnum one two
+three</code> :</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="c1">// .h</span>
+</span><span class='line'><span class="p">...</span> <span class="n">includes</span> <span class="n">qui</span> <span class="n">vont</span> <span class="n">bien</span>
+</span><span class='line'><span class="k">struct</span> <span class="n">MyEnum</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">enum</span> <span class="n">Type</span> <span class="p">{</span> <span class="n">one</span><span class="p">,</span> <span class="n">two</span><span class="p">,</span> <span class="n">three</span><span class="p">,</span> <span class="n">MAX__</span><span class="p">,</span> <span class="n">UNDEFINED__</span><span class="p">,</span> <span class="n">FIRST__</span><span class="o">=</span><span class="mi">0</span> <span class="p">};</span>
+</span><span class='line'>    <span class="p">...</span>
+</span><span class='line'>    <span class="n">MyEnum</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="k">const</span><span class="o">&amp;</span> <span class="n">s</span><span class="p">);</span>
+</span><span class='line'>    <span class="kt">char</span> <span class="k">const</span><span class="o">*</span> <span class="n">toString</span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">...</span>
+</span><span class='line'><span class="k">private</span><span class="o">:</span>
+</span><span class='line'>    <span class="n">Type</span> <span class="n">m_value</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// .cpp</span>
+</span><span class='line'><span class="p">...</span> <span class="n">includes</span> <span class="n">qui</span> <span class="n">vont</span> <span class="n">bien</span>
+</span><span class='line'><span class="k">namespace</span>  <span class="p">{</span> <span class="c1">// Anonymous namespace</span>
+</span><span class='line'>    <span class="k">typedef</span> <span class="kt">char</span> <span class="k">const</span><span class="o">*</span> <span class="k">const</span><span class="o">*</span> <span class="n">strings_iterator</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">static</span> <span class="kt">char</span> <span class="k">const</span><span class="o">*</span> <span class="k">const</span> <span class="n">MYENUM_STRINGS</span><span class="p">[]</span> <span class="o">=</span>
+</span><span class='line'>    <span class="p">{</span> <span class="s">&quot;one&quot;</span><span class="p">,</span> <span class="s">&quot;two&quot;</span><span class="p">,</span> <span class="s">&quot;three&quot;</span> <span class="p">};</span>
+</span><span class='line'><span class="p">}</span> <span class="c1">// Anonymous namespace</span>
+</span><span class='line'><span class="p">...</span>
+</span><span class='line'><span class="kt">char</span> <span class="k">const</span><span class="o">*</span> <span class="n">MyEnum</span><span class="o">::</span><span class="n">toString</span><span class="p">()</span> <span class="k">const</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="c1">// v-- Ici se trouve l&#39;assertion statique</span>
+</span><span class='line'>    <span class="n">static_assert</span><span class="p">(</span><span class="n">MAX__</span> <span class="o">==</span> <span class="n">std</span><span class="o">::</span><span class="n">extent</span><span class="o">&lt;</span><span class="n">decltype</span><span class="p">(</span><span class="o">::</span><span class="n">MYENUM_STRINGS</span><span class="p">)</span><span class="o">&gt;::</span><span class="n">value</span><span class="p">,</span> <span class="s">&quot;Array size mismatches number of elements in enum&quot;</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">assert</span><span class="p">(</span><span class="n">m_value</span> <span class="o">!=</span> <span class="n">UNDEFINED__</span><span class="p">);</span> <span class="c1">// Yes, I know UNDEFINED__ &gt; MAX__</span>
+</span><span class='line'>    <span class="n">assert</span><span class="p">(</span><span class="n">m_value</span> <span class="o">&lt;</span> <span class="n">MAX__</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">MYENUM_STRINGS</span><span class="p">[</span><span class="n">m_value</span><span class="p">];</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>Préférez les références aux pointeurs</h4>
+
+<p>Dans la signature d&#8217;une fonction, les références posent une pré-condition : la
+valeur passée en paramètre par référence doit être non nulle &mdash; à charge au
+code client de vérifier cela.</p>
+
+<p>Dans le corps de la fonction, elles deviennent pratiquement un invariant : à
+partir de là, il est certain que la chose manipulée indirectement est censée
+exister. Il n&#8217;y a plus besoin de tester un pointeur, que cela soit avec une
+assertion (PpC), ou avec un test dynamique (Programmation Défensive).<br/>
+Certes, cela ne protège pas des cas où la donnée est partagée depuis un
+autre thread où elle pourrait être détruite.</p>
+
+<p>John Carmack recommande leur utilisation (en place de pointeurs) dans un
+<a href="http://www.altdevblogaday.com/2011/12/24/static-code-analysis/">billet sur l&#8217;analyse statique de code</a>
+publié sur #AltDevBlog.</p>
+
+<h4>boost.unit</h4>
+
+<p><a href="http://boost.org/libs/units">boost.unit</a> est le genre de bibliothèque qui
+aurait pu sauver une fusée. L&#8217;idée est de ne plus manipuler de simples valeurs
+numériques, mais des quantités physiques. Non seulement on ne peut pas additionner des
+masses à des longueurs, mais en plus l&#8217;addition de masses va prendre en compte
+les ordres de grandeur.<br/>
+Bref, on type fortement toutes les quantités numériques selon les unités du
+<a href="http://fr.wikipedia.org/wiki/Syst%C3%A8me_international_d%27unit%C3%A9s">Système International</a>.</p>
+
+<h4>Une variable devrait toujours être pertinente et utilisable</h4>
+
+<p>Un objet devrait toujours avoir pour invariant : <em>est dans un état pertinent et
+utilisable</em>. Concrètement, cela implique deux choses pour le développeur.</p>
+
+<ol>
+<li>Un tel invariant se positionne à la sortie du constructeur de l&#8217;objet.</li>
+<li>On doit retarder la définition/déclaration d&#8217;une variable jusqu&#8217;à ce que
+l&#8217;on soit capable de lui donner valeur pertinente, et préférentiellement
+définitive.</li>
+</ol>
+
+
+<p>Un futur point de la FAQ C++ de développez traitera plus en détails de cela. Je
+donnerai le lien quand nous aurons finalisé cette entrée.<br/>
+<em>[N.B.: pour ceux qui ont les droits d&#8217;accès, la discussion se passe par <a href="http://www.developpez.net/forums/d1422877-2/c-cpp/cpp/priv-ressources-cpp/faq-cpp/dois-declarer-variables-locales/">là</a>.]</em></p>
+
+<h4>Corolaire : préférez les constructeurs aux fonctions <code>init()</code> et autres <em>setters</em></h4>
+
+<p>Dans la continuité du point précédent, il faut éviter toute initialisation qui
+se produit après la construction d&#8217;un objet. En effet, si l&#8217;objet nécessite
+deux appels de fonction pour être correctement initialisé, il y a de grands
+risques que le second appel soit purement et simplement oublié. Il faut de fait
+tester dynamiquement dans chaque fonction de l&#8217;objet s&#8217;il a bien été initialisé
+avant de tenter de s&#8217;en servir.</p>
+
+<p>Si le positionnement de l&#8217;invariant d&#8217;<em>utilisabilité</em> se fait en sortie du
+constructeur, nous aurions à la place la garantie que soit l&#8217;objet existe et
+il est utilisable, soit l&#8217;objet n&#8217;existe pas et aucune question ne se pose,
+nulle part.</p>
+
+<p>N.B. : il existe des infractions à cette règle. Une des plus visible vient du
+<a href="http://google-styleguide.googlecode.com/svn/trunk/cppguide.xml?showone=Forward_Declarations#Doing_Work_in_Constructors">C++ Style Guide de Google</a>.
+Dans la mesure où les exceptions sont interdites dans leur base de code (car la
+quantité de vieux code sans exceptions est trop importante), il ne reste plus
+aucun moyen de faire échouer des constructeurs. On perd l&#8217;invariant statique,
+il devient alors nécessaire de procéder à des initialisations en deux phases.<br/>
+Si vous n&#8217;avez pas de telle contrainte de <em>&ldquo;pas d&#8217;exceptions&rdquo;</em> sur vos projets,
+bannissez les fonctions <code>init()</code> de votre vocabulaire.</p>
+
+<p>Ceci dit, le recourt à des <em>factories</em> permet de retrouver un semblant
+d&#8217;invariant statique.</p>
+
+<h4>Choisir le bon type de pointeur</h4>
+
+<p>Avec le C++11 nous avons l&#8217;embarras du choix pour choisir comment manipuler des
+entités ou des données dynamiques. Entre, <code>std::unique_ptr&lt;&gt;</code>,
+<code>std::shared_ptr</code>, <code>boost::ptr_vector</code>, les références, les pointeurs bruts
+(/nus), <code>std::optional&lt;&gt;</code> (C++14), <em>etc.</em>, on peut avoir l&#8217;impression que c&#8217;est
+la jungle.</p>
+
+<p>Quel rapport avec les invariants statiques ? Et bien, comme pour les références
+<code>std::unique_ptr&lt;&gt;</code>, apporte une garantie supplémentaire par rapport à un
+simple pointeur brut.
+Ce type assure que la fonction qui réceptionne le pointeur en devient
+responsable alors que l&#8217;émetteur s&#8217;est débarrassé de la patate chaude. Et le
+compilateur est là pour entériner la transaction et faire en sorte que les deux
+intervenants respectent bien ce contrat de passation de responsabilité.</p>
+
+<p>Je pense que j&#8217;y reviendrai dans un prochain billet. En attendant, je ne peux
+que vous conseiller la lecture de cette
+<a href="http://exceptionsafecode.com/slides/svcc/2013/shared_ptr.pdf">présentation</a>
+assez exhaustive d&#8217;Ahmed Charles.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
       <h1 class="entry-title"><a href="/blog/2014/05/24/programmation-par-contrat-un-peu-de-theorie/">Programmation Par Contrat 1/3 &#8211; Un Peu De Théorie</a></h1>
     
     
@@ -102,7 +740,7 @@ Programmation par Contrat, et en particulier comment l&#8217;appliquer au C++. &
   <div class="entry-content"><p>Cela faisait un moment que je voulais partager mes conclusions sur la
 <em>Programmation par Contrat</em>, et en particulier comment l&#8217;appliquer au C++.</p>
 
-<p>Voici un premier billet qui aborde l&#8217;aspect théorique. Dans un <a href="#">second billet</a>,
+<p>Voici un premier billet qui aborde l&#8217;aspect théorique. Dans un <a href="/blog/2014/05/28/programmation-par-contrat-les-assertions/">second billet</a>,
 je traiterai des <em>assertions</em>. En guise de conclusion, je présenterai des
 <a href="#">techniques d&#8217;application de la PpC au C++</a>
 que j&#8217;ai croisées au fil des ans.</p>
@@ -166,7 +804,7 @@ Les assertions permettent d&#8217;installer des points de contrôle dans un prog
 pour vérifier que les traitements se passent bien. Ces points de contrôles
 seront utilisés pour vérifier les contrats préalablement définis.
 Nous les détaillerons dans
-<a href="#">le prochain billet</a>.</p>
+<a href="/blog/2014/05/28/programmation-par-contrat-les-assertions/">le prochain billet</a>.</p>
 
 <h2>II- La programmation par contrat</h2>
 
@@ -187,7 +825,7 @@ comme elle l&#8217;entend.</p>
 <code>sqrt</code> et qu&#8217;elle plante, on n&#8217;est pas plus avancés. Le bug est toujours là. Et
 pourtant, nous avons fait un énorme pas en avant : nous avons formalisé les
 contrats de <code>sqrt</code>. Nous disposons de spécifications précises, et d&#8217;une
-<a href="##Documentation">documentation</a> qui pourra accompagner le code.</p>
+<a href="/blog/2014/05/28/programmation-par-contrat-les-assertions/#Documentation">documentation</a> qui pourra accompagner le code.</p>
 
 <p>Heureusement, nous pouvons aller bien plus loin. Nous pouvons aussi marquer le
 code avec des assertions représentatives des contrats identifiés pour repérer
@@ -682,7 +1320,7 @@ leurs devoirs.</li>
 <li>Toutefois, il est possible de détourner la PpC  basée sur des assertions en C
 et C++ pour faire de la Programmation Défensive ; p.ex. l&#8217;assertion pourrait
 être détournée en <em>Release</em> pour lever une exception. J&#8217;y reviendrai dans le
-<a href="#">prochain billet</a>.</li>
+<a href="/blog/2014/05/28/programmation-par-contrat-les-assertions/">prochain billet</a>.</li>
 </ul>
 
 
@@ -1160,13 +1798,17 @@ ressources manipulées.</p>
 <section>
   <h1>Categories</h1>
   <ul id="categories">
-    <li class='category'><a href='/blog/categories/c-/'>C++ (2)</a></li>
+    <li class='category'><a href='/blog/categories/c-/'>C++ (3)</a></li>
 
   </ul>
 </section>
 <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/05/28/programmation-par-contrat-les-assertions/">Programmation Par Contrat 2/3 &#8211; Les Assertions</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2014/05/24/programmation-par-contrat-un-peu-de-theorie/">Programmation Par Contrat 1/3 &#8211; Un Peu De Théorie</a>
