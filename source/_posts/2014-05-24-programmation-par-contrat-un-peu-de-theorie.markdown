@@ -11,9 +11,9 @@ footer: true
 Cela faisait un moment que je voulais partager mes conclusions sur la
 _Programmation par Contrat_, et en particulier comment l'appliquer au C++.
 
-Voici un premier billet qui aborde l'aspect théorique. Dans un [second billet]({%post_url 2014-05-26-programmation-par-contrat-les-assertions%}),
+Voici un premier billet qui aborde l'aspect théorique. Dans un [second billet]({%post_url 2014-05-28-programmation-par-contrat-les-assertions%}),
 je traiterai des _assertions_. En guise de conclusion, je présenterai des
-[techniques d'application de la PpC au C++]({%post_url 2014-05-27-programmation-par-contrat-snippets-pour-le-c-plus-plus%})
+[techniques d'application de la PpC au C++]({%post_url 2014-05-29-programmation-par-contrat-snippets-pour-le-c-plus-plus%})
 que j'ai croisées au fil des ans.
 
 ## I- Les Erreurs
@@ -75,7 +75,7 @@ Les assertions permettent d'installer des points de contrôle dans un programme
 pour vérifier que les traitements se passent bien. Ces points de contrôles
 seront utilisés pour vérifier les contrats préalablement définis.
 Nous les détaillerons dans
-[le prochain billet]({%post_url 2014-05-26-programmation-par-contrat-les-assertions%}).
+[le prochain billet]({%post_url 2014-05-28-programmation-par-contrat-les-assertions%}).
 
 
 ## II- La programmation par contrat
@@ -97,7 +97,7 @@ On peut se demander à quoi ça sert. En effet, si on passe un nombre négatif �
 `sqrt` et qu'elle plante, on n'est pas plus avancés. Le bug est toujours là. Et
 pourtant, nous avons fait un énorme pas en avant : nous avons formalisé les
 contrats de `sqrt`. Nous disposons de spécifications précises, et d'une
-[documentation]({%post_url 2014-05-26-programmation-par-contrat-les-assertions%}#Documentation) qui pourra accompagner le code.
+[documentation]({%post_url 2014-05-28-programmation-par-contrat-les-assertions%}#Documentation) qui pourra accompagner le code.
 
 
 Heureusement, nous pouvons aller bien plus loin. Nous pouvons aussi marquer le
@@ -512,7 +512,7 @@ Sinon, voici mes conclusions personnelles sur le sujet :
 * Toutefois, il est possible de détourner la PpC  basée sur des assertions en C
   et C++ pour faire de la Programmation Défensive ; p.ex. l'assertion pourrait
   être détournée en *Release* pour lever une exception. J'y reviendrai dans le
-  [prochain billet]({%post_url 2014-05-26-programmation-par-contrat-les-assertions%}).
+  [prochain billet]({%post_url 2014-05-28-programmation-par-contrat-les-assertions%}).
 
 
 ### III.4- Comment reconnaitre des contrats ?

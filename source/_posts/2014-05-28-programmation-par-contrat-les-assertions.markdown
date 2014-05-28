@@ -1,10 +1,10 @@
 ---
 layout: post
 title: "Programmation par contrat 2/3 -- les assertions"
-date: 2014-05-26 12:07:42 +0200
+date: 2014-05-28 12:07:42 +0200
 comments: true
 categories: C++
-published: false
+published: true
 footer: true
 ---
 
@@ -225,7 +225,7 @@ N.B.: l'équivalent existe pour d'autres environnements comme VC++.
 
 #### <a id="Phases"></a>Un outil pour les phases de développement et de tests ...
 
-Je vais paraphraser [[Wilson2006] §1.1.](Wilson2006), qui énonçait déjà des
+Je vais paraphraser [[Wilson2006] §1.1.]({%post_url 2014-05-24-programmation-par-contrat-un-peu-de-theorie%}#Wilson2006), qui énonçait déjà des
 évidences : _"Plus tôt on détecte une erreur, mieux c'est"_.  C'est un adage
 que vous devez déjà connaitre. Concrètement, cela veut dire que l'on va
 préférer trouver nos erreurs, dans l'ordre :
