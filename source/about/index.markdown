@@ -24,6 +24,5 @@ Otherwise, you can also follow the contact information I've given on
 
 Last thing, as French law doesn't let me put all my code snippets under Public
 Domain, let's say that they are available under BSD 3 clauses license, and under
-MIT license, and under Boost Software License, and under GPL v3 license. Choose
-the one that fits you best. (NB: I've to check whether CC 0 makes any sense in
-that case).
+MIT license, and under Boost Software License, and under GPL v3 license, and
+even under CC 0. Choose the one that fits you best.
