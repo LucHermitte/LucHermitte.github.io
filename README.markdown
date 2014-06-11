@@ -6,9 +6,10 @@ BSD-2, BSL, MIT, and CC0.
 
 The blog engine is [Octopress](http://octopress.org). It has been tuned to:
 
-- support dynamic table of contents (see https://github.com/bmc blog) ;
-- ease the generation of the final pages (see
-  http://www.ewal.net/2012/09/08/octopress-customizations/);
-- have an about page, and an _about aside_
-- save empty lines before bullet lists
+- Support dynamic table of contents (see https://github.com/bmc blog) ;
+- Ease the generation of the final pages (see
+  http://www.ewal.net/2012/09/08/octopress-customizations/) ;
+- Have an about page, and an _about aside_ ;
+- Save empty lines before bullet lists ;
+- Have a post subtitle (different style will come later)
 
