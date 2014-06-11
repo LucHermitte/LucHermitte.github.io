@@ -1,3 +1,26 @@
 {% comment %}
   Add content to be output at the bottom of each page. (You might use this for analytics scripts, for example)
 {% endcomment %}
+{% comment %}
+------------------------------------------------------------------------------
+Table of contents generator
+------------------------------------------------------------------------------
+{% endcomment %}
+
+{% if index %}
+  {% comment %}
+  No table of contents on the index page.
+  {% endcomment %}
+
+{% elsif page.toc == true %}
+<script type="text/javascript">
+jQuery(document).ready(function() {
+  // Put a TOC right before the entry content.
+{% if page.language == 'fr' %}
+  generateTOC('.entry-content', 'Sommaire');
+{% else %}
+  generateTOC('.entry-content', 'Table of Contents');
+{% endif %}
+});
+</script>
+{% endif %}
