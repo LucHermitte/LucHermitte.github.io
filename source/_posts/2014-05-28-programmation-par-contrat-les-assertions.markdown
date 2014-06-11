@@ -1,11 +1,14 @@
 ---
 layout: post
-title: "Programmation par contrat 2/3 -- les assertions"
+title: "Programmation par contrat 2/3"
+subtitle: "Les assertions"
 date: 2014-05-28 12:07:42 +0200
 comments: true
 categories: C++
 published: true
 footer: true
+toc: true
+language: fr
 ---
 
 Dans ce second billet sur la _Programmation par Contrat_, nous allons voir que

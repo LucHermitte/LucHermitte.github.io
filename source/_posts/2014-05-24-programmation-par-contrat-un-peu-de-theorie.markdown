@@ -1,11 +1,14 @@
 ---
 layout: post
-title: "Programmation par Contrat 1/3 -- un peu de théorie"
+title: "Programmation par Contrat 1/3"
+subtitle: "Un peu de théorie"
 date: 2014-05-24 01:00:00 +0100
 comments: true
 categories: C++
 published: true
 footer: true
+toc: true
+language: fr
 ---
 
 Cela faisait un moment que je voulais partager mes conclusions sur la

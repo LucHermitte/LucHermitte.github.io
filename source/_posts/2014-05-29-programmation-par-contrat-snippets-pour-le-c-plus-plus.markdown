@@ -1,11 +1,14 @@
 ---
 layout: post
-title: "Programmation par Contrat 3/3 -- snippets pour le C++"
+title: "Programmation par Contrat 3/3"
+subtitle: "Snippets pour le C++"
 date: 2014-05-29 11:33:15 +0200
 comments: true
 categories: C++
 published: false
 footer: true
+toc: true
+language: fr
 ---
 
 Dans ce dernier billet sur la _Programmation par Contrat_, je vais vous présenter
