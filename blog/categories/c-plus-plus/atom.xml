@@ -4,7 +4,7 @@
   <title><![CDATA[Category: C++ | Luc Hermitte's Blog]]></title>
   <link href="http://LucHermitte.github.io/blog/categories/c-plus-plus/atom.xml" rel="self"/>
   <link href="http://LucHermitte.github.io/"/>
-  <updated>2014-06-11T17:36:37+02:00</updated>
+  <updated>2014-07-16T11:28:01+02:00</updated>
   <id>http://LucHermitte.github.io/</id>
   <author>
     <name><![CDATA[Luc Hermitte]]></name>
@@ -600,11 +600,12 @@ quand on est face à une erreur de programmation. Les assertions statiques nous
 aideront en cela.<br/>
 On peut aussi appliquer des petites recettes dont le principe chapeau consiste
 à confier nos invariants au compilateur. Par exemple, on évite de disposer de
-variables dans des états non pertinents (FAQ C++ dvpz), on utilise des
-références à la place de pointeurs quand on sait que l'on est censés disposer
-de <em>liens</em> non nuls, on annote comme <strong>transférables</strong> les types dont les
-responsables changent (<em>cf.</em> un prochain billet), on fait en sorte de ne pas
-pouvoir additionner des distances avec des masses (<em>cf.</em>
+variables dans des états non pertinents (<em>cf.</em> la
+<a href="http://cpp.developpez.com/faq/cpp/?page=Les-fonctions#Ou-dois-je-declarer-mes-variables-locales">FAQ C++ de développez</a>),
+on utilise des références à la place de pointeurs quand on sait que l'on est
+censés disposer de <em>liens</em> non nuls, on annote comme <strong>transférables</strong> les
+types dont les responsables changent (<em>cf.</em> un prochain billet), on fait en
+sorte de ne pas pouvoir additionner des distances avec des masses (<em>cf.</em>
 <a href="http://boost.org/libs/units">boost.unit</a>), &hellip;</p>
 
 <p>Pour les autres cas, <a href="#Meyer1988">[Meyer1988]</a> a jeté les bases d'un outil, la
@@ -708,7 +709,8 @@ Certains préfèrent utiliser le terme de <em>variant de boucle</em> pour désig
 propriété qui va permettre de sortir de la boucle.]</li>
 <li>une variable devrait toujours avoir pour invariant : <em>est utilisable, et est
 dans un état cohérent et pertinent</em> ; cet invariant est positionné à la
-sortie de son constructeur (<em>cf.</em> FAQ C++ dvpz) ;</li>
+sortie de son constructeur (<em>cf.</em> la
+<a href="http://cpp.developpez.com/faq/cpp/?page=Les-fonctions#Ou-dois-je-declarer-mes-variables-locales">FAQ C++ développez</a>) ;</li>
 <li>un <em>invariant de classe</em> est une propriété toujours observable depuis
 du code extérieur aux instances de la classe &mdash; p.ex. une séquence triée garantira
 que tous les éléments de la séquence sont toujours ordonnés lorsque le code
