@@ -65,11 +65,12 @@ quand on est face à une erreur de programmation. Les assertions statiques nous
 aideront en cela.  
 On peut aussi appliquer des petites recettes dont le principe chapeau consiste
 à confier nos invariants au compilateur. Par exemple, on évite de disposer de
-variables dans des états non pertinents (FAQ C++ dvpz), on utilise des
-références à la place de pointeurs quand on sait que l'on est censés disposer
-de _liens_ non nuls, on annote comme **transférables** les types dont les
-responsables changent (_cf._ un prochain billet), on fait en sorte de ne pas
-pouvoir additionner des distances avec des masses (_cf._
+variables dans des états non pertinents (_cf._ la
+[FAQ C++ de développez](http://cpp.developpez.com/faq/cpp/?page=Les-fonctions#Ou-dois-je-declarer-mes-variables-locales)),
+on utilise des références à la place de pointeurs quand on sait que l'on est
+censés disposer de _liens_ non nuls, on annote comme **transférables** les
+types dont les responsables changent (_cf._ un prochain billet), on fait en
+sorte de ne pas pouvoir additionner des distances avec des masses (_cf._
 [boost.unit](http://boost.org/libs/units)), ...
 
 Pour les autres cas, [[Meyer1988]](#Meyer1988) a jeté les bases d'un outil, la
@@ -170,7 +171,8 @@ de codes durant lesquelles une propriété sera vraie :
   propriété qui va permettre de sortir de la boucle.]
 * une variable devrait toujours avoir pour invariant : _est utilisable, et est
   dans un état cohérent et pertinent_ ; cet invariant est positionné à la
-  sortie de son constructeur (_cf._ FAQ C++ dvpz) ;
+  sortie de son constructeur (_cf._ la
+  [FAQ C++ développez](http://cpp.developpez.com/faq/cpp/?page=Les-fonctions#Ou-dois-je-declarer-mes-variables-locales)) ;
 * un _invariant de classe_ est une propriété toujours observable depuis
   du code extérieur aux instances de la classe -- p.ex. une séquence triée garantira
   que tous les éléments de la séquence sont toujours ordonnés lorsque le code
