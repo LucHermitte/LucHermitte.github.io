@@ -106,7 +106,7 @@ contrats de `sqrt`. Nous disposons de spécifications précises, et d'une
 
 Heureusement, nous pouvons aller bien plus loin. Nous pouvons aussi marquer le
 code avec des assertions représentatives des contrats identifiés pour repérer
-les ruptures de contrats en phase de tests et développement.
+les ruptures de contrats en phases de tests et développement.
 
 Idéalement, nous aurions dû pouvoir aller beaucoup plus loin. En effet, les
 outils d'analyse statique de code devraient pouvoir exploiter les contrats
@@ -138,8 +138,8 @@ correctement.
 > exception de _runtime_ en ce qui me concerne.  
 
 Notez cet emploi du _futur_. Il ne s'agit pas de vérifier si les calculs ou
-l'algorithme est correct en sortie de fonction, mais de vérifier si le contexte
-permet bien à la fonction de se dérouler correctement.  
+l'algorithme sont corrects en sortie de fonction, mais de vérifier si le
+contexte permet bien à la fonction de se dérouler correctement.  
 
 Le cas _"j'ai fait tous mes calculs, ils sont faux, et je ne sais pas
 pourquoi"_ ne justifie pas une exception. Il s'agit d'une erreur de
@@ -185,7 +185,7 @@ de codes durant lesquelles une propriété sera vraie :
 
 ### II.2- Acteurs et responsabilités
 
-Ces contrats son définis entre les acteurs qui interviennent dans l'écriture
+Ces contrats sont définis entre les acteurs qui interviennent dans l'écriture
 d'un code.  On peut dans l'absolu distinguer autant d'acteurs que de fonctions.  
 Prenons le bout de code suivant :
 
@@ -403,10 +403,10 @@ Programmation Défensive occupe déjà la place. Décortiquons-les.
 
 #### *"-On utilise l'une ou l'autre"*
 Oui et non. Si la PpC s'intéresse à l'écriture de code correct, la
-Programmation Défensive s'intéresse à l'écriture de code robuste. Certes
-l'objectif premier n'est pas le même (dans un cas on essaie de repérer et
+Programmation Défensive s'intéresse à l'écriture de code robuste. 
+L'objectif premier n'est pas le même (dans un cas on essaie de repérer et
 éliminer les erreurs de programmation, dans l'autre on essaie de ne pas planter
-en cas d'erreur de programmation), mais les deux techniques peuvent se
+en cas d'erreur de programmation), de fait les deux techniques peuvent se
 compléter.  
 D'abord on élimine les bugs, ensuite on essaie de résister aux bugs
 récalcitrants.
@@ -477,7 +477,7 @@ _Debug_, il n'y aurait aucune raison qu'il en aille autrement en _Release_.
 A contrario, un test qui finit en _coredump_ en _Debug_ aurait pu tomber en
 marche en _Release_, comme planter de façon plus ou moins compréhensible (plutôt
 moins en général).  
-Ce qui est sûr, c'est qu'en phase de développement et de tests, les
+Ce qui est sûr, c'est qu'en phases de développement et de tests, les
 développeurs auraient vu l'erreur de programmation et ils auraient dû la
 corriger pour voir le test passer.
 

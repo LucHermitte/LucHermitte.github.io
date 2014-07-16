@@ -431,9 +431,8 @@ utilisable_. Concrètement, cela implique deux choses pour le développeur.
    l'on soit capable de lui donner valeur pertinente, et préférentiellement
    définitive.
 
-Un futur point de la FAQ C++ de développez traitera plus en détails de cela. Je
-donnerai le lien quand nous aurons finalisé cette entrée.  
-_[N.B.: pour ceux qui ont les droits d'accès, la discussion se passe par [là](http://www.developpez.net/forums/d1422877-2/c-cpp/cpp/priv-ressources-cpp/faq-cpp/dois-declarer-variables-locales/).]_
+Un [nouveau point de la FAQ C++ de développez](http://cpp.developpez.com/faq/cpp/?page=Les-fonctions#Ou-dois-je-declarer-mes-variables-locales)
+traite de cela plus en détails.
 
 #### Corolaire : préférez les constructeurs aux fonctions `init()` et autres _setters_
 Dans la continuité du point précédent, il faut éviter toute initialisation qui
