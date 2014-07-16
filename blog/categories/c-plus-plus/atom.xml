@@ -4,7 +4,7 @@
   <title><![CDATA[Category: C++ | Luc Hermitte's Blog]]></title>
   <link href="http://LucHermitte.github.io/blog/categories/c-plus-plus/atom.xml" rel="self"/>
   <link href="http://LucHermitte.github.io/"/>
-  <updated>2014-07-16T11:28:01+02:00</updated>
+  <updated>2014-07-16T12:34:57+02:00</updated>
   <id>http://LucHermitte.github.io/</id>
   <author>
     <name><![CDATA[Luc Hermitte]]></name>
@@ -488,9 +488,8 @@ définitive.</li>
 </ol>
 
 
-<p>Un futur point de la FAQ C++ de développez traitera plus en détails de cela. Je
-donnerai le lien quand nous aurons finalisé cette entrée.<br/>
-<em>[N.B.: pour ceux qui ont les droits d'accès, la discussion se passe par <a href="http://www.developpez.net/forums/d1422877-2/c-cpp/cpp/priv-ressources-cpp/faq-cpp/dois-declarer-variables-locales/">là</a>.]</em></p>
+<p>Un <a href="http://cpp.developpez.com/faq/cpp/?page=Les-fonctions#Ou-dois-je-declarer-mes-variables-locales">nouveau point de la FAQ C++ de développez</a>
+traite de cela plus en détails.</p>
 
 <h4>Corolaire : préférez les constructeurs aux fonctions <code>init()</code> et autres <em>setters</em></h4>
 
@@ -639,7 +638,7 @@ contrats de <code>sqrt</code>. Nous disposons de spécifications précises, et d
 
 <p>Heureusement, nous pouvons aller bien plus loin. Nous pouvons aussi marquer le
 code avec des assertions représentatives des contrats identifiés pour repérer
-les ruptures de contrats en phase de tests et développement.</p>
+les ruptures de contrats en phases de tests et développement.</p>
 
 <p>Idéalement, nous aurions dû pouvoir aller beaucoup plus loin. En effet, les
 outils d'analyse statique de code devraient pouvoir exploiter les contrats
@@ -674,8 +673,8 @@ post-conditions, alors elle <strong>doit</strong> échouer &mdash; de préféren
 exception de <em>runtime</em> en ce qui me concerne.</p></blockquote>
 
 <p>Notez cet emploi du <em>futur</em>. Il ne s'agit pas de vérifier si les calculs ou
-l'algorithme est correct en sortie de fonction, mais de vérifier si le contexte
-permet bien à la fonction de se dérouler correctement.</p>
+l'algorithme sont corrects en sortie de fonction, mais de vérifier si le
+contexte permet bien à la fonction de se dérouler correctement.</p>
 
 <p>Le cas <em>&ldquo;j'ai fait tous mes calculs, ils sont faux, et je ne sais pas
 pourquoi&rdquo;</em> ne justifie pas une exception. Il s'agit d'une erreur de
@@ -724,7 +723,7 @@ invariant une garantie de non-nullité.</li>
 
 <h3>II.2- Acteurs et responsabilités</h3>
 
-<p>Ces contrats son définis entre les acteurs qui interviennent dans l'écriture
+<p>Ces contrats sont définis entre les acteurs qui interviennent dans l'écriture
 d'un code.  On peut dans l'absolu distinguer autant d'acteurs que de fonctions.<br/>
 Prenons le bout de code suivant :</p>
 
@@ -965,10 +964,10 @@ Programmation Défensive occupe déjà la place. Décortiquons-les.</p>
 <h4><em>&ldquo;-On utilise l'une ou l'autre&rdquo;</em></h4>
 
 <p>Oui et non. Si la PpC s'intéresse à l'écriture de code correct, la
-Programmation Défensive s'intéresse à l'écriture de code robuste. Certes
-l'objectif premier n'est pas le même (dans un cas on essaie de repérer et
+Programmation Défensive s'intéresse à l'écriture de code robuste.
+L'objectif premier n'est pas le même (dans un cas on essaie de repérer et
 éliminer les erreurs de programmation, dans l'autre on essaie de ne pas planter
-en cas d'erreur de programmation), mais les deux techniques peuvent se
+en cas d'erreur de programmation), de fait les deux techniques peuvent se
 compléter.<br/>
 D'abord on élimine les bugs, ensuite on essaie de résister aux bugs
 récalcitrants.</p>
@@ -1043,7 +1042,7 @@ c'est que les assertions traversées ne détectent aucune rupture de contrat en
 A contrario, un test qui finit en <em>coredump</em> en <em>Debug</em> aurait pu tomber en
 marche en <em>Release</em>, comme planter de façon plus ou moins compréhensible (plutôt
 moins en général).<br/>
-Ce qui est sûr, c'est qu'en phase de développement et de tests, les
+Ce qui est sûr, c'est qu'en phases de développement et de tests, les
 développeurs auraient vu l'erreur de programmation et ils auraient dû la
 corriger pour voir le test passer.</p>
 
