@@ -4,7 +4,7 @@
   <title><![CDATA[Luc Hermitte's Blog]]></title>
   <link href="http://LucHermitte.github.io/atom.xml" rel="self"/>
   <link href="http://LucHermitte.github.io/"/>
-  <updated>2014-07-16T12:34:57+02:00</updated>
+  <updated>2014-07-18T09:45:09+02:00</updated>
   <id>http://LucHermitte.github.io/</id>
   <author>
     <name><![CDATA[Luc Hermitte]]></name>
@@ -428,24 +428,21 @@ Pour information, je n&#8217;ai pas eu l&#8217;occasion de tester des outils com
 Contract</em> (pour .NET), Ada2012 (si on sort du périmètre du C++) ni même
 <em>Polyspace</em>.</p>
 
-<h2>III- Le standard s&#8217;enrichira-t-il en 2017 pour programmer avec des contrats ?</h2>
+<h2>III- Le standard s&#8217;enrichira-t-il en 2014 ou 2017 pour programmer avec des contrats ?</h2>
 
 <p>Il y a déjà eu des propositions de mots clés plus ou moins sémantiquement forts
 pour supporter la PpC en standard en C++. Dans la dernière en date,
-<a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3753.pdf">n3753</a>,
-John Lakos et Alexei Zakharov introduisent un ensemble de macros <code>pre_assert</code>
+<del><a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3753.pdf">n3753</a></del>
+<a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4075.pdf">n4075</a>,
+John Lakos et Alexei Zakharov introduisent un ensemble de macros <code>STD_CONTRACT_ASSERT</code>
 assez flexible.</p>
 
-<p>Elles supportent des niveaux d&#8217;importance de vérification (<em>toujours</em>,
-<em>parfois</em>) un peu à l&#8217;image des niveaux <em>Error</em>/<em>Warning</em>/<em>Info</em>/<em>Debug</em> dans
-les frameworks de log.  Elle permet de faire de la programmation défensive
-(i.e. de lever des exceptions au lieu de simples assertions). Elle permet
-également de transformer les assertions en assertions de frameworks de tests
-unitaires.</p>
-
-<p>S&#8217;il fallait lui trouver un défaut, je dirai que sémantiquement le nom
-<code>pre_assert</code> est trop restrictif, en effet cette proposition serait également
-parfaitement applicable aux post-conditions et aux invariants.</p>
+<p>Elles supportent des niveaux d&#8217;importance de vérification (<em>disabled</em>,
+<em>optimized</em>, <em>safe</em>, <em>debug</em>,) un peu à l&#8217;image des niveaux
+<em>Error</em>/<em>Warning</em>/<em>Info</em>/<em>Debug</em> dans les frameworks de log.  Elle permet de
+faire de la programmation défensive (i.e. de lever des exceptions au lieu de
+simples assertions). Elle permet également de transformer les assertions en
+assertions de frameworks de tests unitaires.</p>
 
 <p>À noter qu&#8217;elle est déjà implémentée et disponible à l&#8217;intérieur de la
 <a href="https://github.com/bloomberg/bde">bibliothèque BDE/BSL</a> sous licence MIT.</p>
