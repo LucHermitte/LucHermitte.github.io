@@ -325,24 +325,21 @@ Contract_ (pour .NET), Ada2012 (si on sort du périmètre du C++) ni même
 _Polyspace_.
 
 
-## III- Le standard s'enrichira-t-il en 2017 pour programmer avec des contrats ?
+## III- Le standard s'enrichira-t-il en 2014 ou 2017 pour programmer avec des contrats ?
 
 Il y a déjà eu des propositions de mots clés plus ou moins sémantiquement forts
 pour supporter la PpC en standard en C++. Dans la dernière en date, 
-[n3753](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3753.pdf),
-John Lakos et Alexei Zakharov introduisent un ensemble de macros `pre_assert`
+<del>[n3753](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3753.pdf)</del>
+[n4075](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4075.pdf),
+John Lakos et Alexei Zakharov introduisent un ensemble de macros `STD_CONTRACT_ASSERT`
 assez flexible.
 
-Elles supportent des niveaux d'importance de vérification (_toujours_,
-_parfois_) un peu à l'image des niveaux _Error_/_Warning_/_Info_/_Debug_ dans
-les frameworks de log.  Elle permet de faire de la programmation défensive
-(i.e. de lever des exceptions au lieu de simples assertions). Elle permet
-également de transformer les assertions en assertions de frameworks de tests
-unitaires.
-
-S'il fallait lui trouver un défaut, je dirai que sémantiquement le nom
-`pre_assert` est trop restrictif, en effet cette proposition serait également
-parfaitement applicable aux post-conditions et aux invariants.
+Elles supportent des niveaux d'importance de vérification (_disabled_,
+_optimized_, _safe_, _debug_,) un peu à l'image des niveaux
+_Error_/_Warning_/_Info_/_Debug_ dans les frameworks de log.  Elle permet de
+faire de la programmation défensive (i.e. de lever des exceptions au lieu de
+simples assertions). Elle permet également de transformer les assertions en
+assertions de frameworks de tests unitaires.
 
 À noter qu'elle est déjà implémentée et disponible à l'intérieur de la
 [bibliothèque BDE/BSL](https://github.com/bloomberg/bde) sous licence MIT.
