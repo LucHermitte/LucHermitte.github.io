@@ -344,6 +344,14 @@ assertions de frameworks de tests unitaires.
 À noter qu'elle est déjà implémentée et disponible à l'intérieur de la
 [bibliothèque BDE/BSL](https://github.com/bloomberg/bde) sous licence MIT.
 
+Toutefois, cette proposition a été
+[rejetée](https://isocpp.org/files/papers/N4053.html#LWG8), mais on voit que le
+sujet de l'introduction de la PpC en C++ a toujours ses fervents partisans,
+_cf._ :
+
+- [n4110](https://isocpp.org/files/papers/N4110.pdf)
+  _Exploring the design space of contract specications for C++_, J. Daniel Garcia
+- [un étude d'Andrzej Krzemieŉski](http://htmlpreview.github.io/?https://github.com/akrzemi1/contract/blob/master/contract.html).
 
 ## IV- <a id="VerificationsStatiques"></a>Invariants statiques
 
