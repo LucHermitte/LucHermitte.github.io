@@ -4,7 +4,7 @@
   <title><![CDATA[Luc Hermitte's Blog]]></title>
   <link href="http://LucHermitte.github.io/atom.xml" rel="self"/>
   <link href="http://LucHermitte.github.io/"/>
-  <updated>2014-07-18T09:45:09+02:00</updated>
+  <updated>2014-07-28T18:28:19+02:00</updated>
   <id>http://LucHermitte.github.io/</id>
   <author>
     <name><![CDATA[Luc Hermitte]]></name>
@@ -446,6 +446,22 @@ assertions de frameworks de tests unitaires.</p>
 
 <p>À noter qu&#8217;elle est déjà implémentée et disponible à l&#8217;intérieur de la
 <a href="https://github.com/bloomberg/bde">bibliothèque BDE/BSL</a> sous licence MIT.</p>
+
+<p>Toutefois, cette proposition a été
+<a href="https://isocpp.org/files/papers/N4053.html#LWG8">rejetée</a>, mais on voit que le
+sujet de l&#8217;introduction de la PpC en C++ a toujours ses fervents partisans:</p>
+
+<ul>
+<li><a href="https://isocpp.org/files/papers/N4110.pdf">n4110</a>
+<em>Exploring the design space of contract specications for C++</em>
+
+<ol type="a">
+<li>Daniel Garcia</li>
+</ol>
+</li>
+<li><a href="http://htmlpreview.github.io/?https://github.com/akrzemi1/contract/blob/master/contract.html">un étude d&#8217;Andrzej Krzemieŉski</a>.</li>
+</ul>
+
 
 <h2>IV- <a id="VerificationsStatiques"></a>Invariants statiques</h2>
 
