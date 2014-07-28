@@ -4,7 +4,7 @@
   <title><![CDATA[Category: C++ | Luc Hermitte's Blog]]></title>
   <link href="http://LucHermitte.github.io/blog/categories/c-plus-plus/atom.xml" rel="self"/>
   <link href="http://LucHermitte.github.io/"/>
-  <updated>2014-07-28T18:28:19+02:00</updated>
+  <updated>2014-07-28T18:49:16+02:00</updated>
   <id>http://LucHermitte.github.io/</id>
   <author>
     <name><![CDATA[Luc Hermitte]]></name>
@@ -385,16 +385,12 @@ assertions de frameworks de tests unitaires.</p>
 
 <p>Toutefois, cette proposition a été
 <a href="https://isocpp.org/files/papers/N4053.html#LWG8">rejetée</a>, mais on voit que le
-sujet de l'introduction de la PpC en C++ a toujours ses fervents partisans:</p>
+sujet de l'introduction de la PpC en C++ a toujours ses fervents partisans,
+<em>cf.</em> :</p>
 
 <ul>
 <li><a href="https://isocpp.org/files/papers/N4110.pdf">n4110</a>
-<em>Exploring the design space of contract specications for C++</em>
-
-<ol type="a">
-<li>Daniel Garcia</li>
-</ol>
-</li>
+<em>Exploring the design space of contract specications for C++</em>, J. Daniel Garcia</li>
 <li><a href="http://htmlpreview.github.io/?https://github.com/akrzemi1/contract/blob/master/contract.html">un étude d'Andrzej Krzemieŉski</a>.</li>
 </ul>
 
