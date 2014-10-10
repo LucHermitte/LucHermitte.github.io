@@ -4,7 +4,7 @@
   <title><![CDATA[Luc Hermitte's Blog]]></title>
   <link href="http://LucHermitte.github.io/atom.xml" rel="self"/>
   <link href="http://LucHermitte.github.io/"/>
-  <updated>2014-07-28T18:49:16+02:00</updated>
+  <updated>2014-10-10T18:16:17+02:00</updated>
   <id>http://LucHermitte.github.io/</id>
   <author>
     <name><![CDATA[Luc Hermitte]]></name>
@@ -72,11 +72,28 @@ remonte jusqu&#8217;à un <code>catch</code> compatible ; or à l&#8217;endroit 
 plus avoir accès à l&#8217;état (de toutes les variables, dans tous les threads, &hellip;)
 au moment de la détection du problème.</p>
 
-<p>En vérité, il y existe deux moyens peu ergonomiques pour y avoir accès. Le
-premier consiste à mettre des points d&#8217;arrêt sur les levers ou les
-constructions d&#8217;exceptions, et à exécuter le programme depuis un débuggueur. Le
-second consiste à supprimer du code source tous les <code>catchs</code> qui sont
-compatibles avec l&#8217;erreur de logique.</p>
+<p>En vérité, il y existe deux moyens peu ergonomiques pour y avoir accès.</p>
+
+<ul>
+<li>Le premier consiste à mettre des points d&#8217;arrêt sur les levers ou les
+constructions d&#8217;exceptions, et à exécuter le programme depuis un débuggueur.</li>
+<li>Le second consiste à supprimer du code source tous les <code>catchs</code> qui sont
+compatibles avec l&#8217;erreur de logique.<br/>
+Pour se simplifier la vie, et être propres, faites dériver vos erreurs de
+logique de <code>std::logic_error</code> (et de ses enfants) et vos erreurs de <em>runtime</em>
+de <code>std::runtime_error</code> (&amp; fils) ; enfin dans votre code vous pourrez ne pas
+attraper les <code>std::logic_error</code> lorsque vous ne compilez pas en définissant
+<code>NDEBUG</code> histoire d&#8217;avoir un <em>coredump</em> en <em>Debug</em> sur les erreurs de
+logique, et une exception en <em>Release</em>.<br/>
+Le hic est que de nombreux <em>frameworks</em> font dériver leurs erreurs de
+<code>std::exception</code> et non de <code>std::runtime_error</code>, et de fait, on se retrouve
+vite à faire des <code>catch(std::exception const&amp;)</code> aux points d&#8217;interface
+(dialogue via API C, threads en C++03, <code>main()</code>, &hellip;) quelque soit le mode de
+compilation.<br/>
+Corolaire : ne faites pas comme ses <em>frameworks</em> et choisissez judicieusement
+votre exception standard racine.</li>
+</ul>
+
 
 <p>Aucune de ces deux options n&#8217;est véritablement envisageable pour des tests
 automatisés ; et la seconde l&#8217;est encore moins pour du code qui va aller en
@@ -426,7 +443,12 @@ d&#8217;autres outils savent tirer parti des contrats déclarés à l&#8217;aide
 ou peut-être le sauront-ils demain.<br/>
 Pour information, je n&#8217;ai pas eu l&#8217;occasion de tester des outils comme <em>Code
 Contract</em> (pour .NET), Ada2012 (si on sort du périmètre du C++) ni même
-<em>Polyspace</em>.</p>
+<em>Polyspace</em>, ou <em>QA C++</em>.</p>
+
+<p>Dis autrement, je n&#8217;ai pas encore trouvé d&#8217;outil qui fasse de la preuve
+formelle en C++. A noter qu&#8217;il existe des efforts pour fournir à de tels outils
+des moyens simplifiés, et plus forts sémantiquement parlant, pour exprimer des
+contrats dans des codes C++.</p>
 
 <h2>III- Le standard s&#8217;enrichira-t-il en 2014 ou 2017 pour programmer avec des contrats ?</h2>
 
@@ -455,7 +477,8 @@ sujet de l&#8217;introduction de la PpC en C++ a toujours ses fervents partisans
 <ul>
 <li><a href="https://isocpp.org/files/papers/N4110.pdf">n4110</a>
 <em>Exploring the design space of contract specications for C++</em>, J. Daniel Garcia</li>
-<li><a href="http://htmlpreview.github.io/?https://github.com/akrzemi1/contract/blob/master/contract.html">un étude d&#8217;Andrzej Krzemieŉski</a>.</li>
+<li><a href="http://htmlpreview.github.io/?https://github.com/akrzemi1/contract/blob/master/contract.html">une étude d&#8217;Andrzej Krzemieŉski</a>
+qui aborde l&#8217;angle de ce qui pourrait être fourni à des outils d&#8217;analyse pour réaliser de la preuve formelle.</li>
 </ul>
 
 
