@@ -67,11 +67,25 @@ remonte jusqu'à un `catch` compatible ; or à l'endroit du `catch`, on ne peut
 plus avoir accès à l'état (de toutes les variables, dans tous les threads, ...)
 au moment de la détection du problème.
 
-En vérité, il y existe deux moyens peu ergonomiques pour y avoir accès. Le
-premier consiste à mettre des points d'arrêt sur les levers ou les
-constructions d'exceptions, et à exécuter le programme depuis un débuggueur. Le
-second consiste à supprimer du code source tous les `catchs` qui sont
-compatibles avec l'erreur de logique.
+En vérité, il y existe deux moyens peu ergonomiques pour y avoir accès. 
+
+* Le premier consiste à mettre des points d'arrêt sur les levers ou les
+  constructions d'exceptions, et à exécuter le programme depuis un débuggueur.
+* Le second consiste à supprimer du code source tous les `catchs` qui sont
+  compatibles avec l'erreur de logique.  
+  Pour se simplifier la vie, et être propres, faites dériver vos erreurs de
+  logique de `std::logic_error` (et de ses enfants) et vos erreurs de _runtime_
+  de `std::runtime_error` (& fils) ; enfin dans votre code vous pourrez ne pas
+  attraper les `std::logic_error` lorsque vous ne compilez pas en définissant
+  `NDEBUG` histoire d'avoir un _coredump_ en _Debug_ sur les erreurs de
+  logique, et une exception en _Release_.  
+  Le hic est que de nombreux _frameworks_ font dériver leurs erreurs de
+  `std::exception` et non de `std::runtime_error`, et de fait, on se retrouve
+  vite à faire des `catch(std::exception const&)` aux points d'interface
+  (dialogue via API C, threads en C++03, `main()`, ...) quelque soit le mode de
+  compilation.  
+  Corolaire : ne faites pas comme ces _frameworks_ et choisissez judicieusement
+  votre exception standard racine.
 
 Aucune de ces deux options n'est véritablement envisageable pour des tests
 automatisés ; et la seconde l'est encore moins pour du code qui va aller en
@@ -321,8 +335,15 @@ N.B.: Je généralise à partir de mon test avec _clang analyzer_. Peut-être qu
 d'autres outils savent tirer parti des contrats déclarés à l'aide d'assertions,
 ou peut-être le sauront-ils demain.  
 Pour information, je n'ai pas eu l'occasion de tester des outils comme _Code
-Contract_ (pour .NET), Ada2012 (si on sort du périmètre du C++) ni même
-_Polyspace_.
+Contract_ (pour .NET qui semble justement s'attaquer à cette tâche), Ada2012
+(si on sort du périmètre du C++), Eiffel (qui va jusqu'à générer
+automatiquement des tests unitaires à partir des contrats exprimés),
+ni même _Polyspace_, ou _QA C++_.
+
+Dis autrement, je n'ai pas encore trouvé d'outil qui fasse de la preuve
+formelle en C++. A noter qu'il existe des efforts pour fournir à de tels outils
+des moyens simplifiés, et plus forts sémantiquement parlant, pour exprimer des
+contrats dans des codes C++.
 
 
 ## III- Le standard s'enrichira-t-il en 2014 ou 2017 pour programmer avec des contrats ?
@@ -351,7 +372,8 @@ _cf._ :
 
 - [n4110](https://isocpp.org/files/papers/N4110.pdf)
   _Exploring the design space of contract specications for C++_, J. Daniel Garcia
-- [un étude d'Andrzej Krzemieŉski](http://htmlpreview.github.io/?https://github.com/akrzemi1/contract/blob/master/contract.html).
+- [une étude d'Andrzej Krzemieŉski](http://htmlpreview.github.io/?https://github.com/akrzemi1/contract/blob/master/contract.html)
+  qui aborde l'angle de ce qui pourrait être fourni à des outils d'analyse pour réaliser de la preuve formelle.
 
 ## IV- <a id="VerificationsStatiques"></a>Invariants statiques
 
