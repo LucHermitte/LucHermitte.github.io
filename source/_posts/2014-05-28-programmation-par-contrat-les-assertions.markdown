@@ -73,12 +73,13 @@ En vérité, il y existe deux moyens peu ergonomiques pour y avoir accès.
   constructions d'exceptions, et à exécuter le programme depuis un débuggueur.
 * Le second consiste à supprimer du code source tous les `catchs` qui sont
   compatibles avec l'erreur de logique.  
-  Pour se simplifier la vie, et être propres, faites dériver vos erreurs de
+  Pour vous simplifier la vie, et être propres, faites dériver vos erreurs de
   logique de `std::logic_error` (et de ses enfants) et vos erreurs de _runtime_
   de `std::runtime_error` (& fils) ; enfin dans votre code vous pourrez ne pas
   attraper les `std::logic_error` lorsque vous ne compilez pas en définissant
   `NDEBUG` histoire d'avoir un _coredump_ en _Debug_ sur les erreurs de
-  logique, et une exception en _Release_.  
+  logique, et une exception en _Release_. J'y reviendrai dans le prochain
+  billet.  
   Le hic est que de nombreux _frameworks_ font dériver leurs erreurs de
   `std::exception` et non de `std::runtime_error`, et de fait, on se retrouve
   vite à faire des `catch(std::exception const&)` aux points d'interface
@@ -336,11 +337,11 @@ d'autres outils savent tirer parti des contrats déclarés à l'aide d'assertion
 ou peut-être le sauront-ils demain.  
 Pour information, je n'ai pas eu l'occasion de tester des outils comme _Code
 Contract_ (pour .NET qui semble justement s'attaquer à cette tâche), Ada2012
-(si on sort du périmètre du C++), Eiffel (qui va jusqu'à générer
+(si on continue hors du périmètre du C++), Eiffel (qui va jusqu'à générer
 automatiquement des tests unitaires à partir des contrats exprimés),
 ni même _Polyspace_, ou _QA C++_.
 
-Dis autrement, je n'ai pas encore trouvé d'outil qui fasse de la preuve
+Dit autrement, je n'ai pas encore trouvé d'outil qui fasse de la preuve
 formelle en C++. A noter qu'il existe des efforts pour fournir à de tels outils
 des moyens simplifiés, et plus forts sémantiquement parlant, pour exprimer des
 contrats dans des codes C++.
