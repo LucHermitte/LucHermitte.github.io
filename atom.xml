@@ -4,7 +4,7 @@
   <title><![CDATA[Luc Hermitte's Blog]]></title>
   <link href="http://LucHermitte.github.io/atom.xml" rel="self"/>
   <link href="http://LucHermitte.github.io/"/>
-  <updated>2014-10-10T18:16:17+02:00</updated>
+  <updated>2014-10-13T18:51:27+02:00</updated>
   <id>http://LucHermitte.github.io/</id>
   <author>
     <name><![CDATA[Luc Hermitte]]></name>
@@ -90,7 +90,7 @@ Le hic est que de nombreux <em>frameworks</em> font dériver leurs erreurs de
 vite à faire des <code>catch(std::exception const&amp;)</code> aux points d&#8217;interface
 (dialogue via API C, threads en C++03, <code>main()</code>, &hellip;) quelque soit le mode de
 compilation.<br/>
-Corolaire : ne faites pas comme ses <em>frameworks</em> et choisissez judicieusement
+Corolaire : ne faites pas comme ces <em>frameworks</em> et choisissez judicieusement
 votre exception standard racine.</li>
 </ul>
 
@@ -442,8 +442,10 @@ le code n&#8217;appelait jamais <code>my::sqrt</code> avec un nombre négatif.</
 d&#8217;autres outils savent tirer parti des contrats déclarés à l&#8217;aide d&#8217;assertions,
 ou peut-être le sauront-ils demain.<br/>
 Pour information, je n&#8217;ai pas eu l&#8217;occasion de tester des outils comme <em>Code
-Contract</em> (pour .NET), Ada2012 (si on sort du périmètre du C++) ni même
-<em>Polyspace</em>, ou <em>QA C++</em>.</p>
+Contract</em> (pour .NET qui semble justement s&#8217;attaquer à cette tâche), Ada2012
+(si on sort du périmètre du C++), Eiffel (qui va jusqu&#8217;à générer
+automatiquement des tests unitaires à partir des contrats exprimés),
+ni même <em>Polyspace</em>, ou <em>QA C++</em>.</p>
 
 <p>Dis autrement, je n&#8217;ai pas encore trouvé d&#8217;outil qui fasse de la preuve
 formelle en C++. A noter qu&#8217;il existe des efforts pour fournir à de tels outils
