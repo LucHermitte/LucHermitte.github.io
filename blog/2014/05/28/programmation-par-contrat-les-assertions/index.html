@@ -164,12 +164,13 @@ au moment de la détection du problème.</p>
 constructions d&#8217;exceptions, et à exécuter le programme depuis un débuggueur.</li>
 <li>Le second consiste à supprimer du code source tous les <code>catchs</code> qui sont
 compatibles avec l&#8217;erreur de logique.<br/>
-Pour se simplifier la vie, et être propres, faites dériver vos erreurs de
+Pour vous simplifier la vie, et être propres, faites dériver vos erreurs de
 logique de <code>std::logic_error</code> (et de ses enfants) et vos erreurs de <em>runtime</em>
 de <code>std::runtime_error</code> (&amp; fils) ; enfin dans votre code vous pourrez ne pas
 attraper les <code>std::logic_error</code> lorsque vous ne compilez pas en définissant
 <code>NDEBUG</code> histoire d&#8217;avoir un <em>coredump</em> en <em>Debug</em> sur les erreurs de
-logique, et une exception en <em>Release</em>.<br/>
+logique, et une exception en <em>Release</em>. J&#8217;y reviendrai dans le prochain
+billet.<br/>
 Le hic est que de nombreux <em>frameworks</em> font dériver leurs erreurs de
 <code>std::exception</code> et non de <code>std::runtime_error</code>, et de fait, on se retrouve
 vite à faire des <code>catch(std::exception const&amp;)</code> aux points d&#8217;interface
@@ -528,11 +529,11 @@ d&#8217;autres outils savent tirer parti des contrats déclarés à l&#8217;aide
 ou peut-être le sauront-ils demain.<br/>
 Pour information, je n&#8217;ai pas eu l&#8217;occasion de tester des outils comme <em>Code
 Contract</em> (pour .NET qui semble justement s&#8217;attaquer à cette tâche), Ada2012
-(si on sort du périmètre du C++), Eiffel (qui va jusqu&#8217;à générer
+(si on continue hors du périmètre du C++), Eiffel (qui va jusqu&#8217;à générer
 automatiquement des tests unitaires à partir des contrats exprimés),
 ni même <em>Polyspace</em>, ou <em>QA C++</em>.</p>
 
-<p>Dis autrement, je n&#8217;ai pas encore trouvé d&#8217;outil qui fasse de la preuve
+<p>Dit autrement, je n&#8217;ai pas encore trouvé d&#8217;outil qui fasse de la preuve
 formelle en C++. A noter qu&#8217;il existe des efforts pour fournir à de tels outils
 des moyens simplifiés, et plus forts sémantiquement parlant, pour exprimer des
 contrats dans des codes C++.</p>
