@@ -538,37 +538,50 @@ formelle en C++. A noter qu&#8217;il existe des efforts pour fournir à de tels 
 des moyens simplifiés, et plus forts sémantiquement parlant, pour exprimer des
 contrats dans des codes C++.</p>
 
-<h2>III- Le standard s&#8217;enrichira-t-il en 2014 ou 2017 pour programmer avec des contrats ?</h2>
+<h2>III- Le standard s&#8217;enrichira-t-il en <del>2014 ou en</del> 2017 pour programmer avec des contrats ?</h2>
 
 <p>Il y a déjà eu des propositions de mots clés plus ou moins sémantiquement forts
-pour supporter la PpC en standard en C++. Dans la dernière en date,
-<del><a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3753.pdf">n3753</a></del>
-<a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4075.pdf">n4075</a>,
-John Lakos et Alexei Zakharov introduisent un ensemble de macros <code>STD_CONTRACT_ASSERT</code>
+pour supporter la PpC en standard en C++. Dans le dernier mailing (pre-Urbana) en date,
+<del><a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3753.pdf">N3753</a></del>
+<del><a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4075.pdf">N4075</a></del>
+<a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4135.pdf">N4135</a>,
+John Lakos et Alexei Zakharov introduisent un ensemble de macros <code>contract_assert()</code>
 assez flexible.</p>
 
-<p>Elles supportent des niveaux d&#8217;importance de vérification (<em>disabled</em>,
-<em>optimized</em>, <em>safe</em>, <em>debug</em>,) un peu à l&#8217;image des niveaux
-<em>Error</em>/<em>Warning</em>/<em>Info</em>/<em>Debug</em> dans les frameworks de log.  Elle permet de
-faire de la programmation défensive (i.e. de lever des exceptions au lieu de
-simples assertions). Elle permet également de transformer les assertions en
+<p>Elles supportent des niveaux d&#8217;importance de vérification (<em>optimized</em>, <em>safe</em>,
+<em>debug</em>,) un peu à l&#8217;image des niveaux <em>Error</em>/<em>Warning</em>/<em>Info</em>/<em>Debug</em> dans
+les frameworks de log.  La proposition offre de permettre de faire de la
+programmation défensive (i.e. de lever des exceptions au lieu de simples
+assertions). Elle permettrait également de transformer les assertions en
 assertions de frameworks de tests unitaires.</p>
 
 <p>À noter qu&#8217;elle est déjà implémentée et disponible à l&#8217;intérieur de la
 <a href="https://github.com/bloomberg/bde">bibliothèque BDE/BSL</a> sous licence MIT.</p>
 
-<p>Toutefois, cette proposition a été
-<a href="https://isocpp.org/files/papers/N4053.html#LWG8">rejetée</a>, mais on voit que le
-sujet de l&#8217;introduction de la PpC en C++ a toujours ses fervents partisans,
-<em>cf.</em> :</p>
+<p>Cette proposition en est à sa huitième révision. Les
+<a href="https://isocpp.org/files/papers/N4053.html#LWG8">minutes du rejet</a> de la
+révision précédente (N4075) sont disponibles.</p>
+
+<p>De plus, on voit que le sujet de l&#8217;introduction de la PpC en C++ a ses
+partisans, car d&#8217;autres propositions tournent, <em>cf.</em> :</p>
 
 <ul>
-<li><a href="https://isocpp.org/files/papers/N4110.pdf">n4110</a>
-<em>Exploring the design space of contract specications for C++</em>, J. Daniel Garcia</li>
+<li><a href="https://isocpp.org/files/papers/N4110.pdf">N4110</a>
+<em>Exploring the design space of contract specications for C++</em>, J. Daniel Garcia ;</li>
 <li><a href="http://htmlpreview.github.io/?https://github.com/akrzemi1/contract/blob/master/contract.html">une étude d&#8217;Andrzej Krzemieŉski</a>
-qui aborde l&#8217;angle de ce qui pourrait être fourni à des outils d&#8217;analyse pour réaliser de la preuve formelle.</li>
+qui aborde l&#8217;angle de ce qui pourrait être fourni à des outils d&#8217;analyse pour réaliser de la preuve formelle ;</li>
+<li><a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4154.pdf">N4154</a>
+<em>Operator assert</em>, David Krauss ;</li>
+<li><a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4248.html">N4248</a>
+<em>Library Preconditions are a Language Feature</em>, où Alisdair Meredith lance
+une discussion pour faire évoluer le langage en vue de se donner de
+meilleurs moyens pour vérifier les contrats.</li>
 </ul>
 
+
+<p>Bref, les choses évoluent dans le bon sens. Il commence à y avoir une prise de
+conscience de l&#8217;intérêt de la PpC dans le noyau de la communauté C++ qui fait
+le langage.</p>
 
 <h2>IV- <a id="VerificationsStatiques"></a>Invariants statiques</h2>
 
