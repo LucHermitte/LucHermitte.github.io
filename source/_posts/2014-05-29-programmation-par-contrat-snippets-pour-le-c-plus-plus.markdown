@@ -147,6 +147,34 @@ endif
 }
 ```
 
+### Pré- et post-conditions de fonctions ... ` constexpr` C++11
+Les fonctions `constexpr` à la C++11 doivent renvoyer une valeur et ne rien
+faire d'autre. De plus le contrat doit pouvoir être vérifié en mode _appelé
+depuis une expession constante_ comme en mode _appelé depuis une expression
+variable_. De fait, cela nécessite quelques astuces pour pouvoir spécifier des
+contrats dans de telles fonctions.
+
+Pour de plus amples détails, je vous renvoie à
+l'[article](http://ericniebler.com/2014/09/27/assert-and-constexpr-in-cxx11/)
+fort complet d'Eric Niebler sur le sujet.
+
+En résumé, on peut procéder de la sorte.
+```c++
+TODO: ex de code
+```
+
+Pour exprimer une post-condition sans multiplier les appels, on transformer la
+fonction (qui est déjà probablement récursive) en
+[fonction récursive terminale](«TODO link»), de là, il est facile d'insérer une
+assertion.
+
+```c++
+TODO: ex de code
+```
+
+N.B.: Dans le cas des `constexpr` du C++14, il me faudrait vérifier si `assert()` est
+directement utilisable.
+
 ## Invariants de classes
 
 ### Petit snippet de vérification simplifiée en l'absence d'héritage
@@ -226,8 +254,77 @@ effet, si l'invariant ne peut plus être assuré statiquement par programmation,
 il est nécessaire de l'assurer dynamiquement en vérifiant en début de chaque
 fonction membre (/amie) si l'objet est bien valide.
 
-C'est pour tout ces raisons que je ne suis pas d'accord avec cette critique.
+C'est pour toutes ces raisons que je ne suis pas d'accord avec cette critique.
 (TODO: à reformuler)
 
-#### Les objets cassé
+#### Les objets cassés
 TODO:
+
+## Et si la Programmation Défensive est de la partie ?
+
+Prérequis : dérivez de
+[`std::runtime_error`](http://www.cpluscplus.com/reference/stdexcept/runtime_error/)
+vos exceptions pour cas exceptionnels pouvant se produire lors de l'exécution,
+et de
+[`std::logic_error`](http://www.cpluscplus.com/reference/stdexcept/logic_error/)
+vos exceptions pour propager les erreurs de programmation.
+
+Plusieurs cas de figures sont ensuite envisageables. 
+
+### Cas théorique idéal...
+
+... lorsque COTS et bibliothèques tierces ne dérivent pas leurs exceptions
+de `std::exception` mais de `std::runtime_error` pour les cas exceptionnels
+plausibles et de `std::logic_error` pour les erreurs de logique.
+
+Aux points d'interfaces (communication via une API C, limites de threads en
+C++03), ou dans le `main()`, il est possible de filtrer les erreurs de logiques
+pour avoir des coredumps en _Debug_.
+
+```c++
+int main()
+{
+   try {
+        leCodeQuipeutprovoquerDesExceptions();
+        return EXIT_SUCCESS;
+#ifdef NDEBUG
+   } catch (std::logic_error const& e) {
+      std::cerr << "Logic error: " << e.what() << "\n";
+#endif
+   } catch (std::runtime_error const& e) {
+      std::cerr << "Error: " << e.what() << "\n";
+   }
+   return EXIT_FAILURE;
+}
+```
+
+### Cas plausible...
+
+... lorsque COTS et bibliothèques tierces dérivent leurs exceptions
+de `std::exception` au lieu de `std::runtime_error` pour les cas exceptionnels
+plausibles et de `std::logic_error` pour les erreurs de logique.
+
+Aux points d'interfaces (communication via une API C, limites de threads en
+C++03), ou dans le `main()`, il est possible d'ignorer toutes les exceptions pour
+avoir des coredumps en _Debug_ sur les exceptions dues à des erreurs de logiques et ...
+sur les autres aussi.
+
+```c++
+int main()
+{
+#ifdef NDEBUG
+   try {
+#endif
+        leCodeQuipeutprovoquerDesExceptions();
+        return EXIT_SUCCESS;
+#ifdef NDEBUG
+   } catch (std::exception const& e) {
+      std::cerr << "Error: " << e.what() << "\n";
+   }
+   return EXIT_FAILURE;
+#endif
+}
+```
+
+D'autres variations sont très certainement envisageables où l'on rattraperait
+l'erreur de logique pour la relancer en _Debug_.
