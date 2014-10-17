@@ -158,22 +158,88 @@ Pour de plus amples détails, je vous renvoie à
 l'[article](http://ericniebler.com/2014/09/27/assert-and-constexpr-in-cxx11/)
 fort complet d'Eric Niebler sur le sujet.
 
-En résumé, on peut procéder de la sorte.
+En résumé, on peut procéder de la sorte. Avec ceci:
 ```c++
-TODO: ex de code
+/** Helper struct for DbC programming in C++11 constexpr functions.
+ * Copyright 2014 Eric Niebler,
+ * http://ericniebler.com/2014/09/27/assert-and-constexpr-in-cxx11/
+ */
+struct assert_failure
+{
+    template<typename Fun>
+    explicit assert_failure(Fun fun)
+    {
+        fun();
+        // For good measure:
+        std::quick_exit(EXIT_FAILURE);
+    }
+};
+```
+On peut ainsi exprimer des fonctions `constexpr` en C++11 :
+```c++
+/**
+ * Internal constexpr function that computes \f$n!\f$ with a tail-recursion.
+ * @param[in] n  
+ * @param[in] r  pre-computed result
+ * @pre n shall not induce an integer overflow
+ * @post the result won't be null
+ * @author Luc Hermitte
+ */
+constexpr unsigned int fact_impl(unsigned int n, unsigned int r) {
+    return
+        n <= 1                                          ? r
+#ifndef NDEBUG
+        : std::numeric_limits<decltype(n)>::max()/n < r ? throw assert_failure( []{assert(!"int overflow");})
+#endif
+        :                                                 fact_impl(n-1, n*r)
+        ;
+}
+constexpr unsigned int fact(unsigned int n) {
+    return fact_impl(n, 1);
+}
+
+int main() {
+    const unsigned int n10 = fact(10);
+    const unsigned int n50 = fact(50);
+}
 ```
 
-Pour exprimer une post-condition sans multiplier les appels, on transformer la
-fonction (qui est déjà probablement récursive) en
-[fonction récursive terminale](«TODO link»), de là, il est facile d'insérer une
-assertion.
+Malheureusement la rupture de contrat ne sera pas détectée lors de la
+compilation, mais à l'exécution où l'on pourra constater à minima où l'appel de
+plus haut niveau s'est produit (bien que l'on risque de ne pas pouvoir observer
+l'état des variables _optimized out_ dans le débuggueur).
+
+Notez que pour exprimer une post-condition sans multiplier les appels, j'ai 
+écrit la fonction (qui aurait été récursive dans tous les cas) en
+[fonction récursive terminale](http://fr.wikipedia.org/wiki/Récursion_terminale).
+De là, il a été facile d'insérer une assertion -- et de plus, le compilateur
+pourra optimiser la fonction en _Release_ sur les appels dynamiques. 
+
+Pour information, une autre écriture qui exploite l'opérateur virgule est
+possible, mais elle ne compile pas avec les versions de GCC que j'ai eu entre
+les mains (i.e. jusqu'à la version 4.9, GCC n'est pas d'accord).
 
 ```c++
-TODO: ex de code
+/**
+ * Internal constexpr function that computes \f$n!\f$ with a tail-recursion.
+ * @param[in] n  
+ * @param[in] r  pre-computed result
+ * @pre n shall not induce an integer overflow
+ * @post the result won't be null
+ * @warning This version does not compile with GCC up-to v4.9.
+ * @author Luc Hermitte
+ */
+constexpr unsigned int fact_impl(unsigned int n, unsigned int r) {
+    return n >= 1
+        // ? (assert(std::numeric_limits<decltype(n)>::max()/n >= r), fact_impl(n-1, n*r))
+        ? fact_impl((assert(std::numeric_limits<decltype(n)>::max()/n >= r), n-1), n*r)
+        : (assert(r>0), r);
+}
 ```
+
 
 N.B.: Dans le cas des `constexpr` du C++14, il me faudrait vérifier si `assert()` est
-directement utilisable.
+directement utilisable. A priori, cela sera le cas.
 
 ## Invariants de classes
 
