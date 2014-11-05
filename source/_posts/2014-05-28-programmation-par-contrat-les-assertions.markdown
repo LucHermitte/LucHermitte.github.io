@@ -347,6 +347,30 @@ des moyens simplifiés, et plus forts sémantiquement parlant, pour exprimer des
 contrats dans des codes C++.
 
 
+### Option 4 : On utilise des Tests Unitaires (pour les post-conditions)
+
+Quand plus tôt j'indiquais que _sinus_ a pour post-condition toute indiquée un
+résultat inférieur à 1, peut-être avez-vous tiqué. Et vous auriez eu raison. La
+post-condition de la fonction `sin()` est de calculer ... un sinus.  
+Là, plusieurs problèmes se posent : comment valider que le calcul est correct ?
+Avec une seconde implémentation de la fonction ? A l'aide de `cos()` ? Et quel
+serait le prix (même en mode _Debug_) d'une telle vérification ?
+
+Lors de ses présentations sur le sujet, John Lakos rappelle une post-condition
+souvent négligée d'une fonction de tri : non seulement, les éléments produits
+doivent être triés, mais en plus il doit s'agir des mêmes éléments (ni plus, ni
+moins) que ceux qui ont été fournis à la fonction de tri. [NB: Cet exemple
+semble venir de Kevlin Henney.]
+
+Au final, un consensus semble se dégager vers l'utilisation de tests unitaires
+pour valider les post-conditions de fonctions. Après, je vous laisse juger s'il
+est pertinent de vérifier par assertion des post-conditions simples et peu
+couteuses comme le fait que le résultat de `sin()` doit appartenir à `[-1,
++1]`. D'autant que pour l'instant, aucun (?) outil n'exploite des assertions
+pour faire de la preuve formelle et ainsi détecter que `sqrt(sin(x)-1)` est
+problématique sur certaines plages de `x`.
+
+
 ## III- Le standard s'enrichira-t-il en <del>2014 ou en</del> 2017 pour programmer avec des contrats ?
 
 Il y a déjà eu des propositions de mots clés plus ou moins sémantiquement forts
@@ -354,22 +378,28 @@ pour supporter la PpC en standard en C++. Dans le dernier mailing (pre-Urbana) e
 <del>[N3753](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3753.pdf)</del>
 <del>[N4075](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4075.pdf)</del>
 [N4135](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4135.pdf),
-John Lakos et Alexei Zakharov introduisent un ensemble de macros `contract_assert()`
-assez flexible.
+John Lakos et Alexei Zakharov introduisent tout d'abord un nouveau vocabulaire
+pour désigner les contrats : les _narrow contracts_ et les _wide contracts_.
+Ils introduisent également un ensemble de macros `contract_assert()` assez
+flexible.
 
-Elles supportent des niveaux d'importance de vérification (_optimized_, _safe_,
+Ces macros supportent des niveaux d'importance de vérification (_optimized_, _safe_,
 _debug_,) un peu à l'image des niveaux _Error_/_Warning_/_Info_/_Debug_ dans
 les frameworks de log.  La proposition offre de permettre de faire de la
 programmation défensive (i.e. de lever des exceptions au lieu de simples
 assertions). Elle permettrait également de transformer les assertions en
-assertions de frameworks de tests unitaires.
-
+assertions de frameworks de tests unitaires.  
 À noter qu'elle est déjà implémentée et disponible à l'intérieur de la
 [bibliothèque BDE/BSL](https://github.com/bloomberg/bde) sous licence MIT.
 
 Cette proposition en est à sa huitième révision. Les
 [minutes du rejet](https://isocpp.org/files/papers/N4053.html#LWG8) de la
 révision précédente (N4075) sont disponibles.
+
+Ce sujet de la PpC a part ailleurs été abordé lors d'une présentation en deux
+parties par John Lakos lors de la CppCon14: _Defensive Programming Done Right_ 
+[Part I](https://www.youtube.com/watch?v=1QhtXRMp3Hg&feature=youtube_gdata)
+et [Part II](https://www.youtube.com/watch?v=tz2khnjnUx8&feature=youtube_gdata).
 
 De plus, on voit que le sujet de l'introduction de la PpC en C++ a ses
 partisans, car d'autres propositions tournent, _cf._ :
@@ -384,6 +414,10 @@ partisans, car d'autres propositions tournent, _cf._ :
   _Library Preconditions are a Language Feature_, où Alisdair Meredith lance
   une discussion pour faire évoluer le langage en vue de se donner de
   meilleurs moyens pour vérifier les contrats.
+
+Enfin, il est également à noter une interview de B. Stroustrup sur le C++17
+[où il évoque](http://www.infoworld.com/article/2840344/c-plus-plus/stroustrop-c-goals-parallelism-concurrency.html)
+qu'il faut s'attendre au support des contrats.
 
 Bref, les choses évoluent dans le bon sens. Il commence à y avoir une prise de
 conscience de l'intérêt de la PpC dans le noyau de la communauté C++ qui fait
