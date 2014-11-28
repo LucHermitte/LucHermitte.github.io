@@ -374,10 +374,11 @@ problématique sur certaines plages de `x`.
 ## III- Le standard s'enrichira-t-il en <del>2014 ou en</del> 2017 pour programmer avec des contrats ?
 
 Il y a déjà eu des propositions de mots clés plus ou moins sémantiquement forts
-pour supporter la PpC en standard en C++. Dans le dernier mailing (pre-Urbana) en date, 
+pour supporter la PpC en standard en C++. Dans le dernier mailing (post-Urbana) en date, 
 <del>[N3753](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3753.pdf)</del>
 <del>[N4075](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4075.pdf)</del>
-[N4135](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4135.pdf),
+<del>[N4135](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4135.pdf)</del>
+[N4253](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4253.pdf),
 John Lakos et Alexei Zakharov introduisent tout d'abord un nouveau vocabulaire
 pour désigner les contrats : les _narrow contracts_ et les _wide contracts_.
 Ils introduisent également un ensemble de macros `contract_assert()` assez
@@ -392,9 +393,9 @@ assertions de frameworks de tests unitaires.
 À noter qu'elle est déjà implémentée et disponible à l'intérieur de la
 [bibliothèque BDE/BSL](https://github.com/bloomberg/bde) sous licence MIT.
 
-Cette proposition en est à sa huitième révision. Les
+Cette proposition en est à sa neuvième révision. Les
 [minutes du rejet](https://isocpp.org/files/papers/N4053.html#LWG8) de la
-révision précédente (N4075) sont disponibles.
+révision (N4075) sont disponibles.
 
 Ce sujet de la PpC a part ailleurs été abordé lors d'une présentation en deux
 parties par John Lakos lors de la CppCon14: _Defensive Programming Done Right_ 
@@ -406,22 +407,48 @@ partisans, car d'autres propositions tournent, _cf._ :
 
 - [N4110](https://isocpp.org/files/papers/N4110.pdf)
   _Exploring the design space of contract specications for C++_, J. Daniel Garcia ;
-- [une étude d'Andrzej Krzemieŉski](http://htmlpreview.github.io/?https://github.com/akrzemi1/contract/blob/master/contract.html)
-  qui aborde l'angle de ce qui pourrait être fourni à des outils d'analyse pour réaliser de la preuve formelle ;
+- [N4293](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4293.pdf)
+  _C++ language support for contract programming_, où J. Daniel Garcia présente
+  un résumé des discussions autour de la PpC à Urbana ;
+  
+- [N4160](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4160.html)
+  _Value Constraints_, où Andrzej Krzemieŉski
+  aborde l'angle de ce qui pourrait être fourni à des outils d'analyse pour réaliser de la preuve formelle ;
 - [N4154](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4154.pdf)
   _Operator assert_, David Krauss ;
 - [N4248](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4248.html)
   _Library Preconditions are a Language Feature_, où Alisdair Meredith lance
   une discussion pour faire évoluer le langage en vue de se donner de
-  meilleurs moyens pour vérifier les contrats.
+  meilleurs moyens pour vérifier les contrats ;
+- N4289, N4290, N4291, et N4292 par Nathan Myers ;
+- [N4319](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4319.pdf)
+  _Contracts for C++, what are the choices ?_, où Gabriel Dos Reis et al.
+  présentent les exigences derrière le support des contrat en C++, ainsi que
+  quelques outils utilisés à Microsoft.
+
 
 Enfin, il est également à noter une interview de B. Stroustrup sur le C++17
 [où il évoque](http://www.infoworld.com/article/2840344/c-plus-plus/stroustrop-c-goals-parallelism-concurrency.html)
 qu'il faut s'attendre au support des contrats.
 
-Bref, les choses évoluent dans le bon sens. Il commence à y avoir une prise de
-conscience de l'intérêt de la PpC dans le noyau de la communauté C++ qui fait
-le langage.
+Pour être plus précis, je vais reprendre les résumés faits par Daniel Garcia
+dans le N4293 à l'issue du meeting à Urbana :
+
+- _There was a great agreement that C++ should have support for Contracts
+  Programming._
+- _There was an agreement that both features (correctness, better diagnostics,
+  check elision, better reasoning about programs, potential use by external
+  tools) are desirable for contracts programming. The key identified feature of
+  contracts was correctness.  However, it was agreed that performance is also
+  an important feature._
+- _There was a great support to specifying contracts in declarations. While
+  contracts in the body were also discussed, the committee did not get to any
+  final voting on this second issue._
+- _There was a consensus that build modes shall not be standardized._
+
+Bref, les choses évoluent dans le bon sens. Nous sommes bien au delà de la
+prise de conscience de l'intérêt de la PpC dans le noyau de la communauté C++
+qui fait le langage.
 
 
 ## IV- <a id="VerificationsStatiques"></a>Invariants statiques
