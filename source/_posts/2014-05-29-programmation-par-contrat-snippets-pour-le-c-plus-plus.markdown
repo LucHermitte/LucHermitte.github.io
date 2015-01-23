@@ -12,11 +12,12 @@ language: fr
 ---
 
 Dans ce dernier billet sur la _Programmation par Contrat_, je vais vous présenter
-quelques techniques d'application de la PpC au C++.
+quelques techniques d'application de la PpC au C++. Ce billet décrivant des
+techniques sera plus décousu que les précédents qui avaient un fil conducteur.
 
-## Pré- et post-conditions de fonctions
+## I- Pré- et post-conditions de fonctions.
 
-### Pré- et post-conditions de fonctions membres, à la Non-Virtual Interface Pattern (NVI)
+### I.1- Pré- et post-conditions de fonctions membres, à la Non-Virtual Interface Pattern (NVI).
 
 Le pattern NVI est un _Design Pattern_ qui ressemble au DP _Template Method_ mais qui
 n'est pas le _Template Method_. Le principe du pattern est le suivant :
@@ -65,63 +66,10 @@ private:
 };
 ```
 
-Pour ce qui est de gérer en plus les invariants de tous les contrats, et des
-classes finales. Je partirai avec un héritage virtuel depuis une classe de base
-virtuelle `WithInvariants` dont la fonction de vérification serait spécialisée
-par tous les intermédiaires. Et dont les intermédiaires appelleraient toutes
-les versions mères pour n'oublier personne. 
+Je reviendrai [plus loin](#NVI_Invariants) sur une piste pour supporter des
+invariants dans un cadre de NVI.
 
-```c++
-struct WithInvariants : boost::noncopyable {
-    void check_invariants() const {
-ifndef NDEBUG
-        do_check_invariants();
-endif
-    }
-protected:
-    ~WithInvariants() {}
-    virtual void do_check_invariants() const {}
-};
-
-struct InvariantChecker {
-    InvariantChecker(WithInvariants const& wi) : m_wi(wi)
-    { m_wi.check_invariants(); }
-    ~InvariantChecker()
-    { m_wi.check_invariants(); }
-private:
-    WithInvariants const& m_wi;
-};
-
-struct Contract1 : boost::noncopyable, virtual WithInvariants
-{
-    ...
-    double compute(double x) const {
-        ...preconds...
-        InvariantChecker(*this);
-        return do_compute(x);
-    }
-protected:
-    virtual void do_check_invariants() const {
-        assert(invariant C1 ...);
-    }
-    ....
-}
-
-struct Impl : Contract1, Contract2
-{
-    ....
-protected:
-    virtual void do_check_invariants() const {
-        Contract1::do_check_invariants();
-        Contract2::do_check_invariants();
-        assert(invariant rajoutés par Impl ...);
-    }
-};
-```
-
-(Pour l'instant, je n'ai pas de meilleure idée)
-
-### Pré- et post-conditions de fonctions, à la Imperfect C++
+### I.2- Pré- et post-conditions de fonctions, à la Imperfect C++.
 
 Matthew Wilson consacre le premier chapitre de son [_Imperfect C++_](#IPCpp) à
 la PpC. Je ne peux que vous en conseiller la lecture.
@@ -147,7 +95,7 @@ endif
 }
 ```
 
-### Pré- et post-conditions de fonctions ... ` constexpr` C++11
+### I.3- Pré- et post-conditions de fonctions ... ` constexpr` C++11.
 Les fonctions `constexpr` à la C++11 doivent renvoyer une valeur et ne rien
 faire d'autre. De plus le contrat doit pouvoir être vérifié en mode _appelé
 depuis une expession constante_ comme en mode _appelé depuis une expression
@@ -241,9 +189,9 @@ constexpr unsigned int fact_impl(unsigned int n, unsigned int r) {
 N.B.: Dans le cas des `constexpr` du C++14, il me faudrait vérifier si `assert()` est
 directement utilisable. A priori, cela sera le cas.
 
-## Invariants de classes
+## II- Invariants de classes.
 
-### Petit snippet de vérification simplifiée en l'absence d'héritage
+### II.1- Petit snippet de vérification simplifiée en l'absence d'héritage.
 
 Sur un petit [exercice d'écriture de classe fraction](http://ideone.com/DOCWOy),
 j'avais pondu une classe utilitaire dont le but était de simplifier la
@@ -304,10 +252,68 @@ Pour ma part, je préfère avoir une assertion différente pour chaque invariant
 plutôt qu'un seul `assert(is_valid());`. Cela permet de savoir plus précisément
 quel contrat est violé.
 
-### Critiques envisageables avec cette approche
+### <a id="NVI_Invariants"></a>II.2- Invariants et NVI.
+
+Pour ce qui est de gérer les invariants de plusieurs contrats, et des classes
+finales. Je partirai sur un héritage virtuel depuis une classe de base
+virtuelle `WithInvariants` dont la fonction de vérification serait spécialisée
+par tous les intermédiaires. Et dont les intermédiaires appelleraient toutes
+les versions mères pour n'oublier personne.
+
+```c++
+struct WithInvariants : boost::noncopyable {
+    void check_invariants() const {
+ifndef NDEBUG
+        do_check_invariants();
+endif
+    }
+protected:
+    ~WithInvariants() {}
+    virtual void do_check_invariants() const {}
+};
+
+struct InvariantChecker {
+    InvariantChecker(WithInvariants const& wi) : m_wi(wi)
+    { m_wi.check_invariants(); }
+    ~InvariantChecker()
+    { m_wi.check_invariants(); }
+private:
+    WithInvariants const& m_wi;
+};
+
+struct Contract1 : boost::noncopyable, virtual WithInvariants
+{
+    ...
+    double compute(double x) const {
+        ...preconds...
+        InvariantChecker(*this);
+        return do_compute(x);
+    }
+protected:
+    virtual void do_check_invariants() const {
+        assert(invariant C1 ...);
+    }
+    ....
+}
+
+struct Impl : Contract1, Contract2
+{
+    ....
+protected:
+    virtual void do_check_invariants() const {
+        Contract1::do_check_invariants();
+        Contract2::do_check_invariants();
+        assert(invariant rajoutés par Impl ...);
+    }
+};
+```
+
+(Alors certes, c'est tordu, mais pour l'instant, je n'ai pas de meilleure idée.)
+
+### II.3- Critiques envisageables avec ces approches.
 On peut s'attendre qu'en cas d'exception dans une fonction membre (ou amie)
-d'un objet, l'invariant ne soit plus respecté. Dans ce cas là, l'approche
-proposée juste au dessus va poser d'énormes problèmes.
+d'un objet, l'invariant ne soit plus respecté. Dans ce cas là, les approches
+proposées juste au dessus vont poser d'énormes problèmes.
 
 Toutefois cela voudrait dire que l'exception ne laisse plus l'objet dans un
 état cohérent, et que nous n'avons pas la
@@ -323,21 +329,49 @@ fonction membre (/amie) si l'objet est bien valide.
 C'est pour toutes ces raisons que je ne suis pas d'accord avec cette critique.
 (TODO: à reformuler)
 
-#### Les objets cassés
+#### Les objets cassés.
 TODO:
 
-## Et si la Programmation Défensive est de la partie ?
+### II.4- Des exceptions dans les constructeurs.
+Une technique bien connue pour prévenir la construction d'un objet dont on ne
+peut pas garantir les invariants consiste à lever une exception depuis son
+constructeur. En procédant de la sorte, soit un objet existe et il est dans un
+état pertinent et utilisable, soit il n'a jamais existé et on n'a même pas
+besoin de se poser la question de son utilisabilité.
+
+Cela a l'air fantastique, n'est-ce pas ?
+
+Mais ... n'est-ce pas de la programmation défensive ? En effet, ce n'est pas le
+client de l'objet qui vérifie les conditions d'existence, mais l'object.
+Résultat, on ne dispose pas forcément du
+[meilleur contexte]({%post_url 2014-05-24-programmation-par-contrat-un-peu-de-theorie%}#ProgDefCtx) pour
+signaler le problème de _runtime_ qui bloque la création de l'objet.
+
+Idéalement, je tendrais à dire que la vérification devrait être faite en amont,
+et ainsi le constructeur aurait des pré-conditions _étroitement_ vérifiées.
+Dans la pratique: TODO
+
+## III- Et si la Programmation Défensive est de la partie ?
+
+_Discl. : L'utilisation de codes de retour va grandement complexifier
+l'application, qui en plus de devoir tester les codes de retour relatifs au
+métier (dont la validation des entrées), devra propager des codes de retours
+relatifs aux potentielles erreurs de programmation. Au final, cela va accroitre
+les chances d'erreurs de programmation... chose antonomique avec les objectifs
+de la technique. Donc un conseil, pour de la programmation défensive en C++,
+préférez l'emploi d'exceptions -- et bien évidemment, n'oubliez pas le
+[RAII]({%post_url 2012-04-04-le-c-plus-plus-moderne%}#C++Moderne), notre grand ami._
 
 Prérequis : dérivez de
 [`std::runtime_error`](http://www.cpluscplus.com/reference/stdexcept/runtime_error/)
-vos exceptions pour cas exceptionnels pouvant se produire lors de l'exécution,
+vos exceptions pour les cas exceptionnels pouvant se produire lors de l'exécution,
 et de
 [`std::logic_error`](http://www.cpluscplus.com/reference/stdexcept/logic_error/)
 vos exceptions pour propager les erreurs de programmation.
 
-Plusieurs cas de figures sont ensuite envisageables. 
+Plusieurs cas de figures sont ensuite envisageables.
 
-### Cas théorique idéal...
+### III.1- Cas théorique idéal...
 
 ... lorsque COTS et bibliothèques tierces ne dérivent pas leurs exceptions
 de `std::exception` mais de `std::runtime_error` pour les cas exceptionnels
@@ -364,7 +398,16 @@ int main()
 }
 ```
 
-### Cas plausible...
+Il est à noter que ce cas théorique idéal se combine très mal avec les
+techniques de
+[dispatching](http://www.parashift.com/c++-faq/throw-without-an-object.html) et
+de
+[factorisation](http://isocpp.org/wiki/faq/exceptions#throw-without-an-object)
+de gestion des erreurs. En effet, tout repose sur un `catch(...)`, or ce
+dernier va modifier le contexte pour la génération d'un _core_ tandis que rien
+ne sera redispatché vers une `std::logic_error`.
+
+### III.2- Cas plausible...
 
 ... lorsque COTS et bibliothèques tierces dérivent leurs exceptions
 de `std::exception` au lieu de `std::runtime_error` pour les cas exceptionnels

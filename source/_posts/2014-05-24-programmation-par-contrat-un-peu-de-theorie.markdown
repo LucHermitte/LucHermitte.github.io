@@ -293,7 +293,7 @@ aussi utilisée pour introduire une tolérance aux erreurs matérielles, limiter
 les conséquences de ces erreurs (comme les corruptions de mémoire).  C'est un
 aspect que je n'aborde pas dans le cadre de la comparaison avec la PpC._
 
-### III.1- Présentons la Programmation Défensive
+### <a id="ProgDefCtx"></a>III.1- Présentons la Programmation Défensive
 
 La _Programmation Défensive_ a pour objectif qu'un programme ne doit jamais
 s'arrêter afin de toujours pouvoir continuer. On s'intéresse à la robustesse
