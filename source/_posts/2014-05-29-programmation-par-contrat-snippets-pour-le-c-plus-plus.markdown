@@ -19,10 +19,12 @@ techniques sera plus décousu que les précédents qui avaient un fil conducteur
 
 ### I.1- Pré- et post-conditions de fonctions membres, à la Non-Virtual Interface Pattern (NVI).
 
-Le pattern NVI est un _Design Pattern_ qui ressemble au DP _Template Method_ mais qui
-n'est pas le _Template Method_. Le principe du pattern est le suivant :
-l'interface publique est non virtuelle, et elle fait appel à des comportements
-spécialisés qui sont eux privés et virtuels (généralement virtuels purs).
+Le pattern NVI est un _Design Pattern_ qui ressemble au DP _Template Method_
+mais qui n'est pas le
+[_Template Method_](http://fr.wikipedia.org/wiki/Patron_de_m%C3%A9thode). Le
+principe du pattern est le suivant : l'interface publique est non virtuelle, et
+elle fait appel à des comportements spécialisés qui sont eux privés et virtuels
+(généralement virtuels purs).
 
 Ce pattern a deux objectifs avoués. Le premier est de découpler les interfaces
 pour les _utilisateurs_ du pattern. Le code client doit passer par l'interface
@@ -312,12 +314,18 @@ protected:
 
 ### II.3- Critiques envisageables avec ces approches.
 On peut s'attendre qu'en cas d'exception dans une fonction membre (ou amie)
-d'un objet, l'invariant ne soit plus respecté. Dans ce cas là, les approches
-proposées juste au dessus vont poser d'énormes problèmes.
+d'un objet, l'invariant ne soit plus respecté.  
+Dans ce cas là, les approches proposées juste au dessus vont poser d'énormes
+problèmes.
 
 Toutefois cela voudrait dire que l'exception ne laisse plus l'objet dans un
 état cohérent, et que nous n'avons pas la
 [_garantie basique_](http://en.wikipedia.org/wiki/Exception_safety).
+
+Autre scénario dans le même ordre d'idée : imaginez que les flux aient pour
+invariant `good()`, et qu'une extraction ratée invalide le flux.  Cette fois,
+l'objet pourrait exister dans un état contraire à son invariant, ce qui ferait
+claquer l'assertion associée
 
 Dans le même genre d'idée, nous nous retrouverions dans la même situation que
 si on utilisait des constructeurs qui ne garantissent pas l'invariant de leurs
@@ -342,25 +350,34 @@ besoin de se poser la question de son utilisabilité.
 Cela a l'air fantastique, n'est-ce pas ?
 
 Mais ... n'est-ce pas de la programmation défensive ? En effet, ce n'est pas le
-client de l'objet qui vérifie les conditions d'existence, mais l'object.
+client de l'objet qui vérifie les conditions d'existence, mais l'objet.
 Résultat, on ne dispose pas forcément du
 [meilleur contexte]({%post_url 2014-05-24-programmation-par-contrat-un-peu-de-theorie%}#ProgDefCtx) pour
 signaler le problème de _runtime_ qui bloque la création de l'objet.
 
 Idéalement, je tendrais à dire que la vérification devrait être faite en amont,
 et ainsi le constructeur aurait des pré-conditions _étroitement_ vérifiées.
-Dans la pratique: TODO
+Dans la pratique, je dois bien avouer que je tends, aujourd'hui, à laisser la
+vérification au niveau des constructeurs au lieu d'exposer une fonction
+statique de vérification des pré-conditions d'existence dans les cas les plus
+complexes. Il faut dire que les exceptions ont tellement été bien vendues comme
+: c'est le seul moyen d'avorter depuis un opérateur surchargé ou depuis un
+constructeur, que j'ai jusqu'à lors totalement négligé mon instinct qui sentait
+qu'il y avait un truc louche à vérifier les conditions de création depuis un
+contexte restreint. À _élargir_ les contrats, on finit par perdre des
+informations pour nos messages d'erreur.
 
 ## III- Et si la Programmation Défensive est de la partie ?
 
-_Discl. : L'utilisation de codes de retour va grandement complexifier
-l'application, qui en plus de devoir tester les codes de retour relatifs au
-métier (dont la validation des entrées), devra propager des codes de retours
-relatifs aux potentielles erreurs de programmation. Au final, cela va accroitre
-les chances d'erreurs de programmation... chose antonomique avec les objectifs
-de la technique. Donc un conseil, pour de la programmation défensive en C++,
-préférez l'emploi d'exceptions -- et bien évidemment, n'oubliez pas le
-[RAII]({%post_url 2012-04-04-le-c-plus-plus-moderne%}#C++Moderne), notre grand ami._
+_Discl. : [L'utilisation de codes de retour va grandement complexifier l'application](http://isocpp.org/wiki/faq/exceptions#exceptions-avoid-spreading-out-error-logic),
+qui en plus de devoir tester les codes de retour relatifs au métier (dont la
+validation des entrées), devra propager des codes de retours relatifs aux
+potentielles erreurs de programmation. Au final, cela va accroitre les chances
+d'erreurs de programmation... chose antinomique avec les objectifs de la
+technique. Donc un conseil, pour de la programmation défensive en C++, préférez
+l'emploi d'exceptions -- et bien évidemment, n'oubliez pas le
+[RAII]({%post_url 2012-04-04-le-c-plus-plus-moderne%}#C++Moderne), notre grand
+ami._
 
 Prérequis : dérivez de
 [`std::runtime_error`](http://www.cpluscplus.com/reference/stdexcept/runtime_error/)
