@@ -12,3 +12,14 @@ rake preview # Watches, and mounts a webserver at http://localhost:4000
 * Déployer: 
 rake generate
 rake deploy 
+
+NB: sous certains cygwin, il faut faire "bundle exec rake".
+
+* Pour mettre en place sur une nouvelle machine
+mkdir some_dir && cd some_dir
+# The sources
+git pull  git clone git@github.com:LucHermitte/LucHermitte.github.io.git
+cd LucHermitte.github.io/
+git branch source
+# Where the site will be built and pushed to github
+git pull  git clone git@github.com:LucHermitte/LucHermitte.github.io.git _deploy
