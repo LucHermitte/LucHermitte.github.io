@@ -4,7 +4,7 @@
   <title><![CDATA[Luc Hermitte's Blog]]></title>
   <link href="http://LucHermitte.github.io/atom.xml" rel="self"/>
   <link href="http://LucHermitte.github.io/"/>
-  <updated>2014-11-28T16:28:07+01:00</updated>
+  <updated>2015-02-19T23:52:51+01:00</updated>
   <id>http://LucHermitte.github.io/</id>
   <author>
     <name><![CDATA[Luc Hermitte]]></name>
@@ -479,15 +479,17 @@ problématique sur certaines plages de <code>x</code>.</p>
 <h2>III- Le standard s&#8217;enrichira-t-il en <del>2014 ou en</del> 2017 pour programmer avec des contrats ?</h2>
 
 <p>Il y a déjà eu des propositions de mots clés plus ou moins sémantiquement forts
-pour supporter la PpC en standard en C++. Dans le dernier mailing (post-Urbana) en date,
+pour supporter la PpC en standard en C++. Dans le document
 <del><a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3753.pdf">N3753</a></del>
 <del><a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4075.pdf">N4075</a></del>
 <del><a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4135.pdf">N4135</a></del>
-<a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4253.pdf">N4253</a>,
-John Lakos et Alexei Zakharov introduisent tout d&#8217;abord un nouveau vocabulaire
-pour désigner les contrats : les <em>narrow contracts</em> et les <em>wide contracts</em>.
-Ils introduisent également un ensemble de macros <code>contract_assert()</code> assez
-flexible.</p>
+<del><a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4253.pdf">N4253</a></del>
+<a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4378.pdf">N4378</a> (et sa FAQ
+<a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4379.pdf">N4379</a>),
+du dernier mailing (2015-02 mid-meeting) en date, John Lakos et Alexei Zakharov
+introduisent tout d&#8217;abord un nouveau vocabulaire pour désigner les contrats :
+les <em>narrow contracts</em> et les <em>wide contracts</em>.  Ils introduisent également un
+ensemble de macros <code>contract_assert()</code> assez flexible.</p>
 
 <p>Ces macros supportent des niveaux d&#8217;importance de vérification (<em>optimized</em>, <em>safe</em>,
 <em>debug</em>,) un peu à l&#8217;image des niveaux <em>Error</em>/<em>Warning</em>/<em>Info</em>/<em>Debug</em> dans
@@ -498,7 +500,7 @@ assertions de frameworks de tests unitaires.<br/>
 À noter qu&#8217;elle est déjà implémentée et disponible à l&#8217;intérieur de la
 <a href="https://github.com/bloomberg/bde">bibliothèque BDE/BSL</a> sous licence MIT.</p>
 
-<p>Cette proposition en est à sa neuvième révision. Les
+<p>Cette proposition en est à sa dixième révision. Les
 <a href="https://isocpp.org/files/papers/N4053.html#LWG8">minutes du rejet</a> de la
 révision (N4075) sont disponibles.</p>
 
@@ -1034,7 +1036,7 @@ aussi utilisée pour introduire une tolérance aux erreurs matérielles, limiter
 les conséquences de ces erreurs (comme les corruptions de mémoire).  C&#8217;est un
 aspect que je n&#8217;aborde pas dans le cadre de la comparaison avec la PpC.</em></p>
 
-<h3>III.1- Présentons la Programmation Défensive</h3>
+<h3><a id="ProgDefCtx"></a>III.1- Présentons la Programmation Défensive</h3>
 
 <p>La <em>Programmation Défensive</em> a pour objectif qu&#8217;un programme ne doit jamais
 s&#8217;arrêter afin de toujours pouvoir continuer. On s&#8217;intéresse à la robustesse
@@ -1579,7 +1581,7 @@ traduction de la réponse est disponible à l&#8217;adresse suivante :
 codes de retour, avec un <code>if</code> toutes les deux lignes en moyenne pour remonter
 les erreurs, et restituer les ressources.</p>
 
-<h3>Le C++ Moderne</h3>
+<h3><a id="C++Moderne"></a>Le C++ Moderne</h3>
 
 <p>La solution aux problèmes du C++ historique réside dans le C++ moderne.
 Décryptons cette tautologie.</p>
