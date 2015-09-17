@@ -2,11 +2,27 @@
 <urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>
     <url>
         <loc>http://LucHermitte.github.io/blog/2012/04/04/le-c-plus-plus-moderne/</loc>
-        <lastmod>2014-03-20T18:11:42+01:00</lastmod>
+        <lastmod>2014-05-12T10:36:28+02:00</lastmod>
+    </url>
+    <url>
+        <loc>
+            http://LucHermitte.github.io/blog/2014/05/24/programmation-par-contrat-un-peu-de-theorie/
+        </loc>
+        <lastmod>2014-07-16T12:26:15+02:00</lastmod>
+    </url>
+    <url>
+        <loc>
+            http://LucHermitte.github.io/blog/2014/05/28/programmation-par-contrat-les-assertions/
+        </loc>
+        <lastmod>2014-11-28T12:25:13+01:00</lastmod>
+    </url>
+    <url>
+        <loc>http://LucHermitte.github.io/about/</loc>
+        <lastmod>2014-06-11T16:06:15+02:00</lastmod>
     </url>
     <url>
         <loc>http://LucHermitte.github.io/</loc>
-        <lastmod>2014-03-20T18:11:42+01:00</lastmod>
+        <lastmod>2014-11-28T12:25:13+01:00</lastmod>
     </url>
     <url>
         <loc>http://LucHermitte.github.io/robots.txt</loc>
@@ -14,6 +30,6 @@
     </url>
     <url>
         <loc>http://LucHermitte.github.io/blog/archives/</loc>
-        <lastmod>2014-03-20T18:11:42+01:00</lastmod>
+        <lastmod>2014-11-28T12:25:13+01:00</lastmod>
     </url>
 </urlset>

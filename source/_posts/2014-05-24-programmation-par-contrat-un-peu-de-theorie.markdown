@@ -16,7 +16,7 @@ _Programmation par Contrat_, et en particulier comment l'appliquer au C++.
 
 Voici un premier billet qui aborde l'aspect théorique. Dans un [second billet]({%post_url 2014-05-28-programmation-par-contrat-les-assertions%}),
 je traiterai des _assertions_. En guise de conclusion, je présenterai des
-[techniques d'application de la PpC au C++]({%post_url 2014-05-29-programmation-par-contrat-snippets-pour-le-c-plus-plus%})
+[techniques d'application de la PpC au C++]({%post_url 2015-09-17-programmation-par-contrat-snippets-pour-le-c-plus-plus%})
 que j'ai croisées au fil des ans.
 
 ## I- Les Erreurs
