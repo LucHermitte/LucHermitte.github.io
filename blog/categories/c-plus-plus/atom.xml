@@ -4,7 +4,7 @@
   <title><![CDATA[Category: C++ | Luc Hermitte's Blog]]></title>
   <link href="http://LucHermitte.github.io/blog/categories/c-plus-plus/atom.xml" rel="self"/>
   <link href="http://LucHermitte.github.io/"/>
-  <updated>2015-09-17T19:30:12+02:00</updated>
+  <updated>2015-09-17T19:36:30+02:00</updated>
   <id>http://LucHermitte.github.io/</id>
   <author>
     <name><![CDATA[Luc Hermitte]]></name>
@@ -593,7 +593,7 @@ vos exceptions pour propager les erreurs de programmation.</p>
 <h3>III.1- Cas théorique idéal&hellip;</h3>
 
 <p>&hellip; lorsque COTS et bibliothèques tierces <strong>ne</strong> dérivent <strong>pas</strong> leurs
-exceptions de <code>std::exception</code> mais de <code>std::runtime_error</code> pour les cas
+exceptions de <code>std::exception</code> <strong>mais</strong> de <code>std::runtime_error</code> pour les cas
 exceptionnels plausibles et de <code>std::logic_error</code> pour les erreurs de logique.</p>
 
 <p>Aux points d'interfaces (communication via une API C, limites de threads en
@@ -639,9 +639,9 @@ ne sera redispatché vers une <code>std::logic_error</code>.</p>
 
 <h3>III.2- Cas plausible&hellip;</h3>
 
-<p>&hellip; lorsque COTS et bibliothèques tierces dérivent <strong>bien</strong> leurs exceptions
-de <code>std::exception</code> au lieu de <code>std::runtime_error</code> pour les cas exceptionnels
-plausibles et de <code>std::logic_error</code> pour les erreurs de logique.</p>
+<p>&hellip; lorsque COTS et bibliothèques tierces dérivent <em>malheureusement</em> leurs
+exceptions de <code>std::exception</code> <strong>au lieu</strong> de <code>std::runtime_error</code> pour les cas
+exceptionnels plausibles et de <code>std::logic_error</code> pour les erreurs de logique.</p>
 
 <p>Aux points d'interfaces (communication via une API C, limites de threads en
 C++03), ou dans le <code>main()</code>, il est possible d'ignorer toutes les exceptions pour
