@@ -4,7 +4,7 @@
   <title><![CDATA[Category: C++ | Luc Hermitte's Blog]]></title>
   <link href="http://LucHermitte.github.io/blog/categories/c-plus-plus/atom.xml" rel="self"/>
   <link href="http://LucHermitte.github.io/"/>
-  <updated>2015-09-17T19:20:28+02:00</updated>
+  <updated>2015-09-17T19:30:12+02:00</updated>
   <id>http://LucHermitte.github.io/</id>
   <author>
     <name><![CDATA[Luc Hermitte]]></name>
@@ -19,18 +19,21 @@
     <updated>2015-09-17T19:20:15+02:00</updated>
     <id>http://LucHermitte.github.io/blog/2015/09/17/programmation-par-contrat-snippets-pour-le-c-plus-plus</id>
     <content type="html"><![CDATA[<p>Dans ce dernier billet sur la <em>Programmation par Contrat</em>, je vais vous présenter
-quelques techniques d'application de la PpC au C++.</p>
+quelques techniques d'application de la PpC au C++. Ce billet décrivant des
+techniques sera plus décousu que les précédents qui avaient un fil conducteur.</p>
 
 <p><em>(Désolé, j'ai mis du temps à mûrir certains de ses paragraphes)</em></p>
 
-<h2>Pré- et post-conditions de fonctions</h2>
+<h2>I- Pré- et post-conditions de fonctions.</h2>
 
-<h3>Pré- et post-conditions de fonctions membres, à la Non-Virtual Interface Pattern (NVI)</h3>
+<h3>I.1- Pré- et post-conditions de fonctions membres, à la Non-Virtual Interface Pattern (NVI).</h3>
 
-<p>Le pattern NVI est un <em>Design Pattern</em> qui ressemble au DP <em>Template Method</em> mais qui
-n'est pas le <em>Template Method</em>. Le principe du pattern est le suivant :
-l'interface publique est non virtuelle, et elle fait appel à des comportements
-spécialisés qui sont eux privés et virtuels (généralement virtuels purs).</p>
+<p>Le pattern NVI est un <em>Design Pattern</em> qui ressemble au DP <em>Template Method</em>
+mais qui n'est pas le
+<a href="http://fr.wikipedia.org/wiki/Patron_de_m%C3%A9thode"><em>Template Method</em></a>. Le
+principe du pattern est le suivant : l'interface publique est non virtuelle, et
+elle fait appel à des comportements spécialisés qui sont eux privés et virtuels
+(généralement virtuels purs).</p>
 
 <p>Ce pattern a deux objectifs avoués. Le premier est de découpler les interfaces
 pour les <em>utilisateurs</em> du pattern. Le code client doit passer par l'interface
@@ -169,7 +172,10 @@ double compute(double x) const {
 
 <p>(Pour l'instant, je n'ai pas de meilleure idée)</p>
 
-<h3>Pré- et post-conditions de fonctions, à la Imperfect C++</h3>
+<p>Je reviendrai <a href="#NVI_Invariants">plus loin</a> sur une piste pour supporter des
+invariants dans un cadre de NVI.</p>
+
+<h3>I.2- Pré- et post-conditions de fonctions, à la Imperfect C++.</h3>
 
 <p>Matthew Wilson consacre le premier chapitre de son <a href="#IPCpp"><em>Imperfect C++</em></a> à
 la PpC. Je ne peux que vous en conseiller la lecture.</p>
@@ -201,7 +207,7 @@ endif
 <p>}
 ```</p>
 
-<h3>Pré- et post-conditions de fonctions &hellip; <code>constexpr</code> C++11</h3>
+<h3>I.3- Pré- et post-conditions de fonctions &hellip; <code>constexpr</code> C++11.</h3>
 
 <p>Les fonctions <code>constexpr</code> à la C++11 doivent renvoyer une valeur et ne rien
 faire d'autre. De plus le contrat doit pouvoir être vérifié en mode <em>appelé
@@ -318,9 +324,9 @@ constexpr unsigned int fact_impl(unsigned int n, unsigned int r) {</p>
 <p>N.B.: Dans le cas des <code>constexpr</code> du C++14, il me faudrait vérifier si <code>assert()</code> est
 directement utilisable. A priori, cela sera le cas.</p>
 
-<h2>Invariants de classes</h2>
+<h2>II- Invariants de classes.</h2>
 
-<h3>Petit snippet de vérification simplifiée en l'absence d'héritage</h3>
+<h3>II.1- Petit snippet de vérification simplifiée en l'absence d'héritage.</h3>
 
 <p>Sur un petit <a href="http://ideone.com/DOCWOy">exercice d'écriture de classe fraction</a>,
 j'avais pondu une classe utilitaire dont le but était de simplifier la
@@ -392,15 +398,109 @@ Pour ma part, je préfère avoir une assertion différente pour chaque invariant
 plutôt qu'un seul <code>assert(is_valid());</code>. Cela permet de savoir plus précisément
 quel contrat est violé.</p>
 
-<h3>Critiques envisageables avec cette approche</h3>
+<h3><a id="NVI_Invariants"></a>II.2- Invariants et NVI.</h3>
+
+<p>Pour ce qui est de gérer les invariants de plusieurs contrats, et des classes
+finales. Je partirai sur un héritage virtuel depuis une classe de base
+virtuelle <code>WithInvariants</code> dont la fonction de vérification serait spécialisée
+par tous les intermédiaires. Et dont les intermédiaires appelleraient toutes
+les versions mères pour n'oublier personne.</p>
+
+<p>```c++
+struct WithInvariants : boost::noncopyable {</p>
+
+<pre><code>void check_invariants() const {
+</code></pre>
+
+<p>ifndef NDEBUG</p>
+
+<pre><code>    do_check_invariants();
+</code></pre>
+
+<p>endif</p>
+
+<pre><code>}
+</code></pre>
+
+<p>protected:</p>
+
+<pre><code>~WithInvariants() {}
+virtual void do_check_invariants() const {}
+</code></pre>
+
+<p>};</p>
+
+<p>struct InvariantChecker {</p>
+
+<pre><code>InvariantChecker(WithInvariants const&amp; wi) : m_wi(wi)
+{ m_wi.check_invariants(); }
+~InvariantChecker()
+{ m_wi.check_invariants(); }
+</code></pre>
+
+<p>private:</p>
+
+<pre><code>WithInvariants const&amp; m_wi;
+</code></pre>
+
+<p>};</p>
+
+<p>struct Contract1 : boost::noncopyable, virtual WithInvariants
+{</p>
+
+<pre><code>...
+double compute(double x) const {
+    ...preconds...
+    InvariantChecker(*this);
+    return do_compute(x);
+}
+</code></pre>
+
+<p>protected:</p>
+
+<pre><code>virtual void do_check_invariants() const {
+    assert(invariant C1 ...);
+}
+....
+</code></pre>
+
+<p>}</p>
+
+<p>struct Impl : Contract1, Contract2
+{</p>
+
+<pre><code>....
+</code></pre>
+
+<p>protected:</p>
+
+<pre><code>virtual void do_check_invariants() const {
+    Contract1::do_check_invariants();
+    Contract2::do_check_invariants();
+    assert(invariant rajoutés par Impl ...);
+}
+</code></pre>
+
+<p>};
+```</p>
+
+<p>(Alors certes, c'est tordu, mais pour l'instant, je n'ai pas de meilleure idée.)</p>
+
+<h3>II.3- Critiques envisageables avec ces approches.</h3>
 
 <p>On peut s'attendre qu'en cas d'exception dans une fonction membre (ou amie)
-d'un objet, l'invariant ne soit plus respecté. Dans ce cas là, l'approche
-proposée juste au dessus va poser d'énormes problèmes.</p>
+d'un objet, l'invariant ne soit plus respecté.<br/>
+Dans ce cas là, les approches proposées juste au dessus vont poser d'énormes
+problèmes.</p>
 
 <p>Toutefois cela voudrait dire que l'exception ne laisse plus l'objet dans un
 état cohérent, et que nous n'avons pas la
 <a href="http://en.wikipedia.org/wiki/Exception_safety"><em>garantie basique</em></a>.</p>
+
+<p>Autre scénario dans le même ordre d'idée : imaginez que les flux aient pour
+invariant <code>good()</code>, et qu'une extraction ratée invalide le flux.  Cette fois,
+l'objet pourrait exister dans un état contraire à son invariant, ce qui ferait
+claquer l'assertion associée</p>
 
 <p>Dans le même genre d'idée, nous nous retrouverions dans la même situation que
 si on utilisait des constructeurs qui ne garantissent pas l'invariant de leurs
@@ -441,18 +541,56 @@ l'apporter : <em>«un object, une responsabilité»</em>. On pourrait même dire
 
 <blockquote><p>Deux invariants décorrélés (/non synchrones) => deux classes.</p></blockquote>
 
-<h2>Et si la Programmation Défensive est de la partie ?</h2>
+<h3>II.4- Des exceptions dans les constructeurs.</h3>
+
+<p>Une technique bien connue pour prévenir la construction d'un objet dont on ne
+peut pas garantir les invariants consiste à lever une exception depuis son
+constructeur. En procédant de la sorte, soit un objet existe et il est dans un
+état pertinent et utilisable, soit il n'a jamais existé et on n'a même pas
+besoin de se poser la question de son utilisabilité.</p>
+
+<p>Cela a l'air fantastique, n'est-ce pas ?</p>
+
+<p>Mais &hellip; n'est-ce pas de la programmation défensive ? En effet, ce n'est pas le
+client de l'objet qui vérifie les conditions d'existence, mais l'objet.
+Résultat, on ne dispose pas forcément du
+<a href="/blog/2014/05/24/programmation-par-contrat-un-peu-de-theorie/#ProgDefCtx">meilleur contexte</a> pour
+signaler le problème de <em>runtime</em> qui bloque la création de l'objet.</p>
+
+<p>Idéalement, je tendrais à dire que la vérification devrait être faite en amont,
+et ainsi le constructeur aurait des pré-conditions <em>étroitement</em> vérifiées.
+Dans la pratique, je dois bien avouer que je tends, aujourd'hui, à laisser la
+vérification au niveau des constructeurs au lieu d'exposer une fonction
+statique de vérification des pré-conditions d'existence dans les cas les plus
+complexes. Il faut dire que les exceptions ont tellement été bien vendues comme
+: c'est le seul moyen d'avorter depuis un opérateur surchargé ou depuis un
+constructeur, que j'ai jusqu'à lors totalement négligé mon instinct qui sentait
+qu'il y avait un truc louche à vérifier les conditions de création depuis un
+contexte restreint. À <em>élargir</em> les contrats, on finit par perdre des
+informations pour nos messages d'erreur.</p>
+
+<h2>III- Et si la Programmation Défensive est de la partie ?</h2>
+
+<p><em>Discl. : <a href="http://isocpp.org/wiki/faq/exceptions#exceptions-avoid-spreading-out-error-logic">L'utilisation de codes de retour va grandement complexifier l'application</a>,
+qui en plus de devoir tester les codes de retour relatifs au métier (dont la
+validation des entrées), devra propager des codes de retours relatifs aux
+potentielles erreurs de programmation. Au final, cela va accroitre les chances
+d'erreurs de programmation&hellip; chose antinomique avec les objectifs de la
+technique. Donc un conseil, pour de la programmation défensive en C++, préférez
+l'emploi d'exceptions &mdash; et bien évidemment, n'oubliez pas le
+<a href="/blog/2012/04/04/le-c-plus-plus-moderne/#C++Moderne">RAII</a>, notre grand
+ami.</em></p>
 
 <p>Prérequis : dérivez de
 <a href="http://www.cpluscplus.com/reference/stdexcept/runtime_error/"><code>std::runtime_error</code></a>
-vos exceptions pour cas exceptionnels pouvant se produire lors de l'exécution,
+vos exceptions pour les cas exceptionnels pouvant se produire lors de l'exécution,
 et de
 <a href="http://www.cpluscplus.com/reference/stdexcept/logic_error/"><code>std::logic_error</code></a>
 vos exceptions pour propager les erreurs de programmation.</p>
 
 <p>Plusieurs cas de figures sont ensuite envisageables.</p>
 
-<h3>Cas théorique idéal&hellip;</h3>
+<h3>III.1- Cas théorique idéal&hellip;</h3>
 
 <p>&hellip; lorsque COTS et bibliothèques tierces <strong>ne</strong> dérivent <strong>pas</strong> leurs
 exceptions de <code>std::exception</code> mais de <code>std::runtime_error</code> pour les cas
@@ -490,7 +628,16 @@ int main()
 }
 ```</p>
 
-<h3>Cas plausible&hellip;</h3>
+<p>Il est à noter que ce cas théorique idéal se combine très mal avec les
+techniques de
+<a href="http://www.parashift.com/c++-faq/throw-without-an-object.html">dispatching</a> et
+de
+<a href="http://isocpp.org/wiki/faq/exceptions#throw-without-an-object">factorisation</a>
+de gestion des erreurs. En effet, tout repose sur un <code>catch(...)</code>, or ce
+dernier va modifier le contexte pour la génération d'un <em>core</em> tandis que rien
+ne sera redispatché vers une <code>std::logic_error</code>.</p>
+
+<h3>III.2- Cas plausible&hellip;</h3>
 
 <p>&hellip; lorsque COTS et bibliothèques tierces dérivent <strong>bien</strong> leurs exceptions
 de <code>std::exception</code> au lieu de <code>std::runtime_error</code> pour les cas exceptionnels
@@ -937,15 +1084,17 @@ problématique sur certaines plages de <code>x</code>.</p>
 <h2>III- Le standard s'enrichira-t-il en <del>2014 ou en</del> 2017 pour programmer avec des contrats ?</h2>
 
 <p>Il y a déjà eu des propositions de mots clés plus ou moins sémantiquement forts
-pour supporter la PpC en standard en C++. Dans le dernier mailing (post-Urbana) en date,
+pour supporter la PpC en standard en C++. Dans le document
 <del><a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3753.pdf">N3753</a></del>
 <del><a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4075.pdf">N4075</a></del>
 <del><a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4135.pdf">N4135</a></del>
-<a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4253.pdf">N4253</a>,
-John Lakos et Alexei Zakharov introduisent tout d'abord un nouveau vocabulaire
-pour désigner les contrats : les <em>narrow contracts</em> et les <em>wide contracts</em>.
-Ils introduisent également un ensemble de macros <code>contract_assert()</code> assez
-flexible.</p>
+<del><a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4253.pdf">N4253</a></del>
+<a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4378.pdf">N4378</a> (et sa FAQ
+<a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4379.pdf">N4379</a>),
+du dernier mailing (2015-02 mid-meeting) en date, John Lakos et Alexei Zakharov
+introduisent tout d'abord un nouveau vocabulaire pour désigner les contrats :
+les <em>narrow contracts</em> et les <em>wide contracts</em>.  Ils introduisent également un
+ensemble de macros <code>contract_assert()</code> assez flexible.</p>
 
 <p>Ces macros supportent des niveaux d'importance de vérification (<em>optimized</em>, <em>safe</em>,
 <em>debug</em>,) un peu à l'image des niveaux <em>Error</em>/<em>Warning</em>/<em>Info</em>/<em>Debug</em> dans
@@ -956,7 +1105,7 @@ assertions de frameworks de tests unitaires.<br/>
 À noter qu'elle est déjà implémentée et disponible à l'intérieur de la
 <a href="https://github.com/bloomberg/bde">bibliothèque BDE/BSL</a> sous licence MIT.</p>
 
-<p>Cette proposition en est à sa neuvième révision. Les
+<p>Cette proposition en est à sa dixième révision. Les
 <a href="https://isocpp.org/files/papers/N4053.html#LWG8">minutes du rejet</a> de la
 révision (N4075) sont disponibles.</p>
 
@@ -1469,7 +1618,7 @@ aussi utilisée pour introduire une tolérance aux erreurs matérielles, limiter
 les conséquences de ces erreurs (comme les corruptions de mémoire).  C'est un
 aspect que je n'aborde pas dans le cadre de la comparaison avec la PpC.</em></p>
 
-<h3>III.1- Présentons la Programmation Défensive</h3>
+<h3><a id="ProgDefCtx"></a>III.1- Présentons la Programmation Défensive</h3>
 
 <p>La <em>Programmation Défensive</em> a pour objectif qu'un programme ne doit jamais
 s'arrêter afin de toujours pouvoir continuer. On s'intéresse à la robustesse
@@ -1961,7 +2110,7 @@ traduction de la réponse est disponible à l'adresse suivante :
 codes de retour, avec un <code>if</code> toutes les deux lignes en moyenne pour remonter
 les erreurs, et restituer les ressources.</p>
 
-<h3>Le C++ Moderne</h3>
+<h3><a id="C++Moderne"></a>Le C++ Moderne</h3>
 
 <p>La solution aux problèmes du C++ historique réside dans le C++ moderne.
 Décryptons cette tautologie.</p>
