@@ -477,7 +477,7 @@ Plusieurs cas de figures sont ensuite envisageables.
 ### III.1- Cas théorique idéal...
 
 ... lorsque COTS et bibliothèques tierces __ne__ dérivent __pas__ leurs
-exceptions de `std::exception` mais de `std::runtime_error` pour les cas
+exceptions de `std::exception` __mais__ de `std::runtime_error` pour les cas
 exceptionnels plausibles et de `std::logic_error` pour les erreurs de logique.
 
 Aux points d'interfaces (communication via une API C, limites de threads en
@@ -512,9 +512,9 @@ ne sera redispatché vers une `std::logic_error`.
 
 ### III.2- Cas plausible...
 
-... lorsque COTS et bibliothèques tierces dérivent __bien__ leurs exceptions
-de `std::exception` au lieu de `std::runtime_error` pour les cas exceptionnels
-plausibles et de `std::logic_error` pour les erreurs de logique.
+... lorsque COTS et bibliothèques tierces dérivent _malheureusement_ leurs
+exceptions de `std::exception` __au lieu__ de `std::runtime_error` pour les cas
+exceptionnels plausibles et de `std::logic_error` pour les erreurs de logique.
 
 Aux points d'interfaces (communication via une API C, limites de threads en
 C++03), ou dans le `main()`, il est possible d'ignorer toutes les exceptions pour
