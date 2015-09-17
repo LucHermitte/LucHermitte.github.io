@@ -9,8 +9,8 @@
   <meta name="author" content="Luc Hermitte">
 
   
-  <meta name="description" content="Dans ce second billet sur la Programmation par Contrat, nous allons voir que
-faire des contrats une fois établis, et en particulier je vais vous &hellip;">
+  <meta name="description" content="Dans ce dernier billet sur la Programmation par Contrat, je vais vous présenter
+quelques techniques d&#8217;application de la PpC au C++. (Désolé, j &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +72,665 @@ faire des contrats une fois établis, et en particulier je vais vous &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/05/29/programmation-par-contrat-snippets-pour-le-c-plus-plus/">Programmation Par Contrat 3/3 : Snippets pour le C++</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-05-29T11:33:15+02:00" pubdate data-updated="true">May 29<span>th</span>, 2014</time>
+        
+           | <a href="/blog/2014/05/29/programmation-par-contrat-snippets-pour-le-c-plus-plus/#disqus_thread"
+             data-disqus-identifier="http://LucHermitte.github.io/blog/2014/05/29/programmation-par-contrat-snippets-pour-le-c-plus-plus/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Dans ce dernier billet sur la <em>Programmation par Contrat</em>, je vais vous présenter
+quelques techniques d&#8217;application de la PpC au C++.</p>
+
+<p><em>(Désolé, j&#8217;ai mis du temps à mûrir certains de ses paragraphes)</em></p>
+
+<h2>Pré- et post-conditions de fonctions</h2>
+
+<h3>Pré- et post-conditions de fonctions membres, à la Non-Virtual Interface Pattern (NVI)</h3>
+
+<p>Le pattern NVI est un <em>Design Pattern</em> qui ressemble au DP <em>Template Method</em> mais qui
+n&#8217;est pas le <em>Template Method</em>. Le principe du pattern est le suivant :
+l&#8217;interface publique est non virtuelle, et elle fait appel à des comportements
+spécialisés qui sont eux privés et virtuels (généralement virtuels purs).</p>
+
+<p>Ce pattern a deux objectifs avoués. Le premier est de découpler les interfaces
+pour les <em>utilisateurs</em> du pattern. Le code client doit passer par l&#8217;interface
+publique qui est non virtuelle, tandis que le code qui spécialise doit
+s&#8217;intéresser à l&#8217;interface privée et virtuelle.</p>
+
+<p>Le second objectif, est de créer des super-interfaces qui baignent dans la
+PpC. Les interfaces classiques à la Java (up to v7)/C#/COM/CORBA/&hellip; ne
+permettent pas d&#8217;associer nativement des contrats à leurs méthodes. Avec le
+pattern NVI on peut, avec un soupçon d&#8217;huile de coude, rajouter des contrats
+aux fonctions membres.</p>
+
+<p>Les fonctions publiques et non virtuelles se voient définies <code>inline</code>s, elles
+vérifient en premier lieu pré-conditions et invariants, elles exécutent ensuite
+le code spécialisé, et elles finissent par vérifier post-conditions et
+invariants.<br/>
+Soit:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="cm">/** Interface/contrat C1.</span>
+</span><span class='line'><span class="cm"> */</span>
+</span><span class='line'><span class="k">struct</span> <span class="n">Contract1</span> <span class="o">:</span> <span class="n">boost</span><span class="o">::</span><span class="n">noncopyable</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="k">virtual</span> <span class="o">~</span><span class="n">Contract1</span><span class="p">(){};</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="cm">/** @pre &lt;tt&gt; x &gt; 42&lt;/tt&gt;, vérifié par assertion.</span>
+</span><span class='line'><span class="cm">     */</span>
+</span><span class='line'>    <span class="kt">double</span> <span class="n">compute</span><span class="p">(</span><span class="kt">double</span> <span class="n">x</span><span class="p">)</span> <span class="k">const</span> <span class="p">{</span>
+</span><span class='line'>        <span class="n">assert</span><span class="p">(</span><span class="n">x</span> <span class="o">&gt;</span> <span class="mi">42</span> <span class="o">&amp;&amp;</span> <span class="s">&quot;echec de précondition sur contrat1&quot;</span><span class="p">);</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">do_compute</span><span class="p">(</span><span class="n">x</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="k">private</span><span class="o">:</span>
+</span><span class='line'>    <span class="k">virtual</span> <span class="kt">double</span> <span class="n">do_compute</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">)</span> <span class="k">const</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">Impl</span> <span class="o">:</span> <span class="n">Contract1</span><span class="p">,</span> <span class="n">Contract2</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'><span class="k">private</span><span class="o">:</span>
+</span><span class='line'>    <span class="k">virtual</span> <span class="kt">double</span> <span class="n">do_compute</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">)</span> <span class="k">const</span> <span class="n">override</span> <span class="p">{</span> <span class="p">...</span> <span class="p">}</span>
+</span><span class='line'>    <span class="c1">// + spécialisations des fonctions de Contract2</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Pour ce qui est de gérer en plus les invariants de tous les contrats, et des
+classes finales. Je partirai avec un héritage virtuel depuis une classe de base
+virtuelle <code>WithInvariants</code> dont la fonction de vérification serait spécialisée
+par tous les intermédiaires. Et dont les intermédiaires appelleraient toutes
+les versions mères pour n&#8217;oublier personne.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="k">struct</span> <span class="n">WithInvariants</span> <span class="o">:</span> <span class="n">boost</span><span class="o">::</span><span class="n">noncopyable</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kt">void</span> <span class="n">check_invariants</span><span class="p">()</span> <span class="k">const</span> <span class="p">{</span>
+</span><span class='line'><span class="n">ifndef</span> <span class="n">NDEBUG</span>
+</span><span class='line'>        <span class="n">do_check_invariants</span><span class="p">();</span>
+</span><span class='line'><span class="n">endif</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="k">protected</span><span class="o">:</span>
+</span><span class='line'>    <span class="o">~</span><span class="n">WithInvariants</span><span class="p">()</span> <span class="p">{}</span>
+</span><span class='line'>    <span class="k">virtual</span> <span class="kt">void</span> <span class="n">do_check_invariants</span><span class="p">()</span> <span class="k">const</span> <span class="p">{}</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">struct</span> <span class="n">InvariantChecker</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">InvariantChecker</span><span class="p">(</span><span class="n">WithInvariants</span> <span class="k">const</span><span class="o">&amp;</span> <span class="n">wi</span><span class="p">)</span> <span class="o">:</span> <span class="n">m_wi</span><span class="p">(</span><span class="n">wi</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">{</span> <span class="n">m_wi</span><span class="p">.</span><span class="n">check_invariants</span><span class="p">();</span> <span class="p">}</span>
+</span><span class='line'>    <span class="o">~</span><span class="n">InvariantChecker</span><span class="p">()</span>
+</span><span class='line'>    <span class="p">{</span> <span class="n">m_wi</span><span class="p">.</span><span class="n">check_invariants</span><span class="p">();</span> <span class="p">}</span>
+</span><span class='line'><span class="k">private</span><span class="o">:</span>
+</span><span class='line'>    <span class="n">WithInvariants</span> <span class="k">const</span><span class="o">&amp;</span> <span class="n">m_wi</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">struct</span> <span class="n">Contract1</span> <span class="o">:</span> <span class="n">boost</span><span class="o">::</span><span class="n">noncopyable</span><span class="p">,</span> <span class="k">virtual</span> <span class="n">WithInvariants</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="p">...</span>
+</span><span class='line'>    <span class="kt">double</span> <span class="n">compute</span><span class="p">(</span><span class="kt">double</span> <span class="n">x</span><span class="p">)</span> <span class="k">const</span> <span class="p">{</span>
+</span><span class='line'>        <span class="p">...</span><span class="n">preconds</span><span class="p">...</span>
+</span><span class='line'>        <span class="n">InvariantChecker</span><span class="p">(</span><span class="o">*</span><span class="k">this</span><span class="p">);</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">do_compute</span><span class="p">(</span><span class="n">x</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="k">protected</span><span class="o">:</span>
+</span><span class='line'>    <span class="k">virtual</span> <span class="kt">void</span> <span class="n">do_check_invariants</span><span class="p">()</span> <span class="k">const</span> <span class="n">override</span> <span class="p">{</span>
+</span><span class='line'>        <span class="n">assert</span><span class="p">(</span><span class="n">invariant</span> <span class="n">C1</span> <span class="p">...);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="p">....</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">struct</span> <span class="n">Impl</span> <span class="o">:</span> <span class="n">Contract1</span><span class="p">,</span> <span class="n">Contract2</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="p">....</span>
+</span><span class='line'><span class="k">protected</span><span class="o">:</span>
+</span><span class='line'>    <span class="k">virtual</span> <span class="kt">void</span> <span class="n">do_check_invariants</span><span class="p">()</span> <span class="k">const</span> <span class="n">override</span> <span class="p">{</span>
+</span><span class='line'>        <span class="n">Contract1</span><span class="o">::</span><span class="n">do_check_invariants</span><span class="p">();</span>
+</span><span class='line'>        <span class="n">Contract2</span><span class="o">::</span><span class="n">do_check_invariants</span><span class="p">();</span>
+</span><span class='line'>        <span class="n">assert</span><span class="p">(</span><span class="n">invariant</span> <span class="n">rajout</span><span class="err">é</span><span class="n">s</span> <span class="n">par</span> <span class="n">Impl</span> <span class="p">...);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>(Pour l&#8217;instant, je n&#8217;ai pas de meilleure idée)</p>
+
+<h3>Pré- et post-conditions de fonctions, à la Imperfect C++</h3>
+
+<p>Matthew Wilson consacre le premier chapitre de son <a href="#IPCpp"><em>Imperfect C++</em></a> à
+la PpC. Je ne peux que vous en conseiller la lecture.</p>
+
+<p>Il y présente au §I.1.3 la technique suivante :</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">double</span> <span class="n">my</span><span class="o">::</span><span class="n">sqrt</span><span class="p">(</span><span class="kt">double</span> <span class="n">n</span><span class="p">)</span>
+</span><span class='line'><span class="k">if</span> <span class="n">defined</span><span class="p">(</span><span class="n">MYLIB_DBC_ACTIVATED</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="c1">// Check pre-conditions</span>
+</span><span class='line'>    <span class="n">assert</span><span class="p">(</span><span class="n">n</span><span class="o">&gt;=</span><span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="s">&quot;sqrt can&#39;t process negative numbers&quot;</span><span class="p">);</span>
+</span><span class='line'>    <span class="c1">// Do the work</span>
+</span><span class='line'>    <span class="k">const</span> <span class="kt">double</span> <span class="n">res</span> <span class="o">=</span> <span class="n">my</span><span class="o">::</span><span class="n">sqrt_unchecked</span><span class="p">(</span><span class="n">n</span><span class="p">);</span>
+</span><span class='line'>    <span class="c1">// Check post-conditions</span>
+</span><span class='line'>    <span class="n">assert</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">abs</span><span class="p">(</span><span class="n">res</span><span class="o">*</span><span class="n">res</span> <span class="o">-</span> <span class="n">n</span><span class="p">)</span><span class="o">&lt;</span><span class="n">epsilon</span> <span class="o">&amp;&amp;</span> <span class="s">&quot;Invalid sqrt result&quot;</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">res</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="kt">double</span> <span class="n">my</span><span class="o">::</span><span class="n">sqrt_unchecked</span><span class="p">(</span><span class="kt">double</span> <span class="n">n</span><span class="p">)</span>
+</span><span class='line'><span class="n">endif</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">sqrt</span><span class="p">(</span><span class="n">n</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Pré- et post-conditions de fonctions &hellip; <code>constexpr</code> C++11</h3>
+
+<p>Les fonctions <code>constexpr</code> à la C++11 doivent renvoyer une valeur et ne rien
+faire d&#8217;autre. De plus le contrat doit pouvoir être vérifié en mode <em>appelé
+depuis une expession constante</em> comme en mode <em>appelé depuis une expression
+variable</em>. De fait, cela nécessite quelques astuces pour pouvoir spécifier des
+contrats dans de telles fonctions.</p>
+
+<p>Pour de plus amples détails, je vous renvoie à
+l&#8217;<a href="http://ericniebler.com/2014/09/27/assert-and-constexpr-in-cxx11/">article</a>
+fort complet d&#8217;Eric Niebler sur le sujet. Andrzej présente la même technique
+dans son article
+<a href="http://akrzemi1.wordpress.com/2011/05/06/compile-time-computations/">Compile Time Computations</a>.</p>
+
+<p>En résumé, on peut procéder de la sorte. Avec ceci:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="cm">/** Helper struct for DbC programming in C++11 constexpr functions.</span>
+</span><span class='line'><span class="cm"> * Copyright 2014 Eric Niebler,</span>
+</span><span class='line'><span class="cm"> * http://ericniebler.com/2014/09/27/assert-and-constexpr-in-cxx11/</span>
+</span><span class='line'><span class="cm"> */</span>
+</span><span class='line'><span class="k">struct</span> <span class="n">assert_failure</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span> <span class="n">Fun</span><span class="o">&gt;</span>
+</span><span class='line'>    <span class="k">explicit</span> <span class="n">assert_failure</span><span class="p">(</span><span class="n">Fun</span> <span class="n">fun</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="n">fun</span><span class="p">();</span>
+</span><span class='line'>        <span class="c1">// For good measure:</span>
+</span><span class='line'>        <span class="n">std</span><span class="o">::</span><span class="n">quick_exit</span><span class="p">(</span><span class="n">EXIT_FAILURE</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>On peut ainsi exprimer des fonctions <code>constexpr</code> en C++11 :</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="cm">/**</span>
+</span><span class='line'><span class="cm"> * Internal constexpr function that computes \f$n!\f$ with a tail-recursion.</span>
+</span><span class='line'><span class="cm"> * @param[in] n</span>
+</span><span class='line'><span class="cm"> * @param[in] r  pre-computed result</span>
+</span><span class='line'><span class="cm"> * @pre n shall not induce an integer overflow</span>
+</span><span class='line'><span class="cm"> * @post the result won&#39;t be null</span>
+</span><span class='line'><span class="cm"> * @author Luc Hermitte</span>
+</span><span class='line'><span class="cm"> */</span>
+</span><span class='line'><span class="n">constexpr</span> <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">fact_impl</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">n</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">r</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span>
+</span><span class='line'>        <span class="n">n</span> <span class="o">&lt;=</span> <span class="mi">1</span>                                          <span class="o">?</span> <span class="n">r</span>
+</span><span class='line'><span class="cp">#ifndef NDEBUG</span>
+</span><span class='line'>        <span class="o">:</span> <span class="n">std</span><span class="o">::</span><span class="n">numeric_limits</span><span class="o">&lt;</span><span class="n">decltype</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="o">&gt;::</span><span class="n">max</span><span class="p">()</span><span class="o">/</span><span class="n">n</span> <span class="o">&lt;</span> <span class="n">r</span> <span class="o">?</span> <span class="k">throw</span> <span class="n">assert_failure</span><span class="p">(</span> <span class="p">[]{</span><span class="n">assert</span><span class="p">(</span><span class="o">!</span><span class="s">&quot;int overflow&quot;</span><span class="p">);})</span>
+</span><span class='line'><span class="cp">#endif</span>
+</span><span class='line'>        <span class="o">:</span>                                                 <span class="n">fact_impl</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="o">*</span><span class="n">r</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="n">constexpr</span> <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">fact</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">n</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">fact_impl</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">int</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">const</span> <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">n10</span> <span class="o">=</span> <span class="n">fact</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">const</span> <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">n50</span> <span class="o">=</span> <span class="n">fact</span><span class="p">(</span><span class="mi">50</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Malheureusement la rupture de contrat ne sera pas détectée lors de la
+compilation, mais à l&#8217;exécution où l&#8217;on pourra constater à minima où l&#8217;appel de
+plus haut niveau s&#8217;est produit (bien que l&#8217;on risque de ne pas pouvoir observer
+l&#8217;état des variables <em>optimized out</em> dans le débuggueur).</p>
+
+<p>Notez que pour exprimer une post-condition sans multiplier les appels, j&#8217;ai
+écrit la fonction (qui aurait été récursive dans tous les cas) en
+<a href="http://fr.wikipedia.org/wiki/R%C3%A9cursion_terminale">fonction récursive terminale</a>.
+De là, il a été facile d&#8217;insérer une assertion &mdash; et de plus, le compilateur
+pourra optimiser la fonction en <em>Release</em> sur les appels dynamiques.</p>
+
+<p>Pour information, une autre écriture qui exploite l&#8217;opérateur virgule est
+possible, mais elle ne compile pas avec les versions de GCC que j&#8217;ai eu entre
+les mains (i.e. jusqu&#8217;à la version 4.9, GCC n&#8217;est pas d&#8217;accord).</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="cm">/**</span>
+</span><span class='line'><span class="cm"> * Internal constexpr function that computes \f$n!\f$ with a tail-recursion.</span>
+</span><span class='line'><span class="cm"> * @param[in] n</span>
+</span><span class='line'><span class="cm"> * @param[in] r  pre-computed result</span>
+</span><span class='line'><span class="cm"> * @pre n shall not induce an integer overflow</span>
+</span><span class='line'><span class="cm"> * @post the result won&#39;t be null</span>
+</span><span class='line'><span class="cm"> * @warning This version does not compile with GCC up-to v4.9.</span>
+</span><span class='line'><span class="cm"> * @author Luc Hermitte</span>
+</span><span class='line'><span class="cm"> */</span>
+</span><span class='line'><span class="n">constexpr</span> <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">fact_impl</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">n</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">r</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">n</span> <span class="o">&gt;=</span> <span class="mi">1</span>
+</span><span class='line'>        <span class="c1">// ? (assert(std::numeric_limits&lt;decltype(n)&gt;::max()/n &gt;= r), fact_impl(n-1, n*r))</span>
+</span><span class='line'>        <span class="o">?</span> <span class="n">fact_impl</span><span class="p">((</span><span class="n">assert</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">numeric_limits</span><span class="o">&lt;</span><span class="n">decltype</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="o">&gt;::</span><span class="n">max</span><span class="p">()</span><span class="o">/</span><span class="n">n</span> <span class="o">&gt;=</span> <span class="n">r</span><span class="p">),</span> <span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">n</span><span class="o">*</span><span class="n">r</span><span class="p">)</span>
+</span><span class='line'>        <span class="o">:</span> <span class="p">(</span><span class="n">assert</span><span class="p">(</span><span class="n">r</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">),</span> <span class="n">r</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>N.B.: Dans le cas des <code>constexpr</code> du C++14, il me faudrait vérifier si <code>assert()</code> est
+directement utilisable. A priori, cela sera le cas.</p>
+
+<h2>Invariants de classes</h2>
+
+<h3>Petit snippet de vérification simplifiée en l&#8217;absence d&#8217;héritage</h3>
+
+<p>Sur un petit <a href="http://ideone.com/DOCWOy">exercice d&#8217;écriture de classe fraction</a>,
+j&#8217;avais pondu une classe utilitaire dont le but était de simplifier la
+vérification des invariants. Il suffit de déclarer un objet de ce type en tout
+début des fonctions membres (et des fonctions amies) exposées aux clients.
+Ainsi les invariants sont automatiquement vérifiés en début, et en fin de
+fonction lors de la destruction de l&#8217;objet <code>InvariantChecker</code>.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="cm">/** Helper class to check invariants.</span>
+</span><span class='line'><span class="cm"> * @tparam CheckedClass shall define a \c check_invariants fonction where</span>
+</span><span class='line'><span class="cm">   invariants checking is done.</span>
+</span><span class='line'><span class="cm"> */</span>
+</span><span class='line'><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">CheckedClass</span><span class="o">&gt;</span>
+</span><span class='line'><span class="k">struct</span> <span class="n">InvariantChecker</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">InvariantChecker</span><span class="p">(</span><span class="n">CheckedClass</span> <span class="k">const</span><span class="o">&amp;</span> <span class="n">cc_</span><span class="p">)</span> <span class="o">:</span> <span class="n">m_cc</span><span class="p">(</span><span class="n">cc_</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">{</span> <span class="n">m_cc</span><span class="p">.</span><span class="n">check_invariants</span><span class="p">();</span> <span class="p">}</span>
+</span><span class='line'>    <span class="o">~</span><span class="n">InvariantChecker</span><span class="p">()</span>
+</span><span class='line'>    <span class="p">{</span> <span class="n">m_cc</span><span class="p">.</span><span class="n">check_invariants</span><span class="p">();</span> <span class="p">}</span>
+</span><span class='line'><span class="k">private</span><span class="o">:</span>
+</span><span class='line'>    <span class="n">CheckedClass</span> <span class="k">const</span><span class="o">&amp;</span> <span class="n">m_cc</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="cm">/** rational class.</span>
+</span><span class='line'><span class="cm"> * @invariant &lt;tt&gt;denominator() &gt; 0&lt;/tt&gt;</span>
+</span><span class='line'><span class="cm"> * @invariant visible objects are normalized.</span>
+</span><span class='line'><span class="cm"> */</span>
+</span><span class='line'><span class="k">struct</span> <span class="n">Rational</span> <span class="p">{</span>
+</span><span class='line'>    <span class="p">....</span>
+</span><span class='line'>    <span class="c1">// Une fonction publique qui doit vérifier l&#39;invariant</span>
+</span><span class='line'>    <span class="n">Rational</span> <span class="o">&amp;</span> <span class="k">operator</span><span class="o">+=</span><span class="p">(</span><span class="n">Rational</span> <span class="k">const</span><span class="o">&amp;</span> <span class="n">rhs</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="n">InvariantChecker</span><span class="o">&lt;</span><span class="n">Rational</span><span class="o">&gt;</span> <span class="n">check</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">...</span> <span class="n">le</span> <span class="n">code</span> <span class="n">de</span> <span class="n">l</span><span class="err">&#39;</span><span class="n">addition</span> <span class="p">...</span>
+</span><span class='line'>        <span class="k">return</span> <span class="o">*</span><span class="k">this</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">private</span><span class="o">:</span>
+</span><span class='line'>    <span class="c1">// La fonction interne de vérification</span>
+</span><span class='line'>    <span class="kt">void</span> <span class="n">check_invariants</span><span class="p">()</span> <span class="k">const</span> <span class="p">{</span>
+</span><span class='line'>        <span class="n">assert</span><span class="p">(</span><span class="n">denominator</span><span class="p">()</span> <span class="o">&amp;&amp;</span> <span class="s">&quot;Denominator can&#39;t be null&quot;</span><span class="p">);</span>
+</span><span class='line'>        <span class="n">assert</span><span class="p">(</span><span class="n">denominator</span><span class="p">()</span><span class="o">&gt;</span><span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="s">&quot;Denominator can&#39;t be negative&quot;</span><span class="p">);</span>
+</span><span class='line'>        <span class="n">assert</span><span class="p">(</span><span class="n">pgcd</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">abs</span><span class="p">(</span><span class="n">numerator</span><span class="p">()),</span> <span class="n">denominator</span><span class="p">())</span> <span class="o">==</span> <span class="mi">1</span> <span class="o">&amp;&amp;</span> <span class="s">&quot;The rational shall be normalized&quot;</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="c1">// Et on donne accès à la classe InvariantChecker&lt;&gt;</span>
+</span><span class='line'>    <span class="k">friend</span> <span class="k">class</span> <span class="nc">InvariantChecker</span><span class="o">&lt;</span><span class="n">rational</span><span class="o">&gt;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="p">...</span> <span class="n">les</span> <span class="n">membres</span> <span class="p">...</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>N.B.: je vois à la relecture d&#8217;<em>Imperfect C++</em> que c&#8217;est très proche de ce que
+suggérait Matthew Wilson. Au détail qu&#8217;il passe par une fonction <code>is_valid</code>
+renvoyant un booléen et que l&#8217;<code>InvariantChecker</code> s&#8217;occupe de vérifier
+l&#8217;assertion si <code>MYLIB_DBC_ACTIVATED</code> est bien défini &mdash; il découple la
+vérification des contrats de la macro <code>NDEBUG</code> qui est plus liée au mode de
+compilation (<em>Débug</em> VS <em>Release</em>).<br/>
+Pour ma part, je préfère avoir une assertion différente pour chaque invariant
+plutôt qu&#8217;un seul <code>assert(is_valid());</code>. Cela permet de savoir plus précisément
+quel contrat est violé.</p>
+
+<h3>Critiques envisageables avec cette approche</h3>
+
+<p>On peut s&#8217;attendre qu&#8217;en cas d&#8217;exception dans une fonction membre (ou amie)
+d&#8217;un objet, l&#8217;invariant ne soit plus respecté. Dans ce cas là, l&#8217;approche
+proposée juste au dessus va poser d&#8217;énormes problèmes.</p>
+
+<p>Toutefois cela voudrait dire que l&#8217;exception ne laisse plus l&#8217;objet dans un
+état cohérent, et que nous n&#8217;avons pas la
+<a href="http://en.wikipedia.org/wiki/Exception_safety"><em>garantie basique</em></a>.</p>
+
+<p>Dans le même genre d&#8217;idée, nous nous retrouverions dans la même situation que
+si on utilisait des constructeurs qui ne garantissent pas l&#8217;invariant de leurs
+classes, et qui sont utilisés conjointement avec des fonctions <code>init()</code>. En
+effet, si l&#8217;invariant ne peut plus être assuré statiquement par programmation,
+il est nécessaire de l&#8217;assurer dynamiquement en vérifiant en début de chaque
+fonction membre (/amie) si l&#8217;objet est bien valide.</p>
+
+<p>Effectivement il y a alors un problème. À mon avis, le problème n&#8217;est pas dans
+le fait de formuler les invariants de notre objet et de s&#8217;assurer qu&#8217;ils soient
+toujours vérifiés. Le problème est de permettre à l&#8217;objet de ne plus vérifier
+ses invariants et qu&#8217;il faille le tester dynamiquement.</p>
+
+<h4>Les objets <em>cassés</em></h4>
+
+<p>On retrouve le modèle des flux de données (fichiers, sockets, &hellip;) qui peuvent
+passer KO et qu&#8217;il faudra rétablir. Dans cette approche, plutôt que de se
+débarrasser du flux pour en construire un tout beau tout neuf, on le maintient
+(car après tout il est déjà initialisé) et on cherchera à le reconnecter.</p>
+
+<p>Plus je réfléchis à la question est moins je suis friand de ces objets qui
+peuvent être cassés.</p>
+
+<p>Dans un monde idéal, j&#8217;aurai tendance à dire qu&#8217;il faudrait établir des zones
+de codes qui ont des invariants de plus en plus précis &mdash; les invariants étant
+organisés de façon hiérarchique.</p>
+
+<p>Dans la zone <em>descriptif de flux configuré</em>, il y aurait la zone <em>flux valide
+et connecté</em>. Quand le flux n&#8217;est plus valide, on peut retourner à la zone
+englobante de flux décrit. C&#8217;est d&#8217;ailleurs ce qu&#8217;on l&#8217;on fait d&#8217;une certaine
+façon. Sauf que nous avons pris l&#8217;habitude (avec les abstractions de sockets et
+de fichiers usuelles) de n&#8217;avoir qu&#8217;un seul objet pour contenir les deux
+informations. Et de fait, quand on veut séparer les deux invariants à
+l&#8217;exécution, on se retrouve avec des objets cassés&hellip;</p>
+
+<p>La solution ? Ma foi, le SRP (<em>Single Responsability Principle</em>) me semble
+l&#8217;apporter : <em>«un object, une responsabilité»</em>. On pourrait même dire :</p>
+
+<blockquote><p>Deux invariants décorrélés (/non synchrones) => deux classes.</p></blockquote>
+
+<h2>Et si la Programmation Défensive est de la partie ?</h2>
+
+<p>Prérequis : dérivez de
+<a href="http://www.cpluscplus.com/reference/stdexcept/runtime_error/"><code>std::runtime_error</code></a>
+vos exceptions pour cas exceptionnels pouvant se produire lors de l&#8217;exécution,
+et de
+<a href="http://www.cpluscplus.com/reference/stdexcept/logic_error/"><code>std::logic_error</code></a>
+vos exceptions pour propager les erreurs de programmation.</p>
+
+<p>Plusieurs cas de figures sont ensuite envisageables.</p>
+
+<h3>Cas théorique idéal&hellip;</h3>
+
+<p>&hellip; lorsque COTS et bibliothèques tierces <strong>ne</strong> dérivent <strong>pas</strong> leurs
+exceptions de <code>std::exception</code> mais de <code>std::runtime_error</code> pour les cas
+exceptionnels plausibles et de <code>std::logic_error</code> pour les erreurs de logique.</p>
+
+<p>Aux points d&#8217;interfaces (communication via une API C, limites de threads en
+C++03), ou dans le <code>main()</code>, il est possible de filtrer les erreurs de logiques
+pour avoir des coredumps en <em>Debug</em>.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">int</span> <span class="n">main</span><span class="p">()</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>   <span class="k">try</span> <span class="p">{</span>
+</span><span class='line'>        <span class="n">leCodeQuipeutprovoquerDesExceptions</span><span class="p">();</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">EXIT_SUCCESS</span><span class="p">;</span>
+</span><span class='line'><span class="cp">#ifdef NDEBUG</span>
+</span><span class='line'>   <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">logic_error</span> <span class="k">const</span><span class="o">&amp;</span> <span class="n">e</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="n">std</span><span class="o">::</span><span class="n">cerr</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Logic error: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">e</span><span class="p">.</span><span class="n">what</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="cp">#endif</span>
+</span><span class='line'>   <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">runtime_error</span> <span class="k">const</span><span class="o">&amp;</span> <span class="n">e</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="n">std</span><span class="o">::</span><span class="n">cerr</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Error: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">e</span><span class="p">.</span><span class="n">what</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+</span><span class='line'>   <span class="p">}</span>
+</span><span class='line'>   <span class="k">return</span> <span class="n">EXIT_FAILURE</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Cas plausible&hellip;</h3>
+
+<p>&hellip; lorsque COTS et bibliothèques tierces dérivent <strong>bien</strong> leurs exceptions
+de <code>std::exception</code> au lieu de <code>std::runtime_error</code> pour les cas exceptionnels
+plausibles et de <code>std::logic_error</code> pour les erreurs de logique.</p>
+
+<p>Aux points d&#8217;interfaces (communication via une API C, limites de threads en
+C++03), ou dans le <code>main()</code>, il est possible d&#8217;ignorer toutes les exceptions pour
+avoir des coredumps en <em>Debug</em> sur les exceptions dues à des erreurs de logiques et &hellip;
+sur les autres aussi.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">int</span> <span class="n">main</span><span class="p">()</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'><span class="cp">#ifdef NDEBUG</span>
+</span><span class='line'>   <span class="k">try</span> <span class="p">{</span>
+</span><span class='line'><span class="cp">#endif</span>
+</span><span class='line'>       <span class="n">leCodeQuipeutprovoquerDesExceptions</span><span class="p">();</span>
+</span><span class='line'>       <span class="k">return</span> <span class="n">EXIT_SUCCESS</span><span class="p">;</span>
+</span><span class='line'><span class="cp">#ifdef NDEBUG</span>
+</span><span class='line'>   <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">exception</span> <span class="k">const</span><span class="o">&amp;</span> <span class="n">e</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>       <span class="n">std</span><span class="o">::</span><span class="n">cerr</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Error: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">e</span><span class="p">.</span><span class="n">what</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+</span><span class='line'>   <span class="p">}</span>
+</span><span class='line'>   <span class="k">return</span> <span class="n">EXIT_FAILURE</span><span class="p">;</span>
+</span><span class='line'><span class="cp">#endif</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>D&#8217;autres variations sont très certainement envisageables où l&#8217;on rattraperait
+l&#8217;erreur de logique pour la relancer en <em>Debug</em>.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -565,17 +1224,15 @@ problématique sur certaines plages de <code>x</code>.</p>
 <h2>III- Le standard s&#8217;enrichira-t-il en <del>2014 ou en</del> 2017 pour programmer avec des contrats ?</h2>
 
 <p>Il y a déjà eu des propositions de mots clés plus ou moins sémantiquement forts
-pour supporter la PpC en standard en C++. Dans le document
+pour supporter la PpC en standard en C++. Dans le dernier mailing (post-Urbana) en date,
 <del><a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3753.pdf">N3753</a></del>
 <del><a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4075.pdf">N4075</a></del>
 <del><a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4135.pdf">N4135</a></del>
-<del><a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4253.pdf">N4253</a></del>
-<a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4378.pdf">N4378</a> (et sa FAQ
-<a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4379.pdf">N4379</a>),
-du dernier mailing (2015-02 mid-meeting) en date, John Lakos et Alexei Zakharov
-introduisent tout d&#8217;abord un nouveau vocabulaire pour désigner les contrats :
-les <em>narrow contracts</em> et les <em>wide contracts</em>.  Ils introduisent également un
-ensemble de macros <code>contract_assert()</code> assez flexible.</p>
+<a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4253.pdf">N4253</a>,
+John Lakos et Alexei Zakharov introduisent tout d&#8217;abord un nouveau vocabulaire
+pour désigner les contrats : les <em>narrow contracts</em> et les <em>wide contracts</em>.
+Ils introduisent également un ensemble de macros <code>contract_assert()</code> assez
+flexible.</p>
 
 <p>Ces macros supportent des niveaux d&#8217;importance de vérification (<em>optimized</em>, <em>safe</em>,
 <em>debug</em>,) un peu à l&#8217;image des niveaux <em>Error</em>/<em>Warning</em>/<em>Info</em>/<em>Debug</em> dans
@@ -586,7 +1243,7 @@ assertions de frameworks de tests unitaires.<br/>
 À noter qu&#8217;elle est déjà implémentée et disponible à l&#8217;intérieur de la
 <a href="https://github.com/bloomberg/bde">bibliothèque BDE/BSL</a> sous licence MIT.</p>
 
-<p>Cette proposition en est à sa dixième révision. Les
+<p>Cette proposition en est à sa neuvième révision. Les
 <a href="https://isocpp.org/files/papers/N4053.html#LWG8">minutes du rejet</a> de la
 révision (N4075) sont disponibles.</p>
 
@@ -1152,7 +1809,7 @@ aussi utilisée pour introduire une tolérance aux erreurs matérielles, limiter
 les conséquences de ces erreurs (comme les corruptions de mémoire).  C&#8217;est un
 aspect que je n&#8217;aborde pas dans le cadre de la comparaison avec la PpC.</em></p>
 
-<h3><a id="ProgDefCtx"></a>III.1- Présentons la Programmation Défensive</h3>
+<h3>III.1- Présentons la Programmation Défensive</h3>
 
 <p>La <em>Programmation Défensive</em> a pour objectif qu&#8217;un programme ne doit jamais
 s&#8217;arrêter afin de toujours pouvoir continuer. On s&#8217;intéresse à la robustesse
@@ -1727,7 +2384,7 @@ traduction de la réponse est disponible à l&#8217;adresse suivante :
 codes de retour, avec un <code>if</code> toutes les deux lignes en moyenne pour remonter
 les erreurs, et restituer les ressources.</p>
 
-<h3><a id="C++Moderne"></a>Le C++ Moderne</h3>
+<h3>Le C++ Moderne</h3>
 
 <p>La solution aux problèmes du C++ historique réside dans le C++ moderne.
 Décryptons cette tautologie.</p>
@@ -1915,13 +2572,17 @@ ressources manipulées.</p>
 <section>
   <h1>Categories</h1>
   <ul id="categories">
-    <li class='category'><a href='/blog/categories/c-/'>C++ (3)</a></li>
+    <li class='category'><a href='/blog/categories/c-/'>C++ (4)</a></li>
 
   </ul>
 </section>
 <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/05/29/programmation-par-contrat-snippets-pour-le-c-plus-plus/">Programmation Par Contrat 3/3 : Snippets pour le C++</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2014/05/28/programmation-par-contrat-les-assertions/">Programmation Par Contrat 2/3 : Les assertions</a>

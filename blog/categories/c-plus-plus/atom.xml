@@ -4,7 +4,7 @@
   <title><![CDATA[Category: C++ | Luc Hermitte's Blog]]></title>
   <link href="http://LucHermitte.github.io/blog/categories/c-plus-plus/atom.xml" rel="self"/>
   <link href="http://LucHermitte.github.io/"/>
-  <updated>2015-02-19T23:52:51+01:00</updated>
+  <updated>2015-09-17T19:17:54+02:00</updated>
   <id>http://LucHermitte.github.io/</id>
   <author>
     <name><![CDATA[Luc Hermitte]]></name>
@@ -12,6 +12,528 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Programmation Par Contrat 3/3 : Snippets pour le C++]]></title>
+    <link href="http://LucHermitte.github.io/blog/2014/05/29/programmation-par-contrat-snippets-pour-le-c-plus-plus/"/>
+    <updated>2014-05-29T11:33:15+02:00</updated>
+    <id>http://LucHermitte.github.io/blog/2014/05/29/programmation-par-contrat-snippets-pour-le-c-plus-plus</id>
+    <content type="html"><![CDATA[<p>Dans ce dernier billet sur la <em>Programmation par Contrat</em>, je vais vous présenter
+quelques techniques d'application de la PpC au C++.</p>
+
+<p><em>(Désolé, j'ai mis du temps à mûrir certains de ses paragraphes)</em></p>
+
+<h2>Pré- et post-conditions de fonctions</h2>
+
+<h3>Pré- et post-conditions de fonctions membres, à la Non-Virtual Interface Pattern (NVI)</h3>
+
+<p>Le pattern NVI est un <em>Design Pattern</em> qui ressemble au DP <em>Template Method</em> mais qui
+n'est pas le <em>Template Method</em>. Le principe du pattern est le suivant :
+l'interface publique est non virtuelle, et elle fait appel à des comportements
+spécialisés qui sont eux privés et virtuels (généralement virtuels purs).</p>
+
+<p>Ce pattern a deux objectifs avoués. Le premier est de découpler les interfaces
+pour les <em>utilisateurs</em> du pattern. Le code client doit passer par l'interface
+publique qui est non virtuelle, tandis que le code qui spécialise doit
+s'intéresser à l'interface privée et virtuelle.</p>
+
+<p>Le second objectif, est de créer des super-interfaces qui baignent dans la
+PpC. Les interfaces classiques à la Java (up to v7)/C#/COM/CORBA/&hellip; ne
+permettent pas d'associer nativement des contrats à leurs méthodes. Avec le
+pattern NVI on peut, avec un soupçon d'huile de coude, rajouter des contrats
+aux fonctions membres.</p>
+
+<p>Les fonctions publiques et non virtuelles se voient définies <code>inline</code>s, elles
+vérifient en premier lieu pré-conditions et invariants, elles exécutent ensuite
+le code spécialisé, et elles finissent par vérifier post-conditions et
+invariants.<br/>
+Soit:</p>
+
+<p>```c++
+/<em>* Interface/contrat C1.
+ </em>/
+struct Contract1 : boost::noncopyable
+{</p>
+
+<pre><code>virtual ~Contract1(){};
+
+/** @pre &lt;tt&gt; x &gt; 42&lt;/tt&gt;, vérifié par assertion.
+ */
+double compute(double x) const {
+    assert(x &gt; 42 &amp;&amp; "echec de précondition sur contrat1");
+    return do_compute(x);
+}
+</code></pre>
+
+<p>private:</p>
+
+<pre><code>virtual double do_compute(int x) const = 0;
+</code></pre>
+
+<p>};</p>
+
+<p>class Impl : Contract1, Contract2
+{
+private:</p>
+
+<pre><code>virtual double do_compute(int x) const override { ... }
+// + spécialisations des fonctions de Contract2
+</code></pre>
+
+<p>};
+```</p>
+
+<p>Pour ce qui est de gérer en plus les invariants de tous les contrats, et des
+classes finales. Je partirai avec un héritage virtuel depuis une classe de base
+virtuelle <code>WithInvariants</code> dont la fonction de vérification serait spécialisée
+par tous les intermédiaires. Et dont les intermédiaires appelleraient toutes
+les versions mères pour n'oublier personne.</p>
+
+<p>```c++
+struct WithInvariants : boost::noncopyable {</p>
+
+<pre><code>void check_invariants() const {
+</code></pre>
+
+<p>ifndef NDEBUG</p>
+
+<pre><code>    do_check_invariants();
+</code></pre>
+
+<p>endif</p>
+
+<pre><code>}
+</code></pre>
+
+<p>protected:</p>
+
+<pre><code>~WithInvariants() {}
+virtual void do_check_invariants() const {}
+</code></pre>
+
+<p>};</p>
+
+<p>struct InvariantChecker {</p>
+
+<pre><code>InvariantChecker(WithInvariants const&amp; wi) : m_wi(wi)
+{ m_wi.check_invariants(); }
+~InvariantChecker()
+{ m_wi.check_invariants(); }
+</code></pre>
+
+<p>private:</p>
+
+<pre><code>WithInvariants const&amp; m_wi;
+</code></pre>
+
+<p>};</p>
+
+<p>struct Contract1 : boost::noncopyable, virtual WithInvariants
+{</p>
+
+<pre><code>...
+double compute(double x) const {
+    ...preconds...
+    InvariantChecker(*this);
+    return do_compute(x);
+}
+</code></pre>
+
+<p>protected:</p>
+
+<pre><code>virtual void do_check_invariants() const override {
+    assert(invariant C1 ...);
+}
+....
+</code></pre>
+
+<p>}</p>
+
+<p>struct Impl : Contract1, Contract2
+{</p>
+
+<pre><code>....
+</code></pre>
+
+<p>protected:</p>
+
+<pre><code>virtual void do_check_invariants() const override {
+    Contract1::do_check_invariants();
+    Contract2::do_check_invariants();
+    assert(invariant rajoutés par Impl ...);
+}
+</code></pre>
+
+<p>};
+```</p>
+
+<p>(Pour l'instant, je n'ai pas de meilleure idée)</p>
+
+<h3>Pré- et post-conditions de fonctions, à la Imperfect C++</h3>
+
+<p>Matthew Wilson consacre le premier chapitre de son <a href="#IPCpp"><em>Imperfect C++</em></a> à
+la PpC. Je ne peux que vous en conseiller la lecture.</p>
+
+<p>Il y présente au §I.1.3 la technique suivante :</p>
+
+<p>```c++
+double my::sqrt(double n)
+if defined(MYLIB_DBC_ACTIVATED)
+{</p>
+
+<pre><code>// Check pre-conditions
+assert(n&gt;=0 &amp;&amp; "sqrt can't process negative numbers");
+// Do the work
+const double res = my::sqrt_unchecked(n);
+// Check post-conditions
+assert(std::abs(res*res - n)&lt;epsilon &amp;&amp; "Invalid sqrt result");
+return res;
+</code></pre>
+
+<p>}
+double my::sqrt_unchecked(double n)
+endif
+{</p>
+
+<pre><code>return std::sqrt(n);
+</code></pre>
+
+<p>}
+```</p>
+
+<h3>Pré- et post-conditions de fonctions &hellip; <code>constexpr</code> C++11</h3>
+
+<p>Les fonctions <code>constexpr</code> à la C++11 doivent renvoyer une valeur et ne rien
+faire d'autre. De plus le contrat doit pouvoir être vérifié en mode <em>appelé
+depuis une expession constante</em> comme en mode <em>appelé depuis une expression
+variable</em>. De fait, cela nécessite quelques astuces pour pouvoir spécifier des
+contrats dans de telles fonctions.</p>
+
+<p>Pour de plus amples détails, je vous renvoie à
+l'<a href="http://ericniebler.com/2014/09/27/assert-and-constexpr-in-cxx11/">article</a>
+fort complet d'Eric Niebler sur le sujet. Andrzej présente la même technique
+dans son article
+<a href="http://akrzemi1.wordpress.com/2011/05/06/compile-time-computations/">Compile Time Computations</a>.</p>
+
+<p>En résumé, on peut procéder de la sorte. Avec ceci:
+```c++
+/<em>* Helper struct for DbC programming in C++11 constexpr functions.
+ * Copyright 2014 Eric Niebler,
+ * <a href="http://ericniebler.com/2014/09/27/assert-and-constexpr-in-cxx11/">http://ericniebler.com/2014/09/27/assert-and-constexpr-in-cxx11/</a>
+ </em>/
+struct assert_failure
+{</p>
+
+<pre><code>template&lt;typename Fun&gt;
+explicit assert_failure(Fun fun)
+{
+    fun();
+    // For good measure:
+    std::quick_exit(EXIT_FAILURE);
+}
+</code></pre>
+
+<p>};
+<code>
+On peut ainsi exprimer des fonctions `constexpr` en C++11 :
+</code>c++
+/<em>*
+ * Internal constexpr function that computes \f$n!\f$ with a tail-recursion.
+ * @param[in] n
+ * @param[in] r  pre-computed result
+ * @pre n shall not induce an integer overflow
+ * @post the result won&rsquo;t be null
+ * @author Luc Hermitte
+ </em>/
+constexpr unsigned int fact_impl(unsigned int n, unsigned int r) {</p>
+
+<pre><code>return
+    n &lt;= 1                                          ? r
+</code></pre>
+
+<h1>ifndef NDEBUG</h1>
+
+<pre><code>    : std::numeric_limits&lt;decltype(n)&gt;::max()/n &lt; r ? throw assert_failure( []{assert(!"int overflow");})
+</code></pre>
+
+<h1>endif</h1>
+
+<pre><code>    :                                                 fact_impl(n-1, n*r)
+    ;
+</code></pre>
+
+<p>}
+constexpr unsigned int fact(unsigned int n) {</p>
+
+<pre><code>return fact_impl(n, 1);
+</code></pre>
+
+<p>}</p>
+
+<p>int main() {</p>
+
+<pre><code>const unsigned int n10 = fact(10);
+const unsigned int n50 = fact(50);
+</code></pre>
+
+<p>}
+```</p>
+
+<p>Malheureusement la rupture de contrat ne sera pas détectée lors de la
+compilation, mais à l'exécution où l'on pourra constater à minima où l'appel de
+plus haut niveau s'est produit (bien que l'on risque de ne pas pouvoir observer
+l'état des variables <em>optimized out</em> dans le débuggueur).</p>
+
+<p>Notez que pour exprimer une post-condition sans multiplier les appels, j'ai
+écrit la fonction (qui aurait été récursive dans tous les cas) en
+<a href="http://fr.wikipedia.org/wiki/R%C3%A9cursion_terminale">fonction récursive terminale</a>.
+De là, il a été facile d'insérer une assertion &mdash; et de plus, le compilateur
+pourra optimiser la fonction en <em>Release</em> sur les appels dynamiques.</p>
+
+<p>Pour information, une autre écriture qui exploite l'opérateur virgule est
+possible, mais elle ne compile pas avec les versions de GCC que j'ai eu entre
+les mains (i.e. jusqu'à la version 4.9, GCC n'est pas d'accord).</p>
+
+<p>```c++
+/<em>*
+ * Internal constexpr function that computes \f$n!\f$ with a tail-recursion.
+ * @param[in] n
+ * @param[in] r  pre-computed result
+ * @pre n shall not induce an integer overflow
+ * @post the result won&rsquo;t be null
+ * @warning This version does not compile with GCC up-to v4.9.
+ * @author Luc Hermitte
+ </em>/
+constexpr unsigned int fact_impl(unsigned int n, unsigned int r) {</p>
+
+<pre><code>return n &gt;= 1
+    // ? (assert(std::numeric_limits&lt;decltype(n)&gt;::max()/n &gt;= r), fact_impl(n-1, n*r))
+    ? fact_impl((assert(std::numeric_limits&lt;decltype(n)&gt;::max()/n &gt;= r), n-1), n*r)
+    : (assert(r&gt;0), r);
+</code></pre>
+
+<p>}
+```</p>
+
+<p>N.B.: Dans le cas des <code>constexpr</code> du C++14, il me faudrait vérifier si <code>assert()</code> est
+directement utilisable. A priori, cela sera le cas.</p>
+
+<h2>Invariants de classes</h2>
+
+<h3>Petit snippet de vérification simplifiée en l'absence d'héritage</h3>
+
+<p>Sur un petit <a href="http://ideone.com/DOCWOy">exercice d'écriture de classe fraction</a>,
+j'avais pondu une classe utilitaire dont le but était de simplifier la
+vérification des invariants. Il suffit de déclarer un objet de ce type en tout
+début des fonctions membres (et des fonctions amies) exposées aux clients.
+Ainsi les invariants sont automatiquement vérifiés en début, et en fin de
+fonction lors de la destruction de l'objet <code>InvariantChecker</code>.</p>
+
+<p>```c++
+/<em>* Helper class to check invariants.
+ * @tparam CheckedClass shall define a \c check_invariants fonction where
+   invariants checking is done.
+ </em>/
+template <typename CheckedClass>
+struct InvariantChecker {</p>
+
+<pre><code>InvariantChecker(CheckedClass const&amp; cc_) : m_cc(cc_)
+{ m_cc.check_invariants(); }
+~InvariantChecker()
+{ m_cc.check_invariants(); }
+</code></pre>
+
+<p>private:</p>
+
+<pre><code>CheckedClass const&amp; m_cc;
+</code></pre>
+
+<p>};</p>
+
+<p>/<em>* rational class.
+ * @invariant <tt>denominator() > 0</tt>
+ * @invariant visible objects are normalized.
+ </em>/
+struct Rational {</p>
+
+<pre><code>....
+// Une fonction publique qui doit vérifier l'invariant
+Rational &amp; operator+=(Rational const&amp; rhs) {
+    InvariantChecker&lt;Rational&gt; check(this);
+    ... le code de l'addition ...
+    return *this;
+}
+</code></pre>
+
+<p>private:</p>
+
+<pre><code>// La fonction interne de vérification
+void check_invariants() const {
+    assert(denominator() &amp;&amp; "Denominator can't be null");
+    assert(denominator()&gt;0 &amp;&amp; "Denominator can't be negative");
+    assert(pgcd(std::abs(numerator()), denominator()) == 1 &amp;&amp; "The rational shall be normalized");
+}
+// Et on donne accès à la classe InvariantChecker&lt;&gt;
+friend class InvariantChecker&lt;rational&gt;;
+
+... les membres ...
+</code></pre>
+
+<p>}
+```</p>
+
+<p>N.B.: je vois à la relecture d'<em>Imperfect C++</em> que c'est très proche de ce que
+suggérait Matthew Wilson. Au détail qu'il passe par une fonction <code>is_valid</code>
+renvoyant un booléen et que l'<code>InvariantChecker</code> s'occupe de vérifier
+l'assertion si <code>MYLIB_DBC_ACTIVATED</code> est bien défini &mdash; il découple la
+vérification des contrats de la macro <code>NDEBUG</code> qui est plus liée au mode de
+compilation (<em>Débug</em> VS <em>Release</em>).<br/>
+Pour ma part, je préfère avoir une assertion différente pour chaque invariant
+plutôt qu'un seul <code>assert(is_valid());</code>. Cela permet de savoir plus précisément
+quel contrat est violé.</p>
+
+<h3>Critiques envisageables avec cette approche</h3>
+
+<p>On peut s'attendre qu'en cas d'exception dans une fonction membre (ou amie)
+d'un objet, l'invariant ne soit plus respecté. Dans ce cas là, l'approche
+proposée juste au dessus va poser d'énormes problèmes.</p>
+
+<p>Toutefois cela voudrait dire que l'exception ne laisse plus l'objet dans un
+état cohérent, et que nous n'avons pas la
+<a href="http://en.wikipedia.org/wiki/Exception_safety"><em>garantie basique</em></a>.</p>
+
+<p>Dans le même genre d'idée, nous nous retrouverions dans la même situation que
+si on utilisait des constructeurs qui ne garantissent pas l'invariant de leurs
+classes, et qui sont utilisés conjointement avec des fonctions <code>init()</code>. En
+effet, si l'invariant ne peut plus être assuré statiquement par programmation,
+il est nécessaire de l'assurer dynamiquement en vérifiant en début de chaque
+fonction membre (/amie) si l'objet est bien valide.</p>
+
+<p>Effectivement il y a alors un problème. À mon avis, le problème n'est pas dans
+le fait de formuler les invariants de notre objet et de s'assurer qu'ils soient
+toujours vérifiés. Le problème est de permettre à l'objet de ne plus vérifier
+ses invariants et qu'il faille le tester dynamiquement.</p>
+
+<h4>Les objets <em>cassés</em></h4>
+
+<p>On retrouve le modèle des flux de données (fichiers, sockets, &hellip;) qui peuvent
+passer KO et qu'il faudra rétablir. Dans cette approche, plutôt que de se
+débarrasser du flux pour en construire un tout beau tout neuf, on le maintient
+(car après tout il est déjà initialisé) et on cherchera à le reconnecter.</p>
+
+<p>Plus je réfléchis à la question est moins je suis friand de ces objets qui
+peuvent être cassés.</p>
+
+<p>Dans un monde idéal, j'aurai tendance à dire qu'il faudrait établir des zones
+de codes qui ont des invariants de plus en plus précis &mdash; les invariants étant
+organisés de façon hiérarchique.</p>
+
+<p>Dans la zone <em>descriptif de flux configuré</em>, il y aurait la zone <em>flux valide
+et connecté</em>. Quand le flux n'est plus valide, on peut retourner à la zone
+englobante de flux décrit. C'est d'ailleurs ce qu'on l'on fait d'une certaine
+façon. Sauf que nous avons pris l'habitude (avec les abstractions de sockets et
+de fichiers usuelles) de n'avoir qu'un seul objet pour contenir les deux
+informations. Et de fait, quand on veut séparer les deux invariants à
+l'exécution, on se retrouve avec des objets cassés&hellip;</p>
+
+<p>La solution ? Ma foi, le SRP (<em>Single Responsability Principle</em>) me semble
+l'apporter : <em>«un object, une responsabilité»</em>. On pourrait même dire :</p>
+
+<blockquote><p>Deux invariants décorrélés (/non synchrones) => deux classes.</p></blockquote>
+
+<h2>Et si la Programmation Défensive est de la partie ?</h2>
+
+<p>Prérequis : dérivez de
+<a href="http://www.cpluscplus.com/reference/stdexcept/runtime_error/"><code>std::runtime_error</code></a>
+vos exceptions pour cas exceptionnels pouvant se produire lors de l'exécution,
+et de
+<a href="http://www.cpluscplus.com/reference/stdexcept/logic_error/"><code>std::logic_error</code></a>
+vos exceptions pour propager les erreurs de programmation.</p>
+
+<p>Plusieurs cas de figures sont ensuite envisageables.</p>
+
+<h3>Cas théorique idéal&hellip;</h3>
+
+<p>&hellip; lorsque COTS et bibliothèques tierces <strong>ne</strong> dérivent <strong>pas</strong> leurs
+exceptions de <code>std::exception</code> mais de <code>std::runtime_error</code> pour les cas
+exceptionnels plausibles et de <code>std::logic_error</code> pour les erreurs de logique.</p>
+
+<p>Aux points d'interfaces (communication via une API C, limites de threads en
+C++03), ou dans le <code>main()</code>, il est possible de filtrer les erreurs de logiques
+pour avoir des coredumps en <em>Debug</em>.</p>
+
+<p>```c++
+int main()
+{
+   try {</p>
+
+<pre><code>    leCodeQuipeutprovoquerDesExceptions();
+    return EXIT_SUCCESS;
+</code></pre>
+
+<h1>ifdef NDEBUG</h1>
+
+<p>   } catch (std::logic_error const&amp; e) {</p>
+
+<pre><code>  std::cerr &lt;&lt; "Logic error: " &lt;&lt; e.what() &lt;&lt; "\n";
+</code></pre>
+
+<h1>endif</h1>
+
+<p>   } catch (std::runtime_error const&amp; e) {</p>
+
+<pre><code>  std::cerr &lt;&lt; "Error: " &lt;&lt; e.what() &lt;&lt; "\n";
+</code></pre>
+
+<p>   }
+   return EXIT_FAILURE;
+}
+```</p>
+
+<h3>Cas plausible&hellip;</h3>
+
+<p>&hellip; lorsque COTS et bibliothèques tierces dérivent <strong>bien</strong> leurs exceptions
+de <code>std::exception</code> au lieu de <code>std::runtime_error</code> pour les cas exceptionnels
+plausibles et de <code>std::logic_error</code> pour les erreurs de logique.</p>
+
+<p>Aux points d'interfaces (communication via une API C, limites de threads en
+C++03), ou dans le <code>main()</code>, il est possible d'ignorer toutes les exceptions pour
+avoir des coredumps en <em>Debug</em> sur les exceptions dues à des erreurs de logiques et &hellip;
+sur les autres aussi.</p>
+
+<p>```c++
+int main()
+{</p>
+
+<h1>ifdef NDEBUG</h1>
+
+<p>   try {</p>
+
+<h1>endif</h1>
+
+<pre><code>   leCodeQuipeutprovoquerDesExceptions();
+   return EXIT_SUCCESS;
+</code></pre>
+
+<h1>ifdef NDEBUG</h1>
+
+<p>   } catch (std::exception const&amp; e) {</p>
+
+<pre><code>   std::cerr &lt;&lt; "Error: " &lt;&lt; e.what() &lt;&lt; "\n";
+</code></pre>
+
+<p>   }
+   return EXIT_FAILURE;</p>
+
+<h1>endif</h1>
+
+<p>}
+```</p>
+
+<p>D'autres variations sont très certainement envisageables où l'on rattraperait
+l'erreur de logique pour la relancer en <em>Debug</em>.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Programmation Par Contrat 2/3 : Les assertions]]></title>
@@ -415,17 +937,15 @@ problématique sur certaines plages de <code>x</code>.</p>
 <h2>III- Le standard s'enrichira-t-il en <del>2014 ou en</del> 2017 pour programmer avec des contrats ?</h2>
 
 <p>Il y a déjà eu des propositions de mots clés plus ou moins sémantiquement forts
-pour supporter la PpC en standard en C++. Dans le document
+pour supporter la PpC en standard en C++. Dans le dernier mailing (post-Urbana) en date,
 <del><a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3753.pdf">N3753</a></del>
 <del><a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4075.pdf">N4075</a></del>
 <del><a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4135.pdf">N4135</a></del>
-<del><a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4253.pdf">N4253</a></del>
-<a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4378.pdf">N4378</a> (et sa FAQ
-<a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4379.pdf">N4379</a>),
-du dernier mailing (2015-02 mid-meeting) en date, John Lakos et Alexei Zakharov
-introduisent tout d'abord un nouveau vocabulaire pour désigner les contrats :
-les <em>narrow contracts</em> et les <em>wide contracts</em>.  Ils introduisent également un
-ensemble de macros <code>contract_assert()</code> assez flexible.</p>
+<a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4253.pdf">N4253</a>,
+John Lakos et Alexei Zakharov introduisent tout d'abord un nouveau vocabulaire
+pour désigner les contrats : les <em>narrow contracts</em> et les <em>wide contracts</em>.
+Ils introduisent également un ensemble de macros <code>contract_assert()</code> assez
+flexible.</p>
 
 <p>Ces macros supportent des niveaux d'importance de vérification (<em>optimized</em>, <em>safe</em>,
 <em>debug</em>,) un peu à l'image des niveaux <em>Error</em>/<em>Warning</em>/<em>Info</em>/<em>Debug</em> dans
@@ -436,7 +956,7 @@ assertions de frameworks de tests unitaires.<br/>
 À noter qu'elle est déjà implémentée et disponible à l'intérieur de la
 <a href="https://github.com/bloomberg/bde">bibliothèque BDE/BSL</a> sous licence MIT.</p>
 
-<p>Cette proposition en est à sa dixième révision. Les
+<p>Cette proposition en est à sa neuvième révision. Les
 <a href="https://isocpp.org/files/papers/N4053.html#LWG8">minutes du rejet</a> de la
 révision (N4075) sont disponibles.</p>
 
@@ -949,7 +1469,7 @@ aussi utilisée pour introduire une tolérance aux erreurs matérielles, limiter
 les conséquences de ces erreurs (comme les corruptions de mémoire).  C'est un
 aspect que je n'aborde pas dans le cadre de la comparaison avec la PpC.</em></p>
 
-<h3><a id="ProgDefCtx"></a>III.1- Présentons la Programmation Défensive</h3>
+<h3>III.1- Présentons la Programmation Défensive</h3>
 
 <p>La <em>Programmation Défensive</em> a pour objectif qu'un programme ne doit jamais
 s'arrêter afin de toujours pouvoir continuer. On s'intéresse à la robustesse
@@ -1441,7 +1961,7 @@ traduction de la réponse est disponible à l'adresse suivante :
 codes de retour, avec un <code>if</code> toutes les deux lignes en moyenne pour remonter
 les erreurs, et restituer les ressources.</p>
 
-<h3><a id="C++Moderne"></a>Le C++ Moderne</h3>
+<h3>Le C++ Moderne</h3>
 
 <p>La solution aux problèmes du C++ historique réside dans le C++ moderne.
 Décryptons cette tautologie.</p>
