@@ -374,15 +374,17 @@ problématique sur certaines plages de `x`.
 ## III- Le standard s'enrichira-t-il en <del>2014 ou en</del> 2017 pour programmer avec des contrats ?
 
 Il y a déjà eu des propositions de mots clés plus ou moins sémantiquement forts
-pour supporter la PpC en standard en C++. Dans le dernier mailing (post-Urbana) en date, 
+pour supporter la PpC en standard en C++. Dans le document
 <del>[N3753](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3753.pdf)</del>
 <del>[N4075](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4075.pdf)</del>
 <del>[N4135](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4135.pdf)</del>
-[N4253](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4253.pdf),
-John Lakos et Alexei Zakharov introduisent tout d'abord un nouveau vocabulaire
-pour désigner les contrats : les _narrow contracts_ et les _wide contracts_.
-Ils introduisent également un ensemble de macros `contract_assert()` assez
-flexible.
+<del>[N4253](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4253.pdf)</del>
+[N4378](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4378.pdf) (et sa FAQ
+[N4379](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4379.pdf)),
+du dernier mailing (2015-02 mid-meeting) en date, John Lakos et Alexei Zakharov
+introduisent tout d'abord un nouveau vocabulaire pour désigner les contrats :
+les _narrow contracts_ et les _wide contracts_.  Ils introduisent également un
+ensemble de macros `contract_assert()` assez flexible.
 
 Ces macros supportent des niveaux d'importance de vérification (_optimized_, _safe_,
 _debug_,) un peu à l'image des niveaux _Error_/_Warning_/_Info_/_Debug_ dans
@@ -393,7 +395,7 @@ assertions de frameworks de tests unitaires.
 À noter qu'elle est déjà implémentée et disponible à l'intérieur de la
 [bibliothèque BDE/BSL](https://github.com/bloomberg/bde) sous licence MIT.
 
-Cette proposition en est à sa neuvième révision. Les
+Cette proposition en est à sa dixième révision. Les
 [minutes du rejet](https://isocpp.org/files/papers/N4053.html#LWG8) de la
 révision (N4075) sont disponibles.
 

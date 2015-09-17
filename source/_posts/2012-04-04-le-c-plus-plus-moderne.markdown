@@ -130,7 +130,7 @@ Vous trouverez dans l'article une version corrigée du code qui repose sur les
 codes de retour, avec un `if` toutes les deux lignes en moyenne pour remonter
 les erreurs, et restituer les ressources.
 
-### Le C++ Moderne
+### <a id="C++Moderne"></a>Le C++ Moderne
 
 La solution aux problèmes du C++ historique réside dans le C++ moderne.
 Décryptons cette tautologie.
