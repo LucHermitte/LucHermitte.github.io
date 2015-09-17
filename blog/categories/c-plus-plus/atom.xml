@@ -4,7 +4,7 @@
   <title><![CDATA[Category: C++ | Luc Hermitte's Blog]]></title>
   <link href="http://LucHermitte.github.io/blog/categories/c-plus-plus/atom.xml" rel="self"/>
   <link href="http://LucHermitte.github.io/"/>
-  <updated>2015-09-17T19:17:54+02:00</updated>
+  <updated>2015-09-17T19:20:28+02:00</updated>
   <id>http://LucHermitte.github.io/</id>
   <author>
     <name><![CDATA[Luc Hermitte]]></name>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Programmation Par Contrat 3/3 : Snippets pour le C++]]></title>
-    <link href="http://LucHermitte.github.io/blog/2014/05/29/programmation-par-contrat-snippets-pour-le-c-plus-plus/"/>
-    <updated>2014-05-29T11:33:15+02:00</updated>
-    <id>http://LucHermitte.github.io/blog/2014/05/29/programmation-par-contrat-snippets-pour-le-c-plus-plus</id>
+    <link href="http://LucHermitte.github.io/blog/2015/09/17/programmation-par-contrat-snippets-pour-le-c-plus-plus/"/>
+    <updated>2015-09-17T19:20:15+02:00</updated>
+    <id>http://LucHermitte.github.io/blog/2015/09/17/programmation-par-contrat-snippets-pour-le-c-plus-plus</id>
     <content type="html"><![CDATA[<p>Dans ce dernier billet sur la <em>Programmation par Contrat</em>, je vais vous présenter
 quelques techniques d'application de la PpC au C++.</p>
 
@@ -1181,7 +1181,7 @@ assez exhaustive d'Ahmed Charles.</p>
 
 <p>Voici un premier billet qui aborde l'aspect théorique. Dans un <a href="/blog/2014/05/28/programmation-par-contrat-les-assertions/">second billet</a>,
 je traiterai des <em>assertions</em>. En guise de conclusion, je présenterai des
-<a href="#">techniques d'application de la PpC au C++</a>
+<a href="/blog/2015/09/17/programmation-par-contrat-snippets-pour-le-c-plus-plus/">techniques d'application de la PpC au C++</a>
 que j'ai croisées au fil des ans.</p>
 
 <h2>I- Les Erreurs</h2>
