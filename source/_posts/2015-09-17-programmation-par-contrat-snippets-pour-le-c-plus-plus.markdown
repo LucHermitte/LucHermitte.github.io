@@ -70,62 +70,6 @@ private:
 };
 ```
 
-Pour ce qui est de gérer en plus les invariants de tous les contrats, et des
-classes finales. Je partirai avec un héritage virtuel depuis une classe de base
-virtuelle `WithInvariants` dont la fonction de vérification serait spécialisée
-par tous les intermédiaires. Et dont les intermédiaires appelleraient toutes
-les versions mères pour n'oublier personne.
-
-```c++
-struct WithInvariants : boost::noncopyable {
-    void check_invariants() const {
-ifndef NDEBUG
-        do_check_invariants();
-endif
-    }
-protected:
-    ~WithInvariants() {}
-    virtual void do_check_invariants() const {}
-};
-
-struct InvariantChecker {
-    InvariantChecker(WithInvariants const& wi) : m_wi(wi)
-    { m_wi.check_invariants(); }
-    ~InvariantChecker()
-    { m_wi.check_invariants(); }
-private:
-    WithInvariants const& m_wi;
-};
-
-struct Contract1 : boost::noncopyable, virtual WithInvariants
-{
-    ...
-    double compute(double x) const {
-        ...preconds...
-        InvariantChecker(*this);
-        return do_compute(x);
-    }
-protected:
-    virtual void do_check_invariants() const override {
-        assert(invariant C1 ...);
-    }
-    ....
-}
-
-struct Impl : Contract1, Contract2
-{
-    ....
-protected:
-    virtual void do_check_invariants() const override {
-        Contract1::do_check_invariants();
-        Contract2::do_check_invariants();
-        assert(invariant rajoutés par Impl ...);
-    }
-};
-```
-
-(Pour l'instant, je n'ai pas de meilleure idée)
-
 Je reviendrai [plus loin](#NVI_Invariants) sur une piste pour supporter des
 invariants dans un cadre de NVI.
 
@@ -325,9 +269,9 @@ les versions mères pour n'oublier personne.
 ```c++
 struct WithInvariants : boost::noncopyable {
     void check_invariants() const {
-ifndef NDEBUG
+#ifndef NDEBUG
         do_check_invariants();
-endif
+#endif
     }
 protected:
     ~WithInvariants() {}
@@ -352,7 +296,7 @@ struct Contract1 : boost::noncopyable, virtual WithInvariants
         return do_compute(x);
     }
 protected:
-    virtual void do_check_invariants() const {
+    virtual void do_check_invariants() const override {
         assert(invariant C1 ...);
     }
     ....
@@ -362,7 +306,7 @@ struct Impl : Contract1, Contract2
 {
     ....
 protected:
-    virtual void do_check_invariants() const {
+    virtual void do_check_invariants() const override {
         Contract1::do_check_invariants();
         Contract2::do_check_invariants();
         assert(invariant rajoutés par Impl ...);
