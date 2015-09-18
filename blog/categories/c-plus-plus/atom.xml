@@ -4,7 +4,7 @@
   <title><![CDATA[Category: C++ | Luc Hermitte's Blog]]></title>
   <link href="http://LucHermitte.github.io/blog/categories/c-plus-plus/atom.xml" rel="self"/>
   <link href="http://LucHermitte.github.io/"/>
-  <updated>2015-09-17T19:36:30+02:00</updated>
+  <updated>2015-09-18T14:16:09+02:00</updated>
   <id>http://LucHermitte.github.io/</id>
   <author>
     <name><![CDATA[Luc Hermitte]]></name>
@@ -85,92 +85,6 @@ private:</p>
 
 <p>};
 ```</p>
-
-<p>Pour ce qui est de gérer en plus les invariants de tous les contrats, et des
-classes finales. Je partirai avec un héritage virtuel depuis une classe de base
-virtuelle <code>WithInvariants</code> dont la fonction de vérification serait spécialisée
-par tous les intermédiaires. Et dont les intermédiaires appelleraient toutes
-les versions mères pour n'oublier personne.</p>
-
-<p>```c++
-struct WithInvariants : boost::noncopyable {</p>
-
-<pre><code>void check_invariants() const {
-</code></pre>
-
-<p>ifndef NDEBUG</p>
-
-<pre><code>    do_check_invariants();
-</code></pre>
-
-<p>endif</p>
-
-<pre><code>}
-</code></pre>
-
-<p>protected:</p>
-
-<pre><code>~WithInvariants() {}
-virtual void do_check_invariants() const {}
-</code></pre>
-
-<p>};</p>
-
-<p>struct InvariantChecker {</p>
-
-<pre><code>InvariantChecker(WithInvariants const&amp; wi) : m_wi(wi)
-{ m_wi.check_invariants(); }
-~InvariantChecker()
-{ m_wi.check_invariants(); }
-</code></pre>
-
-<p>private:</p>
-
-<pre><code>WithInvariants const&amp; m_wi;
-</code></pre>
-
-<p>};</p>
-
-<p>struct Contract1 : boost::noncopyable, virtual WithInvariants
-{</p>
-
-<pre><code>...
-double compute(double x) const {
-    ...preconds...
-    InvariantChecker(*this);
-    return do_compute(x);
-}
-</code></pre>
-
-<p>protected:</p>
-
-<pre><code>virtual void do_check_invariants() const override {
-    assert(invariant C1 ...);
-}
-....
-</code></pre>
-
-<p>}</p>
-
-<p>struct Impl : Contract1, Contract2
-{</p>
-
-<pre><code>....
-</code></pre>
-
-<p>protected:</p>
-
-<pre><code>virtual void do_check_invariants() const override {
-    Contract1::do_check_invariants();
-    Contract2::do_check_invariants();
-    assert(invariant rajoutés par Impl ...);
-}
-</code></pre>
-
-<p>};
-```</p>
-
-<p>(Pour l'instant, je n'ai pas de meilleure idée)</p>
 
 <p>Je reviendrai <a href="#NVI_Invariants">plus loin</a> sur une piste pour supporter des
 invariants dans un cadre de NVI.</p>
@@ -412,12 +326,12 @@ struct WithInvariants : boost::noncopyable {</p>
 <pre><code>void check_invariants() const {
 </code></pre>
 
-<p>ifndef NDEBUG</p>
+<h1>ifndef NDEBUG</h1>
 
 <pre><code>    do_check_invariants();
 </code></pre>
 
-<p>endif</p>
+<h1>endif</h1>
 
 <pre><code>}
 </code></pre>
@@ -458,7 +372,7 @@ double compute(double x) const {
 
 <p>protected:</p>
 
-<pre><code>virtual void do_check_invariants() const {
+<pre><code>virtual void do_check_invariants() const override {
     assert(invariant C1 ...);
 }
 ....
@@ -474,7 +388,7 @@ double compute(double x) const {
 
 <p>protected:</p>
 
-<pre><code>virtual void do_check_invariants() const {
+<pre><code>virtual void do_check_invariants() const override {
     Contract1::do_check_invariants();
     Contract2::do_check_invariants();
     assert(invariant rajoutés par Impl ...);

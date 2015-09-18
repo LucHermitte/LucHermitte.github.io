@@ -4,7 +4,7 @@
   <title><![CDATA[Luc Hermitte's Blog]]></title>
   <link href="http://LucHermitte.github.io/atom.xml" rel="self"/>
   <link href="http://LucHermitte.github.io/"/>
-  <updated>2015-09-17T19:36:30+02:00</updated>
+  <updated>2015-09-18T14:16:09+02:00</updated>
   <id>http://LucHermitte.github.io/</id>
   <author>
     <name><![CDATA[Luc Hermitte]]></name>
@@ -98,107 +98,6 @@ Soit:</p>
 </span><span class='line'><span class="p">};</span>
 </span></code></pre></td></tr></table></div></figure>
 
-
-<p>Pour ce qui est de gérer en plus les invariants de tous les contrats, et des
-classes finales. Je partirai avec un héritage virtuel depuis une classe de base
-virtuelle <code>WithInvariants</code> dont la fonction de vérification serait spécialisée
-par tous les intermédiaires. Et dont les intermédiaires appelleraient toutes
-les versions mères pour n&#8217;oublier personne.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="k">struct</span> <span class="n">WithInvariants</span> <span class="o">:</span> <span class="n">boost</span><span class="o">::</span><span class="n">noncopyable</span> <span class="p">{</span>
-</span><span class='line'>    <span class="kt">void</span> <span class="n">check_invariants</span><span class="p">()</span> <span class="k">const</span> <span class="p">{</span>
-</span><span class='line'><span class="n">ifndef</span> <span class="n">NDEBUG</span>
-</span><span class='line'>        <span class="n">do_check_invariants</span><span class="p">();</span>
-</span><span class='line'><span class="n">endif</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="k">protected</span><span class="o">:</span>
-</span><span class='line'>    <span class="o">~</span><span class="n">WithInvariants</span><span class="p">()</span> <span class="p">{}</span>
-</span><span class='line'>    <span class="k">virtual</span> <span class="kt">void</span> <span class="n">do_check_invariants</span><span class="p">()</span> <span class="k">const</span> <span class="p">{}</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">struct</span> <span class="n">InvariantChecker</span> <span class="p">{</span>
-</span><span class='line'>    <span class="n">InvariantChecker</span><span class="p">(</span><span class="n">WithInvariants</span> <span class="k">const</span><span class="o">&amp;</span> <span class="n">wi</span><span class="p">)</span> <span class="o">:</span> <span class="n">m_wi</span><span class="p">(</span><span class="n">wi</span><span class="p">)</span>
-</span><span class='line'>    <span class="p">{</span> <span class="n">m_wi</span><span class="p">.</span><span class="n">check_invariants</span><span class="p">();</span> <span class="p">}</span>
-</span><span class='line'>    <span class="o">~</span><span class="n">InvariantChecker</span><span class="p">()</span>
-</span><span class='line'>    <span class="p">{</span> <span class="n">m_wi</span><span class="p">.</span><span class="n">check_invariants</span><span class="p">();</span> <span class="p">}</span>
-</span><span class='line'><span class="k">private</span><span class="o">:</span>
-</span><span class='line'>    <span class="n">WithInvariants</span> <span class="k">const</span><span class="o">&amp;</span> <span class="n">m_wi</span><span class="p">;</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">struct</span> <span class="n">Contract1</span> <span class="o">:</span> <span class="n">boost</span><span class="o">::</span><span class="n">noncopyable</span><span class="p">,</span> <span class="k">virtual</span> <span class="n">WithInvariants</span>
-</span><span class='line'><span class="p">{</span>
-</span><span class='line'>    <span class="p">...</span>
-</span><span class='line'>    <span class="kt">double</span> <span class="n">compute</span><span class="p">(</span><span class="kt">double</span> <span class="n">x</span><span class="p">)</span> <span class="k">const</span> <span class="p">{</span>
-</span><span class='line'>        <span class="p">...</span><span class="n">preconds</span><span class="p">...</span>
-</span><span class='line'>        <span class="n">InvariantChecker</span><span class="p">(</span><span class="o">*</span><span class="k">this</span><span class="p">);</span>
-</span><span class='line'>        <span class="k">return</span> <span class="n">do_compute</span><span class="p">(</span><span class="n">x</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="k">protected</span><span class="o">:</span>
-</span><span class='line'>    <span class="k">virtual</span> <span class="kt">void</span> <span class="n">do_check_invariants</span><span class="p">()</span> <span class="k">const</span> <span class="n">override</span> <span class="p">{</span>
-</span><span class='line'>        <span class="n">assert</span><span class="p">(</span><span class="n">invariant</span> <span class="n">C1</span> <span class="p">...);</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="p">....</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">struct</span> <span class="n">Impl</span> <span class="o">:</span> <span class="n">Contract1</span><span class="p">,</span> <span class="n">Contract2</span>
-</span><span class='line'><span class="p">{</span>
-</span><span class='line'>    <span class="p">....</span>
-</span><span class='line'><span class="k">protected</span><span class="o">:</span>
-</span><span class='line'>    <span class="k">virtual</span> <span class="kt">void</span> <span class="n">do_check_invariants</span><span class="p">()</span> <span class="k">const</span> <span class="n">override</span> <span class="p">{</span>
-</span><span class='line'>        <span class="n">Contract1</span><span class="o">::</span><span class="n">do_check_invariants</span><span class="p">();</span>
-</span><span class='line'>        <span class="n">Contract2</span><span class="o">::</span><span class="n">do_check_invariants</span><span class="p">();</span>
-</span><span class='line'>        <span class="n">assert</span><span class="p">(</span><span class="n">invariant</span> <span class="n">rajout</span><span class="err">é</span><span class="n">s</span> <span class="n">par</span> <span class="n">Impl</span> <span class="p">...);</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">};</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>(Pour l&#8217;instant, je n&#8217;ai pas de meilleure idée)</p>
 
 <p>Je reviendrai <a href="#NVI_Invariants">plus loin</a> sur une piste pour supporter des
 invariants dans un cadre de NVI.</p>
@@ -555,9 +454,9 @@ les versions mères pour n&#8217;oublier personne.</p>
 <span class='line-number'>45</span>
 </pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="k">struct</span> <span class="n">WithInvariants</span> <span class="o">:</span> <span class="n">boost</span><span class="o">::</span><span class="n">noncopyable</span> <span class="p">{</span>
 </span><span class='line'>    <span class="kt">void</span> <span class="n">check_invariants</span><span class="p">()</span> <span class="k">const</span> <span class="p">{</span>
-</span><span class='line'><span class="n">ifndef</span> <span class="n">NDEBUG</span>
+</span><span class='line'><span class="cp">#ifndef NDEBUG</span>
 </span><span class='line'>        <span class="n">do_check_invariants</span><span class="p">();</span>
-</span><span class='line'><span class="n">endif</span>
+</span><span class='line'><span class="cp">#endif</span>
 </span><span class='line'>    <span class="p">}</span>
 </span><span class='line'><span class="k">protected</span><span class="o">:</span>
 </span><span class='line'>    <span class="o">~</span><span class="n">WithInvariants</span><span class="p">()</span> <span class="p">{}</span>
@@ -582,7 +481,7 @@ les versions mères pour n&#8217;oublier personne.</p>
 </span><span class='line'>        <span class="k">return</span> <span class="n">do_compute</span><span class="p">(</span><span class="n">x</span><span class="p">);</span>
 </span><span class='line'>    <span class="p">}</span>
 </span><span class='line'><span class="k">protected</span><span class="o">:</span>
-</span><span class='line'>    <span class="k">virtual</span> <span class="kt">void</span> <span class="n">do_check_invariants</span><span class="p">()</span> <span class="k">const</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">virtual</span> <span class="kt">void</span> <span class="n">do_check_invariants</span><span class="p">()</span> <span class="k">const</span> <span class="n">override</span> <span class="p">{</span>
 </span><span class='line'>        <span class="n">assert</span><span class="p">(</span><span class="n">invariant</span> <span class="n">C1</span> <span class="p">...);</span>
 </span><span class='line'>    <span class="p">}</span>
 </span><span class='line'>    <span class="p">....</span>
@@ -592,7 +491,7 @@ les versions mères pour n&#8217;oublier personne.</p>
 </span><span class='line'><span class="p">{</span>
 </span><span class='line'>    <span class="p">....</span>
 </span><span class='line'><span class="k">protected</span><span class="o">:</span>
-</span><span class='line'>    <span class="k">virtual</span> <span class="kt">void</span> <span class="n">do_check_invariants</span><span class="p">()</span> <span class="k">const</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">virtual</span> <span class="kt">void</span> <span class="n">do_check_invariants</span><span class="p">()</span> <span class="k">const</span> <span class="n">override</span> <span class="p">{</span>
 </span><span class='line'>        <span class="n">Contract1</span><span class="o">::</span><span class="n">do_check_invariants</span><span class="p">();</span>
 </span><span class='line'>        <span class="n">Contract2</span><span class="o">::</span><span class="n">do_check_invariants</span><span class="p">();</span>
 </span><span class='line'>        <span class="n">assert</span><span class="p">(</span><span class="n">invariant</span> <span class="n">rajout</span><span class="err">é</span><span class="n">s</span> <span class="n">par</span> <span class="n">Impl</span> <span class="p">...);</span>
