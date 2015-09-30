@@ -286,6 +286,7 @@ définition. N'oublions pas que les assertions sont des macros dont le
 comportement exact dépend de la définition de `NDEBUG`.
 
 Une façon assez sale de faire serait p.ex.:
+
 ```c++
 #if defined(NDEBUG)
 #   define my_assert(condition_, message_) \

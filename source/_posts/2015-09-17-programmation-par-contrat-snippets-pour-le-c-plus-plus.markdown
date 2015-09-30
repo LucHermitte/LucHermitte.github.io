@@ -82,7 +82,7 @@ Il y présente au §I.1.3 la technique suivante :
 
 ```c++
 double my::sqrt(double n)
-if defined(MYLIB_DBC_ACTIVATED)
+#if defined(MYLIB_DBC_ACTIVATED)
 {
     // Check pre-conditions
     assert(n>=0 && "sqrt can't process negative numbers");
@@ -93,7 +93,7 @@ if defined(MYLIB_DBC_ACTIVATED)
     return res;
 }
 double my::sqrt_unchecked(double n)
-endif
+#endif
 {
     return std::sqrt(n);
 }
