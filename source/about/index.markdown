@@ -13,14 +13,20 @@ about C++. However, most of my C++ posts will be in French (sorry guys).
 
 I've also been a vimmer for quite some times now.  [Vim](http://www.vim.org)
 posts should be in English. And they'll be about my plugins suites hosted
-partially on [google-code](https://code.google.com/p/lh-vim/), and on
+<del>partially on [google-code](https://code.google.com/p/lh-vim/), and</del> on
 [github](https://github.com/LucHermitte/).
 
 If you want to contact me, if it's related my plugins, try the trackers from
-google-code or from github depending on where the plugin is hosted.
-Otherwise, you can also follow the contact information I've given on
-[lh-vim contact page](https://code.google.com/p/lh-vim/wiki/contact).
+github. I welcome enhancement/feature suggestions, bugs and misspelling
+notifications, _etc._
 
+You can also send an email to
+[lh-vim-users](http://groups.google.com/group/lh-vim-users) group, or directly
+send me an email to hermitte{at}free{dot}fr.  
+However, sometimes my email server has an odd behaviour, and all my outgoing
+emails are likely to be filtered out by spamcops-like bots. Send me an email
+to luc{dot}hermitte{at}gmail{dot}com, if you suspect your email was lost
+somewhere -- I consult my gmail mailbox something like twice a month ^^'
 
 Last thing, as French law doesn't let me put all my code snippets under Public
 Domain, let's say that they are available under BSD 3 clauses license, and under
