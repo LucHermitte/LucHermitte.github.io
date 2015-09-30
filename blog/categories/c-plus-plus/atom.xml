@@ -4,7 +4,7 @@
   <title><![CDATA[Category: C++ | Luc Hermitte's Blog]]></title>
   <link href="http://LucHermitte.github.io/blog/categories/c-plus-plus/atom.xml" rel="self"/>
   <link href="http://LucHermitte.github.io/"/>
-  <updated>2015-09-30T11:41:29+02:00</updated>
+  <updated>2015-09-30T12:16:31+02:00</updated>
   <id>http://LucHermitte.github.io/</id>
   <author>
     <name><![CDATA[Luc Hermitte]]></name>
@@ -136,40 +136,71 @@ struct assert_failure
 };
 </code>
 On peut ainsi exprimer des fonctions <code>constexpr</code> en C++11 :
-```c++
-/<em>*
- * Internal constexpr function that computes \f$n!\f$ with a tail-recursion.
- * @param[in] n
- * @param[in] r  pre-computed result
- * @pre n shall not induce an integer overflow
- * @post the result won&rsquo;t be null
- * @author Luc Hermitte
- </em>/
-constexpr unsigned int fact_impl(unsigned int n, unsigned int r) {
-    return
-        n &lt;= 1                                          ? r</p>
-
-<h1>ifndef NDEBUG</h1>
-
-<pre><code>    : std::numeric_limits&lt;decltype(n)&gt;::max()/n &lt; r ? throw assert_failure( []{assert(!"int overflow");})
-</code></pre>
-
-<h1>endif</h1>
-
-<pre><code>    :                                                 fact_impl(n-1, n*r)
-    ;
-</code></pre>
-
-<p>}
-constexpr unsigned int fact(unsigned int n) {
-    return fact_impl(n, 1);
-}</p>
-
-<p>int main() {
-    const unsigned int n10 = fact(10);
-    const unsigned int n50 = fact(50);
-}
-```</p>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="o">/&lt;</span><span class="n">em</span><span class="o">&gt;*</span>
+</span><span class='line'> <span class="o">*</span> <span class="n">Internal</span> <span class="k">constexpr</span> <span class="n">function</span> <span class="n">that</span> <span class="n">computes</span> <span class="err">\</span><span class="n">f</span><span class="err">$</span><span class="n">n</span><span class="o">!</span><span class="err">\</span><span class="n">f</span><span class="err">$</span> <span class="n">with</span> <span class="n">a</span> <span class="n">tail</span><span class="o">-</span><span class="n">recursion</span><span class="p">.</span>
+</span><span class='line'> <span class="o">*</span> <span class="err">@</span><span class="n">param</span><span class="p">[</span><span class="n">in</span><span class="p">]</span> <span class="n">n</span>
+</span><span class='line'> <span class="o">*</span> <span class="err">@</span><span class="n">param</span><span class="p">[</span><span class="n">in</span><span class="p">]</span> <span class="n">r</span>  <span class="n">pre</span><span class="o">-</span><span class="n">computed</span> <span class="n">result</span>
+</span><span class='line'> <span class="o">*</span> <span class="err">@</span><span class="n">pre</span> <span class="n">n</span> <span class="n">shall</span> <span class="n">not</span> <span class="n">induce</span> <span class="n">an</span> <span class="n">integer</span> <span class="n">overflow</span>
+</span><span class='line'> <span class="o">*</span> <span class="err">@</span><span class="n">post</span> <span class="n">the</span> <span class="n">result</span> <span class="n">won</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="p">;</span><span class="n">t</span> <span class="n">be</span> <span class="n">null</span>
+</span><span class='line'> <span class="o">*</span> <span class="err">@</span><span class="n">author</span> <span class="n">Luc</span> <span class="n">Hermitte</span>
+</span><span class='line'> <span class="o">&lt;/</span><span class="n">em</span><span class="o">&gt;/</span>
+</span><span class='line'><span class="k">constexpr</span> <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">fact_impl</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">n</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">r</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span>
+</span><span class='line'>        <span class="n">n</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">=</span> <span class="mi">1</span>                                          <span class="o">?</span> <span class="n">r</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span><span class="n">ifndef</span> <span class="n">NDEBUG</span><span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span>    <span class="o">:</span> <span class="n">std</span><span class="o">::</span><span class="n">numeric_limits</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="k">decltype</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span><span class="o">::</span><span class="n">max</span><span class="p">()</span><span class="o">/</span><span class="n">n</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="n">r</span> <span class="o">?</span> <span class="k">throw</span> <span class="n">assert_failure</span><span class="p">(</span> <span class="p">[]{</span><span class="n">assert</span><span class="p">(</span><span class="o">!</span><span class="s">&quot;int overflow&quot;</span><span class="p">);})</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span><span class="n">endif</span><span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span>    <span class="o">:</span>                                                 <span class="n">fact_impl</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="o">*</span><span class="n">r</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">;</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="p">}</span>
+</span><span class='line'><span class="k">constexpr</span> <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">fact</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">n</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">fact_impl</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kt">int</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">const</span> <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">n10</span> <span class="o">=</span> <span class="n">fact</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">const</span> <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">n50</span> <span class="o">=</span> <span class="n">fact</span><span class="p">(</span><span class="mi">50</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>Malheureusement la rupture de contrat ne sera pas détectée lors de la
 compilation, mais à l'exécution où l'on pourra constater à minima où l'appel de
@@ -393,7 +424,7 @@ besoin de se poser la question de son utilisabilité.</p>
 <p>Mais &hellip; n'est-ce pas de la programmation défensive ? En effet, ce n'est pas le
 client de l'objet qui vérifie les conditions d'existence, mais l'objet.
 Résultat, on ne dispose pas forcément du
-<a href="{%post_url%202014-05-24-programmation-par-contrat-un-peu-de-theorie%}#ProgDefCtx">meilleur contexte</a> pour
+<a href="/blog/2014/05/24/programmation-par-contrat-un-peu-de-theorie/#ProgDefCtx">meilleur contexte</a> pour
 signaler le problème de <em>runtime</em> qui bloque la création de l'objet.</p>
 
 <dl>
@@ -419,7 +450,7 @@ potentielles erreurs de programmation. Au final, cela va accroitre les chances
 d'erreurs de programmation&hellip; chose antinomique avec les objectifs de la
 technique. Donc un conseil, pour de la programmation défensive en C++, préférez
 l'emploi d'exceptions &ndash; et bien évidemment, n'oubliez pas le
-<a href="{%post_url%202012-04-04-le-c-plus-plus-moderne%}#C++Moderne">RAII</a>, notre grand
+<a href="/blog/2012/04/04/le-c-plus-plus-moderne/#C++Moderne">RAII</a>, notre grand
 ami.</em></p>
 
 <p>Prérequis : dérivez de
@@ -541,7 +572,7 @@ série de billets est de combattre cette habitude.</p>
 <p>À l'opposé, on peut prendre la voie de la <em>Programmation Défensive</em> et vérifier
 chaque rupture potentielle de contrat pour lever une exception. Au delà des
 problèmes de conceptions et de déresponsabilisation évoqués dans le
-<a href="{%post_url%202014-05-24-programmation-par-contrat-un-peu-de-theorie%}">billet précédent</a>,
+<a href="/blog/2014/05/24/programmation-par-contrat-un-peu-de-theorie/">billet précédent</a>,
 il y a un soucis technique.</p>
 
 <p>En effet, en temps normal avec une exception en C++, on ne peut rien avoir de
@@ -693,43 +724,77 @@ Program received signal SIGABRT, Aborted.
 </code></pre>
 
 <p>La pile d'appels (<em>back trace</em>) contient :
-```
-(gdb) bt</p>
-
-<h1>0  0x0022da18 in ?? ()</h1>
-
-<h1>1  0x7c802542 in WaitForSingleObject () from /cygdrive/c/WINDOWS/system32/kernel32.dll</h1>
-
-<h1>2  0x610da840 in sig_send(<em>pinfo*, siginfo_t&amp;, </em>cygtls*) () from /usr/bin/cygwin1.dll</h1>
-
-<h1>3  0x610d7c7c in _pinfo::kill(siginfo_t&amp;) () from /usr/bin/cygwin1.dll</h1>
-
-<h1>4  0x610d8146 in kill0(int, siginfo_t&amp;) () from /usr/bin/cygwin1.dll</h1>
-
-<h1>5  0x610d8312 in raise () from /usr/bin/cygwin1.dll</h1>
-
-<h1>6  0x610d85b3 in abort () from /usr/bin/cygwin1.dll</h1>
-
-<h1>7  0x61001aed in __assert_func () from /usr/bin/cygwin1.dll</h1>
-
-<h1>8  0x004011d3 in my::sqrt (n=-1) at test-assert.cpp:14</h1>
-
-<h1>9  0x0040125a in main () at test-assert.cpp:33</h1>
-
-<pre><code>
-Avec un `up 8` pour se positionner au niveau où l'assertion est fausse, on peut
-regarder le code source local avec un `list`, ou de façon plus intéressante,
-demander ce que vaut ce fameux `n`.
-</code></pre>
-
-<p>(gdb) up 8</p>
-
-<h1>8  0x004011d3 in my::sqrt (n=-1) at test-assert.cpp:14</h1>
-
-<p>7               assert(n >=0);
-(gdb) p n
-$1 = -1
-```</p>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="p">(</span><span class="n">gdb</span><span class="p">)</span> <span class="n">bt</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span><span class="mi">0</span>  <span class="mh">0x0022da18</span> <span class="n">in</span> <span class="o">??</span> <span class="p">()</span><span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span><span class="mi">1</span>  <span class="mh">0x7c802542</span> <span class="n">in</span> <span class="n">WaitForSingleObject</span> <span class="p">()</span> <span class="n">from</span> <span class="o">/</span><span class="n">cygdrive</span><span class="o">/</span><span class="n">c</span><span class="o">/</span><span class="n">WINDOWS</span><span class="o">/</span><span class="n">system32</span><span class="o">/</span><span class="n">kernel32</span><span class="p">.</span><span class="n">dll</span><span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span><span class="mi">2</span>  <span class="mh">0x610da840</span> <span class="n">in</span> <span class="n">sig_send</span><span class="p">(</span><span class="o">&lt;</span><span class="n">em</span><span class="o">&gt;</span><span class="n">pinfo</span><span class="o">*</span><span class="p">,</span> <span class="kt">siginfo_t</span><span class="o">&amp;</span><span class="n">amp</span><span class="p">;,</span> <span class="o">&lt;/</span><span class="n">em</span><span class="o">&gt;</span><span class="n">cygtls</span><span class="o">*</span><span class="p">)</span> <span class="p">()</span> <span class="n">from</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">cygwin1</span><span class="p">.</span><span class="n">dll</span><span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span><span class="mi">3</span>  <span class="mh">0x610d7c7c</span> <span class="n">in</span> <span class="n">_pinfo</span><span class="o">::</span><span class="n">kill</span><span class="p">(</span><span class="kt">siginfo_t</span><span class="o">&amp;</span><span class="n">amp</span><span class="p">;)</span> <span class="p">()</span> <span class="n">from</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">cygwin1</span><span class="p">.</span><span class="n">dll</span><span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span><span class="mi">4</span>  <span class="mh">0x610d8146</span> <span class="n">in</span> <span class="n">kill0</span><span class="p">(</span><span class="kt">int</span><span class="p">,</span> <span class="kt">siginfo_t</span><span class="o">&amp;</span><span class="n">amp</span><span class="p">;)</span> <span class="p">()</span> <span class="n">from</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">cygwin1</span><span class="p">.</span><span class="n">dll</span><span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span><span class="mi">5</span>  <span class="mh">0x610d8312</span> <span class="n">in</span> <span class="n">raise</span> <span class="p">()</span> <span class="n">from</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">cygwin1</span><span class="p">.</span><span class="n">dll</span><span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span><span class="mi">6</span>  <span class="mh">0x610d85b3</span> <span class="n">in</span> <span class="n">abort</span> <span class="p">()</span> <span class="n">from</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">cygwin1</span><span class="p">.</span><span class="n">dll</span><span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span><span class="mi">7</span>  <span class="mh">0x61001aed</span> <span class="n">in</span> <span class="n">__assert_func</span> <span class="p">()</span> <span class="n">from</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">cygwin1</span><span class="p">.</span><span class="n">dll</span><span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span><span class="mi">8</span>  <span class="mh">0x004011d3</span> <span class="n">in</span> <span class="n">my</span><span class="o">::</span><span class="n">sqrt</span> <span class="p">(</span><span class="n">n</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="n">at</span> <span class="n">test</span><span class="o">-</span><span class="n">assert</span><span class="p">.</span><span class="nl">cpp</span><span class="p">:</span><span class="mi">14</span><span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span><span class="mi">9</span>  <span class="mh">0x0040125a</span> <span class="n">in</span> <span class="n">main</span> <span class="p">()</span> <span class="n">at</span> <span class="n">test</span><span class="o">-</span><span class="n">assert</span><span class="p">.</span><span class="nl">cpp</span><span class="p">:</span><span class="mi">33</span><span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span>
+</span><span class='line'><span class="n">Avec</span> <span class="n">un</span> <span class="err">`</span><span class="n">up</span> <span class="mi">8</span><span class="err">`</span> <span class="n">pour</span> <span class="n">se</span> <span class="n">positionner</span> <span class="n">au</span> <span class="n">niveau</span> <span class="n">o</span><span class="err">ù</span> <span class="n">l</span><span class="err">&#39;</span><span class="n">assertion</span> <span class="n">est</span> <span class="n">fausse</span><span class="p">,</span> <span class="n">on</span> <span class="n">peut</span>
+</span><span class='line'><span class="n">regarder</span> <span class="n">le</span> <span class="n">code</span> <span class="n">source</span> <span class="n">local</span> <span class="n">avec</span> <span class="n">un</span> <span class="err">`</span><span class="n">list</span><span class="err">`</span><span class="p">,</span> <span class="n">ou</span> <span class="n">de</span> <span class="n">fa</span><span class="err">ç</span><span class="n">on</span> <span class="n">plus</span> <span class="kt">int</span><span class="err">é</span><span class="n">ressante</span><span class="p">,</span>
+</span><span class='line'><span class="n">demander</span> <span class="n">ce</span> <span class="n">que</span> <span class="n">vaut</span> <span class="n">ce</span> <span class="n">fameux</span> <span class="err">`</span><span class="n">n</span><span class="err">`</span><span class="p">.</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="p">(</span><span class="n">gdb</span><span class="p">)</span> <span class="n">up</span> <span class="mi">8</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span><span class="mi">8</span>  <span class="mh">0x004011d3</span> <span class="n">in</span> <span class="n">my</span><span class="o">::</span><span class="n">sqrt</span> <span class="p">(</span><span class="n">n</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="n">at</span> <span class="n">test</span><span class="o">-</span><span class="n">assert</span><span class="p">.</span><span class="nl">cpp</span><span class="p">:</span><span class="mi">14</span><span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="mi">7</span>               <span class="n">assert</span><span class="p">(</span><span class="n">n</span> <span class="o">&gt;=</span><span class="mi">0</span><span class="p">);</span>
+</span><span class='line'><span class="p">(</span><span class="n">gdb</span><span class="p">)</span> <span class="n">p</span> <span class="n">n</span>
+</span><span class='line'><span class="err">$</span><span class="mi">1</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>On voit que <code>my::sqrt</code> a été appelée avec <code>-1</code> comme paramètre. Avec un <code>up</code> on
 peut investiguer le contexte de la fonction appelante &ndash; avec <code>down</code> on
@@ -743,7 +808,7 @@ avec son résultat.</p>
 
 <h4><a id="Phases"></a>Un outil pour les phases de développement et de tests &hellip;</h4>
 
-<p>Je vais paraphraser <a href="{%post_url%202014-05-24-programmation-par-contrat-un-peu-de-theorie%}#Wilson2006">[Wilson2006] §1.1.</a>, qui énonçait déjà des
+<p>Je vais paraphraser <a href="/blog/2014/05/24/programmation-par-contrat-un-peu-de-theorie/#Wilson2006">[Wilson2006] §1.1.</a>, qui énonçait déjà des
 évidences : <em>&ldquo;Plus tôt on détecte une erreur, mieux c'est&rdquo;</em>.  C'est un adage
 que vous devez déjà connaitre. Concrètement, cela veut dire que l'on va
 préférer trouver nos erreurs, dans l'ordre :</p>
@@ -1104,9 +1169,9 @@ assez exhaustive d'Ahmed Charles.</p>
     <content type="html"><![CDATA[<p>Cela faisait un moment que je voulais partager mes conclusions sur la
 <em>Programmation par Contrat</em>, et en particulier comment l'appliquer au C++.</p>
 
-<p>Voici un premier billet qui aborde l'aspect théorique. Dans un <a href="{%post_url%202014-05-28-programmation-par-contrat-les-assertions%}">second billet</a>,
+<p>Voici un premier billet qui aborde l'aspect théorique. Dans un <a href="/blog/2014/05/28/programmation-par-contrat-les-assertions/">second billet</a>,
 je traiterai des <em>assertions</em>. En guise de conclusion, je présenterai des
-<a href="{%post_url%202015-09-17-programmation-par-contrat-snippets-pour-le-c-plus-plus%}">techniques d'application de la PpC au C++</a>
+<a href="/blog/2015/09/17/programmation-par-contrat-snippets-pour-le-c-plus-plus/">techniques d'application de la PpC au C++</a>
 que j'ai croisées au fil des ans.</p>
 
 <h2>I- Les Erreurs</h2>
@@ -1169,7 +1234,7 @@ Les assertions permettent d'installer des points de contrôle dans un programme
 pour vérifier que les traitements se passent bien. Ces points de contrôles
 seront utilisés pour vérifier les contrats préalablement définis.
 Nous les détaillerons dans
-<a href="{%post_url%202014-05-28-programmation-par-contrat-les-assertions%}">le prochain billet</a>.</p>
+<a href="/blog/2014/05/28/programmation-par-contrat-les-assertions/">le prochain billet</a>.</p>
 
 <h2>II- La programmation par contrat</h2>
 
@@ -1190,7 +1255,7 @@ comme elle l'entend.</p>
 <code>sqrt</code> et qu'elle plante, on n'est pas plus avancés. Le bug est toujours là. Et
 pourtant, nous avons fait un énorme pas en avant : nous avons formalisé les
 contrats de <code>sqrt</code>. Nous disposons de spécifications précises, et d'une
-<a href="{%post_url%202014-05-28-programmation-par-contrat-les-assertions%}#Documentation">documentation</a> qui pourra accompagner le code.</p>
+<a href="/blog/2014/05/28/programmation-par-contrat-les-assertions/#Documentation">documentation</a> qui pourra accompagner le code.</p>
 
 <p>Heureusement, nous pouvons aller bien plus loin. Nous pouvons aussi marquer le
 code avec des assertions représentatives des contrats identifiés pour repérer
@@ -1616,7 +1681,7 @@ leurs devoirs.</li>
 <li>Toutefois, il est possible de détourner la PpC  basée sur des assertions en C
 et C++ pour faire de la Programmation Défensive ; p.ex. l'assertion pourrait
 être détournée en <em>Release</em> pour lever une exception. J'y reviendrai dans le
-<a href="{%post_url%202014-05-28-programmation-par-contrat-les-assertions%}">prochain billet</a>.</li>
+<a href="/blog/2014/05/28/programmation-par-contrat-les-assertions/">prochain billet</a>.</li>
 </ul>
 
 
