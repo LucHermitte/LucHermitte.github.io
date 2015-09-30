@@ -4,7 +4,7 @@
   <title><![CDATA[Category: C++ | Luc Hermitte's Blog]]></title>
   <link href="http://LucHermitte.github.io/blog/categories/c-plus-plus/atom.xml" rel="self"/>
   <link href="http://LucHermitte.github.io/"/>
-  <updated>2015-09-29T14:03:55+02:00</updated>
+  <updated>2015-09-30T11:41:29+02:00</updated>
   <id>http://LucHermitte.github.io/</id>
   <author>
     <name><![CDATA[Luc Hermitte]]></name>
@@ -52,39 +52,29 @@ le code spécialisé, et elles finissent par vérifier post-conditions et
 invariants.<br/>
 Soit:</p>
 
-<p>```c++
-/<em>* Interface/contrat C1.
- </em>/
-struct Contract1 : boost::noncopyable
-{</p>
-
-<pre><code>virtual ~Contract1(){};
-
-/** @pre &lt;tt&gt; x &gt; 42&lt;/tt&gt;, vérifié par assertion.
+<pre><code class="c++">/** Interface/contrat C1.
  */
-double compute(double x) const {
-    assert(x &gt; 42 &amp;&amp; "echec de précondition sur contrat1");
-    return do_compute(x);
-}
-</code></pre>
-
-<p>private:</p>
-
-<pre><code>virtual double do_compute(int x) const = 0;
-</code></pre>
-
-<p>};</p>
-
-<p>class Impl : Contract1, Contract2
+struct Contract1 : boost::noncopyable
 {
-private:</p>
+    virtual ~Contract1(){};
 
-<pre><code>virtual double do_compute(int x) const override { ... }
-// + spécialisations des fonctions de Contract2
+    /** @pre &lt;tt&gt; x &gt; 42&lt;/tt&gt;, vérifié par assertion.
+     */
+    double compute(double x) const {
+        assert(x &gt; 42 &amp;&amp; "echec de précondition sur contrat1");
+        return do_compute(x);
+    }
+private:
+    virtual double do_compute(int x) const = 0;
+};
+
+class Impl : Contract1, Contract2
+{
+private:
+    virtual double do_compute(int x) const override { ... }
+    // + spécialisations des fonctions de Contract2
+};
 </code></pre>
-
-<p>};
-```</p>
 
 <p>Je reviendrai <a href="#NVI_Invariants">plus loin</a> sur une piste pour supporter des
 invariants dans un cadre de NVI.</p>
@@ -96,30 +86,23 @@ la PpC. Je ne peux que vous en conseiller la lecture.</p>
 
 <p>Il y présente au §I.1.3 la technique suivante :</p>
 
-<p>```c++
-double my::sqrt(double n)
-if defined(MYLIB_DBC_ACTIVATED)
-{</p>
-
-<pre><code>// Check pre-conditions
-assert(n&gt;=0 &amp;&amp; "sqrt can't process negative numbers");
-// Do the work
-const double res = my::sqrt_unchecked(n);
-// Check post-conditions
-assert(std::abs(res*res - n)&lt;epsilon &amp;&amp; "Invalid sqrt result");
-return res;
-</code></pre>
-
-<p>}
+<pre><code class="c++">double my::sqrt(double n)
+#if defined(MYLIB_DBC_ACTIVATED)
+{
+    // Check pre-conditions
+    assert(n&gt;=0 &amp;&amp; "sqrt can't process negative numbers");
+    // Do the work
+    const double res = my::sqrt_unchecked(n);
+    // Check post-conditions
+    assert(std::abs(res*res - n)&lt;epsilon &amp;&amp; "Invalid sqrt result");
+    return res;
+}
 double my::sqrt_unchecked(double n)
-endif
-{</p>
-
-<pre><code>return std::sqrt(n);
+#endif
+{
+    return std::sqrt(n);
+}
 </code></pre>
-
-<p>}
-```</p>
 
 <h3>I.3- Pré- et post-conditions de fonctions &hellip; <code>constexpr</code> C++11.</h3>
 
@@ -136,27 +119,24 @@ dans son article
 <a href="http://akrzemi1.wordpress.com/2011/05/06/compile-time-computations/">Compile Time Computations</a>.</p>
 
 <p>En résumé, on peut procéder de la sorte. Avec ceci:
-```c++
-/<em>* Helper struct for DbC programming in C++11 constexpr functions.
+<code>c++
+/** Helper struct for DbC programming in C++11 constexpr functions.
  * Copyright 2014 Eric Niebler,
- * <a href="http://ericniebler.com/2014/09/27/assert-and-constexpr-in-cxx11/">http://ericniebler.com/2014/09/27/assert-and-constexpr-in-cxx11/</a>
- </em>/
+ * http://ericniebler.com/2014/09/27/assert-and-constexpr-in-cxx11/
+ */
 struct assert_failure
-{</p>
-
-<pre><code>template&lt;typename Fun&gt;
-explicit assert_failure(Fun fun)
 {
-    fun();
-    // For good measure:
-    std::quick_exit(EXIT_FAILURE);
-}
-</code></pre>
-
-<p>};
-<code>
-On peut ainsi exprimer des fonctions `constexpr` en C++11 :
-</code>c++
+    template&lt;typename Fun&gt;
+    explicit assert_failure(Fun fun)
+    {
+        fun();
+        // For good measure:
+        std::quick_exit(EXIT_FAILURE);
+    }
+};
+</code>
+On peut ainsi exprimer des fonctions <code>constexpr</code> en C++11 :
+```c++
 /<em>*
  * Internal constexpr function that computes \f$n!\f$ with a tail-recursion.
  * @param[in] n
@@ -165,11 +145,9 @@ On peut ainsi exprimer des fonctions `constexpr` en C++11 :
  * @post the result won&rsquo;t be null
  * @author Luc Hermitte
  </em>/
-constexpr unsigned int fact_impl(unsigned int n, unsigned int r) {</p>
-
-<pre><code>return
-    n &lt;= 1                                          ? r
-</code></pre>
+constexpr unsigned int fact_impl(unsigned int n, unsigned int r) {
+    return
+        n &lt;= 1                                          ? r</p>
 
 <h1>ifndef NDEBUG</h1>
 
@@ -183,20 +161,14 @@ constexpr unsigned int fact_impl(unsigned int n, unsigned int r) {</p>
 </code></pre>
 
 <p>}
-constexpr unsigned int fact(unsigned int n) {</p>
+constexpr unsigned int fact(unsigned int n) {
+    return fact_impl(n, 1);
+}</p>
 
-<pre><code>return fact_impl(n, 1);
-</code></pre>
-
-<p>}</p>
-
-<p>int main() {</p>
-
-<pre><code>const unsigned int n10 = fact(10);
-const unsigned int n50 = fact(50);
-</code></pre>
-
-<p>}
+<p>int main() {
+    const unsigned int n10 = fact(10);
+    const unsigned int n50 = fact(50);
+}
 ```</p>
 
 <p>Malheureusement la rupture de contrat ne sera pas détectée lors de la
@@ -207,33 +179,29 @@ l'état des variables <em>optimized out</em> dans le débuggueur).</p>
 <p>Notez que pour exprimer une post-condition sans multiplier les appels, j'ai
 écrit la fonction (qui aurait été récursive dans tous les cas) en
 <a href="http://fr.wikipedia.org/wiki/R%C3%A9cursion_terminale">fonction récursive terminale</a>.
-De là, il a été facile d'insérer une assertion &mdash; et de plus, le compilateur
+De là, il a été facile d'insérer une assertion &ndash; et de plus, le compilateur
 pourra optimiser la fonction en <em>Release</em> sur les appels dynamiques.</p>
 
 <p>Pour information, une autre écriture qui exploite l'opérateur virgule est
 possible, mais elle ne compile pas avec les versions de GCC que j'ai eu entre
 les mains (i.e. jusqu'à la version 4.9, GCC n'est pas d'accord).</p>
 
-<p>```c++
-/<em>*
+<pre><code class="c++">/**
  * Internal constexpr function that computes \f$n!\f$ with a tail-recursion.
  * @param[in] n
  * @param[in] r  pre-computed result
  * @pre n shall not induce an integer overflow
- * @post the result won&rsquo;t be null
+ * @post the result won't be null
  * @warning This version does not compile with GCC up-to v4.9.
  * @author Luc Hermitte
- </em>/
-constexpr unsigned int fact_impl(unsigned int n, unsigned int r) {</p>
-
-<pre><code>return n &gt;= 1
-    // ? (assert(std::numeric_limits&lt;decltype(n)&gt;::max()/n &gt;= r), fact_impl(n-1, n*r))
-    ? fact_impl((assert(std::numeric_limits&lt;decltype(n)&gt;::max()/n &gt;= r), n-1), n*r)
-    : (assert(r&gt;0), r);
+ */
+constexpr unsigned int fact_impl(unsigned int n, unsigned int r) {
+    return n &gt;= 1
+        // ? (assert(std::numeric_limits&lt;decltype(n)&gt;::max()/n &gt;= r), fact_impl(n-1, n*r))
+        ? fact_impl((assert(std::numeric_limits&lt;decltype(n)&gt;::max()/n &gt;= r), n-1), n*r)
+        : (assert(r&gt;0), r);
+}
 </code></pre>
-
-<p>}
-```</p>
 
 <p>N.B.: Dans le cas des <code>constexpr</code> du C++14, il me faudrait vérifier si <code>assert()</code> est
 directement utilisable. A priori, cela sera le cas.</p>
@@ -249,63 +217,51 @@ début des fonctions membres (et des fonctions amies) exposées aux clients.
 Ainsi les invariants sont automatiquement vérifiés en début, et en fin de
 fonction lors de la destruction de l'objet <code>InvariantChecker</code>.</p>
 
-<p>```c++
-/<em>* Helper class to check invariants.
+<pre><code class="c++">/** Helper class to check invariants.
  * @tparam CheckedClass shall define a \c check_invariants fonction where
    invariants checking is done.
- </em>/
-template <typename CheckedClass>
-struct InvariantChecker {</p>
+ */
+template &lt;typename CheckedClass&gt;
+struct InvariantChecker {
+    InvariantChecker(CheckedClass const&amp; cc_) : m_cc(cc_)
+    { m_cc.check_invariants(); }
+    ~InvariantChecker()
+    { m_cc.check_invariants(); }
+private:
+    CheckedClass const&amp; m_cc;
+};
 
-<pre><code>InvariantChecker(CheckedClass const&amp; cc_) : m_cc(cc_)
-{ m_cc.check_invariants(); }
-~InvariantChecker()
-{ m_cc.check_invariants(); }
-</code></pre>
-
-<p>private:</p>
-
-<pre><code>CheckedClass const&amp; m_cc;
-</code></pre>
-
-<p>};</p>
-
-<p>/<em>* rational class.
- * @invariant <tt>denominator() > 0</tt>
+/** rational class.
+ * @invariant &lt;tt&gt;denominator() &gt; 0&lt;/tt&gt;
  * @invariant visible objects are normalized.
- </em>/
-struct Rational {</p>
+ */
+struct Rational {
+    ....
+    // Une fonction publique qui doit vérifier l'invariant
+    Rational &amp; operator+=(Rational const&amp; rhs) {
+        InvariantChecker&lt;Rational&gt; check(this);
+        ... le code de l'addition ...
+        return *this;
+    }
 
-<pre><code>....
-// Une fonction publique qui doit vérifier l'invariant
-Rational &amp; operator+=(Rational const&amp; rhs) {
-    InvariantChecker&lt;Rational&gt; check(this);
-    ... le code de l'addition ...
-    return *this;
+private:
+    // La fonction interne de vérification
+    void check_invariants() const {
+        assert(denominator() &amp;&amp; "Denominator can't be null");
+        assert(denominator()&gt;0 &amp;&amp; "Denominator can't be negative");
+        assert(pgcd(std::abs(numerator()), denominator()) == 1 &amp;&amp; "The rational shall be normalized");
+    }
+    // Et on donne accès à la classe InvariantChecker&lt;&gt;
+    friend class InvariantChecker&lt;rational&gt;;
+
+    ... les membres ...
 }
 </code></pre>
-
-<p>private:</p>
-
-<pre><code>// La fonction interne de vérification
-void check_invariants() const {
-    assert(denominator() &amp;&amp; "Denominator can't be null");
-    assert(denominator()&gt;0 &amp;&amp; "Denominator can't be negative");
-    assert(pgcd(std::abs(numerator()), denominator()) == 1 &amp;&amp; "The rational shall be normalized");
-}
-// Et on donne accès à la classe InvariantChecker&lt;&gt;
-friend class InvariantChecker&lt;rational&gt;;
-
-... les membres ...
-</code></pre>
-
-<p>}
-```</p>
 
 <p>N.B.: je vois à la relecture d'<em>Imperfect C++</em> que c'est très proche de ce que
 suggérait Matthew Wilson. Au détail qu'il passe par une fonction <code>is_valid</code>
 renvoyant un booléen et que l'<code>InvariantChecker</code> s'occupe de vérifier
-l'assertion si <code>MYLIB_DBC_ACTIVATED</code> est bien défini &mdash; il découple la
+l'assertion si <code>MYLIB_DBC_ACTIVATED</code> est bien défini &ndash; il découple la
 vérification des contrats de la macro <code>NDEBUG</code> qui est plus liée au mode de
 compilation (<em>Débug</em> VS <em>Release</em>).<br/>
 Pour ma part, je préfère avoir une assertion différente pour chaque invariant
@@ -320,83 +276,52 @@ virtuelle <code>WithInvariants</code> dont la fonction de vérification serait s
 par tous les intermédiaires. Et dont les intermédiaires appelleraient toutes
 les versions mères pour n'oublier personne.</p>
 
-<p>```c++
-struct WithInvariants : boost::noncopyable {</p>
+<pre><code class="c++">struct WithInvariants : boost::noncopyable {
+    void check_invariants() const {
+#ifndef NDEBUG
+        do_check_invariants();
+#endif
+    }
+protected:
+    ~WithInvariants() {}
+    virtual void do_check_invariants() const {}
+};
 
-<pre><code>void check_invariants() const {
-</code></pre>
+struct InvariantChecker {
+    InvariantChecker(WithInvariants const&amp; wi) : m_wi(wi)
+    { m_wi.check_invariants(); }
+    ~InvariantChecker()
+    { m_wi.check_invariants(); }
+private:
+    WithInvariants const&amp; m_wi;
+};
 
-<h1>ifndef NDEBUG</h1>
-
-<pre><code>    do_check_invariants();
-</code></pre>
-
-<h1>endif</h1>
-
-<pre><code>}
-</code></pre>
-
-<p>protected:</p>
-
-<pre><code>~WithInvariants() {}
-virtual void do_check_invariants() const {}
-</code></pre>
-
-<p>};</p>
-
-<p>struct InvariantChecker {</p>
-
-<pre><code>InvariantChecker(WithInvariants const&amp; wi) : m_wi(wi)
-{ m_wi.check_invariants(); }
-~InvariantChecker()
-{ m_wi.check_invariants(); }
-</code></pre>
-
-<p>private:</p>
-
-<pre><code>WithInvariants const&amp; m_wi;
-</code></pre>
-
-<p>};</p>
-
-<p>struct Contract1 : boost::noncopyable, virtual WithInvariants
-{</p>
-
-<pre><code>...
-double compute(double x) const {
-    ...preconds...
-    InvariantChecker(*this);
-    return do_compute(x);
+struct Contract1 : boost::noncopyable, virtual WithInvariants
+{
+    ...
+    double compute(double x) const {
+        ...preconds...
+        InvariantChecker(*this);
+        return do_compute(x);
+    }
+protected:
+    virtual void do_check_invariants() const override {
+        assert(invariant C1 ...);
+    }
+    ....
 }
+
+struct Impl : Contract1, Contract2
+{
+    ....
+protected:
+    virtual void do_check_invariants() const override {
+        Contract1::do_check_invariants();
+        Contract2::do_check_invariants();
+        assert(invariant rajoutés par Impl ...);
+    }
+};
 </code></pre>
-
-<p>protected:</p>
-
-<pre><code>virtual void do_check_invariants() const override {
-    assert(invariant C1 ...);
-}
-....
-</code></pre>
-
-<p>}</p>
-
-<p>struct Impl : Contract1, Contract2
-{</p>
-
-<pre><code>....
-</code></pre>
-
-<p>protected:</p>
-
-<pre><code>virtual void do_check_invariants() const override {
-    Contract1::do_check_invariants();
-    Contract2::do_check_invariants();
-    assert(invariant rajoutés par Impl ...);
-}
-</code></pre>
-
-<p>};
-```</p>
 
 <p>(Alors certes, c'est tordu, mais pour l'instant, je n'ai pas de meilleure idée.)</p>
 
@@ -439,7 +364,7 @@ débarrasser du flux pour en construire un tout beau tout neuf, on le maintient
 peuvent être cassés.</p>
 
 <p>Dans un monde idéal, j'aurai tendance à dire qu'il faudrait établir des zones
-de codes qui ont des invariants de plus en plus précis &mdash; les invariants étant
+de codes qui ont des invariants de plus en plus précis &ndash; les invariants étant
 organisés de façon hiérarchique.</p>
 
 <p>Dans la zone <em>descriptif de flux configuré</em>, il y aurait la zone <em>flux valide
@@ -468,20 +393,22 @@ besoin de se poser la question de son utilisabilité.</p>
 <p>Mais &hellip; n'est-ce pas de la programmation défensive ? En effet, ce n'est pas le
 client de l'objet qui vérifie les conditions d'existence, mais l'objet.
 Résultat, on ne dispose pas forcément du
-<a href="/blog/2014/05/24/programmation-par-contrat-un-peu-de-theorie/#ProgDefCtx">meilleur contexte</a> pour
+<a href="{%post_url%202014-05-24-programmation-par-contrat-un-peu-de-theorie%}#ProgDefCtx">meilleur contexte</a> pour
 signaler le problème de <em>runtime</em> qui bloque la création de l'objet.</p>
 
-<p>Idéalement, je tendrais à dire que la vérification devrait être faite en amont,
-et ainsi le constructeur aurait des pré-conditions <em>étroitement</em> vérifiées.
-Dans la pratique, je dois bien avouer que je tends, aujourd'hui, à laisser la
-vérification au niveau des constructeurs au lieu d'exposer une fonction
-statique de vérification des pré-conditions d'existence dans les cas les plus
-complexes. Il faut dire que les exceptions ont tellement été bien vendues comme
-: c'est le seul moyen d'avorter depuis un opérateur surchargé ou depuis un
+<dl>
+<dt>Idéalement, je tendrais à dire que la vérification devrait être faite en amont,</dt>
+<dt>et ainsi le constructeur aurait des pré-conditions <em>étroitement</em> vérifiées.</dt>
+<dt>Dans la pratique, je dois bien avouer que je tends, aujourd'hui, à laisser la</dt>
+<dt>vérification au niveau des constructeurs au lieu d'exposer une fonction</dt>
+<dt>statique de vérification des pré-conditions d'existence dans les cas les plus</dt>
+<dt>complexes. Il faut dire que les exceptions ont tellement été bien vendues comme</dt>
+<dd>c'est le seul moyen d'avorter depuis un opérateur surchargé ou depuis un
 constructeur, que j'ai jusqu'à lors totalement négligé mon instinct qui sentait
 qu'il y avait un truc louche à vérifier les conditions de création depuis un
 contexte restreint. À <em>élargir</em> les contrats, on finit par perdre des
-informations pour nos messages d'erreur.</p>
+informations pour nos messages d'erreur.</dd>
+</dl>
 
 <h2>III- Et si la Programmation Défensive est de la partie ?</h2>
 
@@ -491,8 +418,8 @@ validation des entrées), devra propager des codes de retours relatifs aux
 potentielles erreurs de programmation. Au final, cela va accroitre les chances
 d'erreurs de programmation&hellip; chose antinomique avec les objectifs de la
 technique. Donc un conseil, pour de la programmation défensive en C++, préférez
-l'emploi d'exceptions &mdash; et bien évidemment, n'oubliez pas le
-<a href="/blog/2012/04/04/le-c-plus-plus-moderne/#C++Moderne">RAII</a>, notre grand
+l'emploi d'exceptions &ndash; et bien évidemment, n'oubliez pas le
+<a href="{%post_url%202012-04-04-le-c-plus-plus-moderne%}#C++Moderne">RAII</a>, notre grand
 ami.</em></p>
 
 <p>Prérequis : dérivez de
@@ -514,33 +441,21 @@ exceptionnels plausibles et de <code>std::logic_error</code> pour les erreurs de
 C++03), ou dans le <code>main()</code>, il est possible de filtrer les erreurs de logiques
 pour avoir des coredumps en <em>Debug</em>.</p>
 
-<p>```c++
-int main()
+<pre><code class="c++">int main()
 {
-   try {</p>
-
-<pre><code>    leCodeQuipeutprovoquerDesExceptions();
-    return EXIT_SUCCESS;
-</code></pre>
-
-<h1>ifdef NDEBUG</h1>
-
-<p>   } catch (std::logic_error const&amp; e) {</p>
-
-<pre><code>  std::cerr &lt;&lt; "Logic error: " &lt;&lt; e.what() &lt;&lt; "\n";
-</code></pre>
-
-<h1>endif</h1>
-
-<p>   } catch (std::runtime_error const&amp; e) {</p>
-
-<pre><code>  std::cerr &lt;&lt; "Error: " &lt;&lt; e.what() &lt;&lt; "\n";
-</code></pre>
-
-<p>   }
+   try {
+        leCodeQuipeutprovoquerDesExceptions();
+        return EXIT_SUCCESS;
+#ifdef NDEBUG
+   } catch (std::logic_error const&amp; e) {
+      std::cerr &lt;&lt; "Logic error: " &lt;&lt; e.what() &lt;&lt; "\n";
+#endif
+   } catch (std::runtime_error const&amp; e) {
+      std::cerr &lt;&lt; "Error: " &lt;&lt; e.what() &lt;&lt; "\n";
+   }
    return EXIT_FAILURE;
 }
-```</p>
+</code></pre>
 
 <p>Il est à noter que ce cas théorique idéal se combine très mal avec les
 techniques de
@@ -562,34 +477,21 @@ C++03), ou dans le <code>main()</code>, il est possible d'ignorer toutes les exc
 avoir des coredumps en <em>Debug</em> sur les exceptions dues à des erreurs de logiques et &hellip;
 sur les autres aussi.</p>
 
-<p>```c++
-int main()
-{</p>
-
-<h1>ifdef NDEBUG</h1>
-
-<p>   try {</p>
-
-<h1>endif</h1>
-
-<pre><code>   leCodeQuipeutprovoquerDesExceptions();
-   return EXIT_SUCCESS;
+<pre><code class="c++">int main()
+{
+#ifdef NDEBUG
+   try {
+#endif
+       leCodeQuipeutprovoquerDesExceptions();
+       return EXIT_SUCCESS;
+#ifdef NDEBUG
+   } catch (std::exception const&amp; e) {
+       std::cerr &lt;&lt; "Error: " &lt;&lt; e.what() &lt;&lt; "\n";
+   }
+   return EXIT_FAILURE;
+#endif
+}
 </code></pre>
-
-<h1>ifdef NDEBUG</h1>
-
-<p>   } catch (std::exception const&amp; e) {</p>
-
-<pre><code>   std::cerr &lt;&lt; "Error: " &lt;&lt; e.what() &lt;&lt; "\n";
-</code></pre>
-
-<p>   }
-   return EXIT_FAILURE;</p>
-
-<h1>endif</h1>
-
-<p>}
-```</p>
 
 <p>D'autres variations sont très certainement envisageables où l'on rattraperait
 l'erreur de logique pour la relancer en <em>Debug</em>.</p>
@@ -639,7 +541,7 @@ série de billets est de combattre cette habitude.</p>
 <p>À l'opposé, on peut prendre la voie de la <em>Programmation Défensive</em> et vérifier
 chaque rupture potentielle de contrat pour lever une exception. Au delà des
 problèmes de conceptions et de déresponsabilisation évoqués dans le
-<a href="/blog/2014/05/24/programmation-par-contrat-un-peu-de-theorie/">billet précédent</a>,
+<a href="{%post_url%202014-05-24-programmation-par-contrat-un-peu-de-theorie%}">billet précédent</a>,
 il y a un soucis technique.</p>
 
 <p>En effet, en temps normal avec une exception en C++, on ne peut rien avoir de
@@ -713,52 +615,41 @@ programme au moment de la détection de l'erreur.</p>
 
 <p>Sans faire un cours sur gdb, regardons ce qu'il se passe sur ce petit programme :</p>
 
-<p>```c++
-// test-assert.cpp</p>
+<pre><code class="c++">// test-assert.cpp
+#include &lt;iostream&gt;
+#include &lt;cmath&gt;
+#include &lt;cassert&gt;
+#include &lt;limits&gt;
 
-<h1>include <iostream></h1>
+namespace my {
+    /** Computes square root.
+     * @pre \c n must be positive, checked with an assertion
+     * @post &lt;tt&gt;result * result == n&lt;/tt&gt;, checked with an assertion
+     */
+    double sqrt(double n) {
+        assert(n &gt;=0);
+        const double result = std::sqrt(n);
+        assert(std::abs(result*result - n) &lt; std::numeric_limits&lt;double&gt;::epsilon() * 100);
+        return result;
+    }
 
-<h1>include <cmath></h1>
+    /** Computes sinus.
+     * @post \c n belongs to [-1, 1], checked with an assertion
+     */
+    double sin(double n) {
+        const double r = std::sin(n);
+        assert(r &lt;= 1 &amp;&amp; r &gt;= -1);
+        return r;
+    }
+} // my namespace
 
-<h1>include <cassert></h1>
 
-<h1>include <limits></h1>
-
-<p>namespace my {</p>
-
-<pre><code>/** Computes square root.
- * @pre \c n must be positive, checked with an assertion
- * @post &lt;tt&gt;result * result == n&lt;/tt&gt;, checked with an assertion
- */
-double sqrt(double n) {
-    assert(n &gt;=0);
-    const double result = std::sqrt(n);
-    assert(std::abs(result*result - n) &lt; std::numeric_limits&lt;double&gt;::epsilon() * 100);
-    return result;
+int main ()
+{
+    std::cout &lt;&lt; my::sqrt(my::sin(0)-1) &lt;&lt; std::endl;
 }
-
-/** Computes sinus.
- * @post \c n belongs to [-1, 1], checked with an assertion
- */
-double sin(double n) {
-    const double r = std::sin(n);
-    assert(r &lt;= 1 &amp;&amp; r &gt;= -1);
-    return r;
-}
+// Vim: let $CXXFLAGS='-g'
 </code></pre>
-
-<p>} // my namespace</p>
-
-<p>int main ()
-{</p>
-
-<pre><code>std::cout &lt;&lt; my::sqrt(my::sin(0)-1) &lt;&lt; std::endl;
-</code></pre>
-
-<p>}
-// Vim: let $CXXFLAGS=&lsquo;-g&rsquo;</p>
-
-<p>```</p>
 
 <p>Exécuté en console, on verra juste :
 <code>
@@ -774,33 +665,32 @@ votre plateforme, faites un <code>ulimit -c unlimited</code> pour cela), ou <cod
 ./test-assert</code> puis <code>run</code> pour une investigation pseudo-interactive, on observe
 ceci :</p>
 
-<p>```
-$ gdb test-assert
+<pre><code>$ gdb test-assert
 GNU gdb (GDB) 7.6.50.20130728-cvs (cygwin-special)
-Copyright &copy; 2013 Free Software Foundation, Inc.
-License GPLv3+: GNU GPL version 3 or later <a href="http://gnu.org/licenses/gpl.html">http://gnu.org/licenses/gpl.html</a>
+Copyright (C) 2013 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later &lt;http://gnu.org/licenses/gpl.html&gt;
 This is free software: you are free to change and redistribute it.
-There is NO WARRANTY, to the extent permitted by law.  Type &ldquo;show copying&rdquo;
-and &ldquo;show warranty&rdquo; for details.
-This GDB was configured as &ldquo;i686-pc-cygwin&rdquo;.
-Type &ldquo;show configuration&rdquo; for configuration details.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "i686-pc-cygwin".
+Type "show configuration" for configuration details.
 For bug reporting instructions, please see:
-<a href="http://www.gnu.org/software/gdb/bugs/">http://www.gnu.org/software/gdb/bugs/</a>.
+&lt;http://www.gnu.org/software/gdb/bugs/&gt;.
 Find the GDB manual and other documentation resources online at:
-<a href="http://www.gnu.org/software/gdb/documentation/">http://www.gnu.org/software/gdb/documentation/</a>.
-For help, type &ldquo;help&rdquo;.
-Type &ldquo;apropos word&rdquo; to search for commands related to &ldquo;word&rdquo;.
+&lt;http://www.gnu.org/software/gdb/documentation/&gt;.
+For help, type "help".
+Type "apropos word" to search for commands related to "word".
 ..
-Reading symbols from /cygdrive/c/Dev/blog/source/<em>posts/test-assert&hellip;done.
+Reading symbols from /cygdrive/c/Dev/blog/source/_posts/test-assert...done.
 (gdb) run
-Starting program: /cygdrive/c/Dev/blog/source/</em>posts/test-assert
+Starting program: /cygdrive/c/Dev/blog/source/_posts/test-assert
 [New Thread 5264.0xe2c]
 [New Thread 5264.0x6fc]
-assertion &ldquo;n >=0&rdquo; failed: file &ldquo;test-assert.cpp&rdquo;, line 14, function: double my::sqrt(double)</p>
+assertion "n &gt;=0" failed: file "test-assert.cpp", line 14, function: double my::sqrt(double)
 
-<p>Program received signal SIGABRT, Aborted.
+Program received signal SIGABRT, Aborted.
 0x0022da18 in ?? ()
-```</p>
+</code></pre>
 
 <p>La pile d'appels (<em>back trace</em>) contient :
 ```
@@ -826,14 +716,13 @@ assertion &ldquo;n >=0&rdquo; failed: file &ldquo;test-assert.cpp&rdquo;, line 1
 
 <h1>9  0x0040125a in main () at test-assert.cpp:33</h1>
 
-<p>```</p>
+<pre><code>
+Avec un `up 8` pour se positionner au niveau où l'assertion est fausse, on peut
+regarder le code source local avec un `list`, ou de façon plus intéressante,
+demander ce que vaut ce fameux `n`.
+</code></pre>
 
-<p>Avec un <code>up 8</code> pour se positionner au niveau où l'assertion est fausse, on peut
-regarder le code source local avec un <code>list</code>, ou de façon plus intéressante,
-demander ce que vaut ce fameux <code>n</code>.</p>
-
-<p>```
-(gdb) up 8</p>
+<p>(gdb) up 8</p>
 
 <h1>8  0x004011d3 in my::sqrt (n=-1) at test-assert.cpp:14</h1>
 
@@ -843,7 +732,7 @@ $1 = -1
 ```</p>
 
 <p>On voit que <code>my::sqrt</code> a été appelée avec <code>-1</code> comme paramètre. Avec un <code>up</code> on
-peut investiguer le contexte de la fonction appelante &mdash; avec <code>down</code> on
+peut investiguer le contexte de la fonction appelante &ndash; avec <code>down</code> on
 progresse dans l'autre sens. Ici, la raison de l'erreur est triviale. Dans un
 programme plus complexe, on aurait pu imaginer que <code>sin</code> était appelée avec une
 donnée non constante, et on aurait peut-être passé un peu plus de temps à
@@ -854,7 +743,7 @@ avec son résultat.</p>
 
 <h4><a id="Phases"></a>Un outil pour les phases de développement et de tests &hellip;</h4>
 
-<p>Je vais paraphraser <a href="/blog/2014/05/24/programmation-par-contrat-un-peu-de-theorie/#Wilson2006">[Wilson2006] §1.1.</a>, qui énonçait déjà des
+<p>Je vais paraphraser <a href="{%post_url%202014-05-24-programmation-par-contrat-un-peu-de-theorie%}#Wilson2006">[Wilson2006] §1.1.</a>, qui énonçait déjà des
 évidences : <em>&ldquo;Plus tôt on détecte une erreur, mieux c'est&rdquo;</em>.  C'est un adage
 que vous devez déjà connaitre. Concrètement, cela veut dire que l'on va
 préférer trouver nos erreurs, dans l'ordre :</p>
@@ -899,26 +788,16 @@ abondamment décrit.</p>
 définition. N'oublions pas que les assertions sont des macros dont le
 comportement exact dépend de la définition de <code>NDEBUG</code>.</p>
 
-<p>Une façon assez sale de faire serait p.ex.:
-```c++</p>
+<p>Une façon assez sale de faire serait p.ex.:</p>
 
-<h1>if defined(NDEBUG)</h1>
-
-<h1>define my_assert(condition<em>, message</em>) \</h1>
-
-<pre><code>   if (!(condition_)) throw std::logic_error(message_)
+<pre><code class="c++">#if defined(NDEBUG)
+#   define my_assert(condition_, message_) \
+       if (!(condition_)) throw std::logic_error(message_)
+#else
+#   define my_assert(condition_, message_) \
+       assert(condition_ &amp;&amp; message_)
+#endif
 </code></pre>
-
-<h1>else</h1>
-
-<h1>define my_assert(condition<em>, message</em>) \</h1>
-
-<pre><code>   assert(condition_ &amp;&amp; message_)
-</code></pre>
-
-<h1>endif</h1>
-
-<p>```</p>
 
 <h4>Techniques connexes</h4>
 
@@ -930,17 +809,13 @@ compréhensibles en profitant du fonctionnement interne de la macro.</p>
 assert(n&gt;=0 &amp;&amp; "sqrt can't process negative numbers");
 </code></p>
 
-<p>```c++
-switch (myEnum) {</p>
-
-<pre><code>case Enum::first: .... break;
-case Enum::second: .... break;
-default:
-    assert(!"Unexpected case");
+<pre><code class="c++">switch (myEnum) {
+    case Enum::first: .... break;
+    case Enum::second: .... break;
+    default:
+        assert(!"Unexpected case");
+}
 </code></pre>
-
-<p>}
-```</p>
 
 <h4>Exploitation des assertions par les outils d'analyse statique de code</h4>
 
@@ -1099,53 +974,40 @@ dans un énuméré. Avec mes <a href="https://code.google.com/p/lh-vim/wiki/lhCp
 je génère automatiquement ce genre de choses avec <code>:InsertEnum MyEnum one two
 three</code> :</p>
 
-<p>```c++
-// .h
-&hellip; includes qui vont bien
-struct MyEnum {</p>
+<pre><code class="c++">// .h
+... includes qui vont bien
+struct MyEnum {
+    enum Type { one, two, three, MAX__, UNDEFINED__, FIRST__=0 };
+    ...
+    MyEnum(std::string const&amp; s);
+    char const* toString() const;
+    ...
+private:
+    Type m_value;
+};
 
-<pre><code>enum Type { one, two, three, MAX__, UNDEFINED__, FIRST__=0 };
+// .cpp
+... includes qui vont bien
+namespace  { // Anonymous namespace
+    typedef char const* const* strings_iterator;
+    static char const* const MYENUM_STRINGS[] =
+    { "one", "two", "three" };
+} // Anonymous namespace
 ...
-MyEnum(std::string const&amp; s);
-char const* toString() const;
-...
-</code></pre>
-
-<p>private:</p>
-
-<pre><code>Type m_value;
-</code></pre>
-
-<p>};</p>
-
-<p>// .cpp
-&hellip; includes qui vont bien
-namespace  { // Anonymous namespace</p>
-
-<pre><code>typedef char const* const* strings_iterator;
-static char const* const MYENUM_STRINGS[] =
-{ "one", "two", "three" };
-</code></pre>
-
-<p>} // Anonymous namespace
-&hellip;
 char const* MyEnum::toString() const
-{</p>
-
-<pre><code>// v-- Ici se trouve l'assertion statique
-static_assert(MAX__ == std::extent&lt;decltype(::MYENUM_STRINGS)&gt;::value, "Array size mismatches number of elements in enum");
-assert(m_value != UNDEFINED__); // Yes, I know UNDEFINED__ &gt; MAX__
-assert(m_value &lt; MAX__);
-return MYENUM_STRINGS[m_value];
+{
+    // v-- Ici se trouve l'assertion statique
+    static_assert(MAX__ == std::extent&lt;decltype(::MYENUM_STRINGS)&gt;::value, "Array size mismatches number of elements in enum");
+    assert(m_value != UNDEFINED__); // Yes, I know UNDEFINED__ &gt; MAX__
+    assert(m_value &lt; MAX__);
+    return MYENUM_STRINGS[m_value];
+}
 </code></pre>
-
-<p>}
-```</p>
 
 <h4>Préférez les références aux pointeurs</h4>
 
 <p>Dans la signature d'une fonction, les références posent une pré-condition : la
-valeur passée en paramètre par référence doit être non nulle &mdash; à charge au
+valeur passée en paramètre par référence doit être non nulle &ndash; à charge au
 code client de vérifier cela.</p>
 
 <p>Dans le corps de la fonction, elles deviennent pratiquement un invariant : à
@@ -1242,9 +1104,9 @@ assez exhaustive d'Ahmed Charles.</p>
     <content type="html"><![CDATA[<p>Cela faisait un moment que je voulais partager mes conclusions sur la
 <em>Programmation par Contrat</em>, et en particulier comment l'appliquer au C++.</p>
 
-<p>Voici un premier billet qui aborde l'aspect théorique. Dans un <a href="/blog/2014/05/28/programmation-par-contrat-les-assertions/">second billet</a>,
+<p>Voici un premier billet qui aborde l'aspect théorique. Dans un <a href="{%post_url%202014-05-28-programmation-par-contrat-les-assertions%}">second billet</a>,
 je traiterai des <em>assertions</em>. En guise de conclusion, je présenterai des
-<a href="/blog/2015/09/17/programmation-par-contrat-snippets-pour-le-c-plus-plus/">techniques d'application de la PpC au C++</a>
+<a href="{%post_url%202015-09-17-programmation-par-contrat-snippets-pour-le-c-plus-plus%}">techniques d'application de la PpC au C++</a>
 que j'ai croisées au fil des ans.</p>
 
 <h2>I- Les Erreurs</h2>
@@ -1307,7 +1169,7 @@ Les assertions permettent d'installer des points de contrôle dans un programme
 pour vérifier que les traitements se passent bien. Ces points de contrôles
 seront utilisés pour vérifier les contrats préalablement définis.
 Nous les détaillerons dans
-<a href="/blog/2014/05/28/programmation-par-contrat-les-assertions/">le prochain billet</a>.</p>
+<a href="{%post_url%202014-05-28-programmation-par-contrat-les-assertions%}">le prochain billet</a>.</p>
 
 <h2>II- La programmation par contrat</h2>
 
@@ -1328,7 +1190,7 @@ comme elle l'entend.</p>
 <code>sqrt</code> et qu'elle plante, on n'est pas plus avancés. Le bug est toujours là. Et
 pourtant, nous avons fait un énorme pas en avant : nous avons formalisé les
 contrats de <code>sqrt</code>. Nous disposons de spécifications précises, et d'une
-<a href="/blog/2014/05/28/programmation-par-contrat-les-assertions/#Documentation">documentation</a> qui pourra accompagner le code.</p>
+<a href="{%post_url%202014-05-28-programmation-par-contrat-les-assertions%}#Documentation">documentation</a> qui pourra accompagner le code.</p>
 
 <p>Heureusement, nous pouvons aller bien plus loin. Nous pouvons aussi marquer le
 code avec des assertions représentatives des contrats identifiés pour repérer
@@ -1363,7 +1225,7 @@ si les pré-conditions sont remplies et que la fonction s'est exécutée
 correctement.</p>
 
 <blockquote><p><strong>Important :</strong> Si une fonction voit qu'elle ne pourra pas remplir ses
-post-conditions, alors elle <strong>doit</strong> échouer &mdash; de préférence en levant une
+post-conditions, alors elle <strong>doit</strong> échouer &ndash; de préférence en levant une
 exception de <em>runtime</em> en ce qui me concerne.</p></blockquote>
 
 <p>Notez cet emploi du <em>futur</em>. Il ne s'agit pas de vérifier si les calculs ou
@@ -1374,7 +1236,7 @@ contexte permet bien à la fonction de se dérouler correctement.</p>
 pourquoi&rdquo;</em> ne justifie pas une exception. Il s'agit d'une erreur de
 programmation ou de logique.<br/>
 Prenons <a href="http://fr.wikipedia.org/wiki/Vil_Coyote">Vil Coyote</a>. Il a un plan
-splendide pour attraper Bip Bip &mdash; c'est d'ailleurs la post-condition de son
+splendide pour attraper Bip Bip &ndash; c'est d'ailleurs la post-condition de son
 plan. Il détourne une route pour la faire arriver au pied d'une falaise, et il
 peint un tunnel sur le rocher. C'est un algo simple et efficace, Bip Bip
 devrait s'écraser sur la roche, et Vil aura son repas. Sauf que. Il y a un bug
@@ -1405,7 +1267,7 @@ dans un état cohérent et pertinent</em> ; cet invariant est positionné à la
 sortie de son constructeur (<em>cf.</em> la
 <a href="http://cpp.developpez.com/faq/cpp/?page=Les-fonctions#Ou-dois-je-declarer-mes-variables-locales">FAQ C++ développez</a>) ;</li>
 <li>un <em>invariant de classe</em> est une propriété toujours observable depuis
-du code extérieur aux instances de la classe &mdash; p.ex. une séquence triée garantira
+du code extérieur aux instances de la classe &ndash; p.ex. une séquence triée garantira
 que tous les éléments de la séquence sont toujours ordonnés lorsque le code
 utilisant la séquence cherche à y accéder, cependant ponctuellement, le temps
 de l'insertion d'un nouvel élément l'invariant de la classe n'a pas à être
@@ -1421,12 +1283,11 @@ invariant une garantie de non-nullité.</li>
 d'un code.  On peut dans l'absolu distinguer autant d'acteurs que de fonctions.<br/>
 Prenons le bout de code suivant :</p>
 
-<p><code>c++
-double metier() {                  // écrit par l'Intégrateur
+<pre><code class="c++">double metier() {                  // écrit par l'Intégrateur
    const double i = interrogeES(); // écrit par le responsable UI
    return sqrt(i);                 // écrit par le Mathématicien
 }
-</code></p>
+</code></pre>
 
 <p>Nous pouvons distinguer trois acteurs :</p>
 
@@ -1461,17 +1322,13 @@ renvoyé sera positif, alors l'Intégrateur est responsable au moment de l'inté
 s'assurer que ce qu'il va passer à <code>sqrt</code> soit bien positif. Une correction
 typique serait :</p>
 
-<p>```c++
-double metier() {                  // écrit par l'Intégrateur
+<pre><code class="c++">double metier() {                  // écrit par l'Intégrateur
    const double i = interrogeES(); // écrit par le responsable UI
-   if (i &lt;0)</p>
-
-<pre><code>   throw std::runtime_error("invalid input obtained ...");
-</code></pre>
-
-<p>   return sqrt(i);                 // écrit par le Mathématicien
+   if (i &lt;0)
+       throw std::runtime_error("invalid input obtained ...");
+   return sqrt(i);                 // écrit par le Mathématicien
 }
-```</p>
+</code></pre>
 
 <p>Remarquez, que l'Intégrateur est alors face à une erreur de contexte
 (/<em>runtime</em>) et nullement face à une erreur de programmation. Il est alors en
@@ -1557,27 +1414,20 @@ le paramètre reçu est positif, et à lever une exception dans le cas contraire
 
 <p>Ce qui donnerait :</p>
 
-<p>```c++
-double my::sqrt(double n) {</p>
+<pre><code class="c++">double my::sqrt(double n) {
+    if (n&lt;0) throw std::domain_error("Negative number sent to sqrt");
+    return std::sqrt(n);
+}
 
-<pre><code>if (n&lt;0) throw std::domain_error("Negative number sent to sqrt");
-return std::sqrt(n);
-</code></pre>
-
-<p>}</p>
-
-<p>void my::process(boost::filesystem::path const&amp; file) {</p>
-
-<pre><code>boost::ifstream f(file);
-if (!f) throw std::runtime_error("Cannot open "+file.string());
-double d;
-while (f &gt;&gt; d) {
-    my::memorize(my::sqrt(d));
+void my::process(boost::filesystem::path const&amp; file) {
+    boost::ifstream f(file);
+    if (!f) throw std::runtime_error("Cannot open "+file.string());
+    double d;
+    while (f &gt;&gt; d) {
+        my::memorize(my::sqrt(d));
+    }
 }
 </code></pre>
-
-<p>}
-```</p>
 
 <p>Si un nombre négatif devait être présent dans le fichier, nous aurions droit à
 l'exception <em>&ldquo;Negative number sent to sqrt&rdquo;</em>. Limpide, n'est-ce pas ? On ne sait
@@ -1587,68 +1437,58 @@ instrumenter <code>process</code> pour intercepter l'exception. Soit on fait le 
 niveau de la fonction, et on sait dans quel fichier a lieu l'erreur, soit on
 encadre l'appel à <code>my::sqrt</code> pour remonter plus d'informations.</p>
 
-<p>```c++
-void my::process(boost::filesystem::path const&amp; file) {</p>
-
-<pre><code>boost::ifstream f(file);
-if (!f) throw std::runtime_error("Cannot open "+file.string());
-double d;
-while (f &gt;&gt; d) {
-    double sq = 0;
-    try {
-        sq = my::sqrt(d);
+<pre><code class="c++">void my::process(boost::filesystem::path const&amp; file) {
+    boost::ifstream f(file);
+    if (!f) throw std::runtime_error("Cannot open "+file.string());
+    double d;
+    while (f &gt;&gt; d) {
+        double sq = 0;
+        try {
+            sq = my::sqrt(d);
+        }
+        catch (std::logic_error const&amp;) {
+            throw std::runtime_error(
+                "Invalid negative distance " + std::to_string(d)
+                +" at the "+std::to_string(l)
+                +"th line in distances file "+file.string());
+        }
+        my::memorize(sq);
     }
-    catch (std::logic_error const&amp;) {
-        throw std::runtime_error(
-            "Invalid negative distance " + std::to_string(d)
-            +" at the "+std::to_string(l)
-            +"th line in distances file "+file.string());
-    }
-    my::memorize(sq);
 }
 </code></pre>
-
-<p>}
-```</p>
 
 <p>Et là &hellip; on fait ce que le code client aurait dû faire dès le début : assurer
 que le contrat des fonctions appelées est bien respecté.<br/>
 En effet, si on avait embrassé la PpC dans l'écriture de ces deux fonctions, ce
 bout de code aurait ressemblé à :</p>
 
-<p>```c++
-double my::sqrt(double n) {</p>
+<pre><code class="c++">double my::sqrt(double n) {
+    assert(n&gt;=0 &amp;&amp; "sqrt can't process negative numbers");
+    return std::sqrt(n);
+}
 
-<pre><code>assert(n&gt;=0 &amp;&amp; "sqrt can't process negative numbers");
-return std::sqrt(n);
-</code></pre>
-
-<p>}</p>
-
-<p>void my::process(boost::filesystem::path const&amp; file) {</p>
-
-<pre><code>boost::ifstream f(file);
-if (!f) throw std::runtime_error("Cannot open "+file.string());
-double d;
-for (std::size_t l = 1 ; f &gt;&gt; d ; ++l) {
-    if (d &lt;= 0) 
-        throw std::runtime_error(
-            "Invalid negative distance " + std::to_string(d)
-            +" at the "+std::to_string(l)
-            +"th line in distances file "+file.string());
-    my::memorize(my::sqrt(d));
+void my::process(boost::filesystem::path const&amp; file) {
+    boost::ifstream f(file);
+    if (!f) throw std::runtime_error("Cannot open "+file.string());
+    double d;
+    for (std::size_t l = 1 ; f &gt;&gt; d ; ++l) {
+        if (d &lt;= 0) 
+            throw std::runtime_error(
+                "Invalid negative distance " + std::to_string(d)
+                +" at the "+std::to_string(l)
+                +"th line in distances file "+file.string());
+        my::memorize(my::sqrt(d));
+    }
 }
 </code></pre>
 
-<p>}
-<code>``
-Cela n'est-il pas plus simple et propre pour disposer d'un message non
+<p>Cela n'est-il pas plus simple et propre pour disposer d'un message non
 seulement plus explicite, mais surtout bien plus utile ? Comparez ce nouveau
-message *"Invalid negative distance -28.15 at the 42th line of distances file
-distances.txt"*, au précédent *"Negative number sent to sqrt"*.  
+message <em>&ldquo;Invalid negative distance -28.15 at the 42th line of distances file
+distances.txt&rdquo;</em>, au précédent <em>&ldquo;Negative number sent to sqrt&rdquo;</em>.<br/>
 Notez que l'on pourrait aussi critiquer l'impact en termes de performances de
-la solution précédente (avec le</code>catch<code>). Un</code>catch` n'est pas si gratuit que
-cela &mdash; a contrario du <em>Stack Unwinding</em>.</p>
+la solution précédente (avec le <code>catch</code>). Un <code>catch</code> n'est pas si gratuit que
+cela &ndash; a contrario du <em>Stack Unwinding</em>.</p>
 
 <h3>III.2- Des objections ?</h3>
 
@@ -1677,7 +1517,7 @@ test dynamique sur les entrées des fonctions.<br/>
 Reste que toute la difficulté réside dans comment être certains qu'une séquence
 d'opérations est exempte de bugs.</p>
 
-<h4><em>&ldquo;&ndash; La PpC éparpille les vérifications alors que la Programmation Défensive les factorise.&rdquo;</em></h4>
+<h4><em>&ldquo;- La PpC éparpille les vérifications alors que la Programmation Défensive les factorise.&rdquo;</em></h4>
 
 <p>Il est vrai que la Programmation Défensive permet d'une certaine façon de
 centraliser et factoriser les vérifications. Mais les vérifications ainsi
@@ -1707,15 +1547,12 @@ programmation, alors il n'y a pas de test à faire dans les cas où le <em>runti
 n'a pas à être vérifié.<br/>
 Quel sens il y a-t-il à écrire ceci ?</p>
 
-<p>```c++
-for (std::size_t i=0, N=vect.size(); i!=N ; ++i)</p>
+<pre><code class="c++">for (std::size_t i=0, N=vect.size(); i!=N ; ++i)
+    f(vect.at(i));
 
-<pre><code>f(vect.at(i));
-</code></pre>
-
-<p>// ou de vérifier la positivité des paramètres de sqrt() dans
+// ou de vérifier la positivité des paramètres de sqrt() dans
 sqrt(1-sin(x))
-```</p>
+</code></pre>
 
 <h4><em>&ldquo;-Le mode Debug ne doit pas se comporter différemment du mode Release!&rdquo;</em></h4>
 
@@ -1740,7 +1577,7 @@ Ce qui est sûr, c'est qu'en phases de développement et de tests, les
 développeurs auraient vu l'erreur de programmation et ils auraient dû la
 corriger pour voir le test passer.</p>
 
-<h4><em>&ldquo;&ndash; La programmation Défensive est plus adaptée aux développeurs inexpérimentés.&rdquo;</em></h4>
+<h4><em>&ldquo;- La programmation Défensive est plus adaptée aux développeurs inexpérimentés.&rdquo;</em></h4>
 
 <p>C'est possible. On ne réfléchit pas avant. On code et on voit ensuite ce qu'il
 se passe. Traditionnellement, les débutants tendent à être formés de la sorte.</p>
@@ -1779,7 +1616,7 @@ leurs devoirs.</li>
 <li>Toutefois, il est possible de détourner la PpC  basée sur des assertions en C
 et C++ pour faire de la Programmation Défensive ; p.ex. l'assertion pourrait
 être détournée en <em>Release</em> pour lever une exception. J'y reviendrai dans le
-<a href="/blog/2014/05/28/programmation-par-contrat-les-assertions/">prochain billet</a>.</li>
+<a href="{%post_url%202014-05-28-programmation-par-contrat-les-assertions%}">prochain billet</a>.</li>
 </ul>
 
 
@@ -1859,10 +1696,10 @@ Cédric Poncet-Montange</p>
 <p>[<em>NdA: Je réorganiserai les liens au fur et à mesure des sorties des articles</em>]</p>
 
 <ul>
-<li><a id="Meyer1988"></a>[Meyer2000] &mdash; <a href="http://www.editions-eyrolles.com/Livre/9782212122701/conception-et-programmation-orientees-objet"><em>Conception et programmation orientées objet</em></a> de Bertrand Meyer, Eyrolles, 1988, Seconde Édition parue en 2000</li>
-<li><a id="Dunksi2014"></a>[Dunksi2014] &mdash; <a href="http://www.d-booker.fr/programmation-et-langage/157-coder-efficacement.html"><em>Coder Efficacement &mdash; Bonnes pratiques et erreurs à éviter (en C++)</em></a> de Philippe Dunski, D-Booker, Février 2014</li>
-<li><a id="IPCpp"></a>[Wilson2004] &mdash; <em>Imperfect C++</em> de Matthew Wilson, Addisson-Wesley Professionnal, Octobre 2004.</li>
-<li><a id="Wilson2006"></a>[Wilson2006] &mdash; <a href="http://www.artima.com/cppsource/deepspace3.html"><em>Contract Programming 101</em></a>, Matthew Wilson, artima, Janvier 2006.</li>
+<li><a id="Meyer1988"></a>[Meyer2000] &ndash; <a href="http://www.editions-eyrolles.com/Livre/9782212122701/conception-et-programmation-orientees-objet"><em>Conception et programmation orientées objet</em></a> de Bertrand Meyer, Eyrolles, 1988, Seconde Édition parue en 2000</li>
+<li><a id="Dunksi2014"></a>[Dunksi2014] &ndash; <a href="http://www.d-booker.fr/programmation-et-langage/157-coder-efficacement.html"><em>Coder Efficacement &ndash; Bonnes pratiques et erreurs à éviter (en C++)</em></a> de Philippe Dunski, D-Booker, Février 2014</li>
+<li><a id="IPCpp"></a>[Wilson2004] &ndash; <em>Imperfect C++</em> de Matthew Wilson, Addisson-Wesley Professionnal, Octobre 2004.</li>
+<li><a id="Wilson2006"></a>[Wilson2006] &ndash; <a href="http://www.artima.com/cppsource/deepspace3.html"><em>Contract Programming 101</em></a>, Matthew Wilson, artima, Janvier 2006.</li>
 <li><a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3753.pdf">n3753</a></li>
 <li>Billets d'Andrzej<br/>
 Il s'agit là d'une excellente série d'articles/billets sur la PpC.
@@ -1922,7 +1759,7 @@ Cf l'article de Bjarne Stroustrup: <a href="http://www.research.att.com/~bs/new_
 
 <p>On touche au paradoxe de la simplicité entre le C et le C++. Le C qui ne
 dispose uniquement que des briques élémentaires (relativement à la gestion de
-la mémoire et des chaines &mdash; et encore) est plus simple que le C++. Pourtant le
+la mémoire et des chaines &ndash; et encore) est plus simple que le C++. Pourtant le
 C++ qui offre des encapsulations de ces briques élémentaires permet de produire
 plus simplement du code robuste.</p>
 
@@ -1960,19 +1797,15 @@ teste pas toutes les fonctions qui peuvent échouer pour traiter les cas
 dégradés. À commencer par les erreurs de type « mémoire saturée ». Un tel code
 cavalier dans sa gestion des erreurs ressemblerait à ceci :</p>
 
-<p>```cpp</p>
-
-<pre><code>NotifyIcon* CreateNotifyIcon()
-{
-    NotifyIcon* icon = new NotifyIcon();
-    icon.set_text("Blah blah blah");
-    icon.set_icon(new Icon(...), GetInfo());
-    icon.set_visible(true);
-    return icon;
-}
+<pre><code class="cpp">    NotifyIcon* CreateNotifyIcon()
+    {
+        NotifyIcon* icon = new NotifyIcon();
+        icon.set_text("Blah blah blah");
+        icon.set_icon(new Icon(...), GetInfo());
+        icon.set_visible(true);
+        return icon;
+    }
 </code></pre>
-
-<p>```</p>
 
 <p>Sauf que … le C++ peut lever des exceptions. C'est le comportement par défaut
 des allocations de mémoire en C++, des types standards qui nous simplifient
@@ -1986,24 +1819,20 @@ de corriger le code précédent.</p>
 
 <p>Une version corrigée pourrait ressembler à ceci :</p>
 
-<p>```cpp</p>
-
-<pre><code>NotifyIcon* CreateNotifyIcon()
-{
-    NotifyIcon* icon = new NotifyIcon();
-    try {
-        icon.set_text("Blah blah blah");
-        icon.set_visible(true);
-        Info info = GetInfo();
-        icon.set_icon(new Icon(...), info);
-    } catch (...) {
-        delete icon; throw;
+<pre><code class="cpp">    NotifyIcon* CreateNotifyIcon()
+    {
+        NotifyIcon* icon = new NotifyIcon();
+        try {
+            icon.set_text("Blah blah blah");
+            icon.set_visible(true);
+            Info info = GetInfo();
+            icon.set_icon(new Icon(...), info);
+        } catch (...) {
+            delete icon; throw;
+        }
+        return icon;
     }
-    return icon;
-}
 </code></pre>
-
-<p>```</p>
 
 <p>Il semblerait que nous ayons fini. Et pourtant ce tout petit code est juste inmaintenable.</p>
 
@@ -2040,7 +1869,7 @@ qui devront être restituées.</p>
 
 <p>Pour cela on a recourt à une spécificité du C++ : tout objet local sera
 implicitement détruit en sortie de la portée où il vit, et ce quelque soit le
-chemin (propre &mdash; i.e. suite à un return ou une exception levée) qui conduit à
+chemin (propre &ndash; i.e. suite à un return ou une exception levée) qui conduit à
 l'extérieur de cette portée. Si l'on veut être pédant, ce comportement
 déterministe répond à l'appellation <em>Resource Finalization is Destruction idiom</em>
 (RFID). Mais généralement on se contente de l'appeler
@@ -2061,38 +1890,30 @@ des types dans la continuité du RAII : des pointeurs dit intelligents.</p>
 
 <p>Ainsi, si nous reprenons l'exemple de la section précédente, le code devient une fois corrigé :</p>
 
-<p>```cpp</p>
-
-<pre><code>shared_ptr&lt;NotifyIcon&gt; CreateNotifyIcon()
-{
-    shared_ptr&lt;NotifyIcon&gt; icon(new NotifyIcon());
-    icon-&gt;set_text("Blah blah blah");
-    shared_ptr&lt;Icon&gt; inner( new Icon(...) );
-    icon-&gt;set_icon(inner, GetInfo());
-    icon-&gt;set_visible(true);
-    return icon;
-}
+<pre><code class="cpp">    shared_ptr&lt;NotifyIcon&gt; CreateNotifyIcon()
+    {
+        shared_ptr&lt;NotifyIcon&gt; icon(new NotifyIcon());
+        icon-&gt;set_text("Blah blah blah");
+        shared_ptr&lt;Icon&gt; inner( new Icon(...) );
+        icon-&gt;set_icon(inner, GetInfo());
+        icon-&gt;set_visible(true);
+        return icon;
+    }
 </code></pre>
-
-<p>```</p>
 
 <p>Ou en version C++14 :</p>
 
-<p>```cpp</p>
-
-<pre><code>// Ou en version C++14
-unique_ptr&lt;NotifyIcon&gt; CreateNotifyIcon()
-{
-    auto icon {make_unique&lt;NotifyIcon&gt;()};
-    icon-&gt;set_text("Blah blah blah");
-    auto inner {make_unique&lt;Icon&gt;(...)};
-    icon-&gt;set_icon(move(inner), GetInfo());
-    icon-&gt;set_visible(true);
-    return icon;
-}
+<pre><code class="cpp">    // Ou en version C++14
+    unique_ptr&lt;NotifyIcon&gt; CreateNotifyIcon()
+    {
+        auto icon {make_unique&lt;NotifyIcon&gt;()};
+        icon-&gt;set_text("Blah blah blah");
+        auto inner {make_unique&lt;Icon&gt;(...)};
+        icon-&gt;set_icon(move(inner), GetInfo());
+        icon-&gt;set_visible(true);
+        return icon;
+    }
 </code></pre>
-
-<p>```</p>
 
 <p>Peu importe si les fonctions appelées échouent, peu importe si elles viennent à
 être réordonnées, nous avons la certitude que <code>inner</code> sera libérée (ou confié à
@@ -2106,7 +1927,7 @@ fonctionner avec des codes de retour pour assurer la propagation des erreurs.</p
 <p>À vrai dire bien qu'il s'agisse d'une spécificité du C++, les autres langages
 pourvus d'exceptions disposent généralement d'un équivalent avec le
 <a href="http://en.wikipedia.org/wiki/Dispose_pattern"><em>dispose-pattern</em></a>
-(<code>try</code>&ndash;<code>catch</code>&ndash;<code>finally</code>) qui permet d'obtenir le même comportement
+(<code>try</code>-<code>catch</code>-<code>finally</code>) qui permet d'obtenir le même comportement
 mais de façon explicite et non plus implicite. Si en plus ce langage est pourvu
 d'un garbage collector, la gestion de la mémoire est encore gérée autrement
 alors que le C++ nous oriente vers une solution unique pour gérer toutes les

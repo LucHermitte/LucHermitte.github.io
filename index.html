@@ -10,7 +10,7 @@
 
   
   <meta name="description" content="Dans ce dernier billet sur la Programmation par Contrat, je vais vous présenter
-quelques techniques d&#8217;application de la PpC au C++. Ce billet &hellip;">
+quelques techniques d'application de la PpC au C++. Ce billet &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -19,13 +19,13 @@ quelques techniques d&#8217;application de la PpC au C++. Ce billet &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://LucHermitte.github.io">
+  <link rel="canonical" href="http://LucHermitte.github.io/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="Luc Hermitte's Blog" type="application/atom+xml">
   <script src="/javascripts/modernizr-2.0.js"></script>
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
   <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
 <link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
@@ -56,7 +56,7 @@ quelques techniques d&#8217;application de la PpC au C++. Ce billet &hellip;">
   
 <form action="https://www.google.com/search" method="get">
   <fieldset role="search">
-    <input type="hidden" name="q" value="site:LucHermitte.github.io" />
+    <input type="hidden" name="sitesearch" value="LucHermitte.github.io">
     <input class="search" type="text" name="q" results="0" placeholder="Search"/>
   </fieldset>
 </form>
@@ -87,14 +87,7 @@ quelques techniques d&#8217;application de la PpC au C++. Ce billet &hellip;">
 
 
 
-
-
-
-
-  
-
-
-<time datetime="2015-09-17T19:20:15+02:00" pubdate data-updated="true">Sep 17<span>th</span>, 2015</time>
+<time class='entry-date' datetime='2015-09-17T19:20:15+02:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>17</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>7:20 pm</span></time>
         
            | <a href="/blog/2015/09/17/programmation-par-contrat-snippets-pour-le-c-plus-plus/#disqus_thread"
              data-disqus-identifier="http://LucHermitte.github.io/blog/2015/09/17/programmation-par-contrat-snippets-pour-le-c-plus-plus/">Comments</a>
@@ -105,31 +98,31 @@ quelques techniques d&#8217;application de la PpC au C++. Ce billet &hellip;">
 
 
   <div class="entry-content"><p>Dans ce dernier billet sur la <em>Programmation par Contrat</em>, je vais vous présenter
-quelques techniques d&#8217;application de la PpC au C++. Ce billet décrivant des
+quelques techniques d'application de la PpC au C++. Ce billet décrivant des
 techniques sera plus décousu que les précédents qui avaient un fil conducteur.</p>
 
-<p><em>(Désolé, j&#8217;ai mis du temps à mûrir certains de ses paragraphes)</em></p>
+<p><em>(Désolé, j'ai mis du temps à mûrir certains de ses paragraphes)</em></p>
 
 <h2>I- Pré- et post-conditions de fonctions.</h2>
 
 <h3>I.1- Pré- et post-conditions de fonctions membres, à la Non-Virtual Interface Pattern (NVI).</h3>
 
 <p>Le pattern NVI est un <em>Design Pattern</em> qui ressemble au DP <em>Template Method</em>
-mais qui n&#8217;est pas le
+mais qui n'est pas le
 <a href="http://fr.wikipedia.org/wiki/Patron_de_m%C3%A9thode"><em>Template Method</em></a>. Le
-principe du pattern est le suivant : l&#8217;interface publique est non virtuelle, et
+principe du pattern est le suivant : l'interface publique est non virtuelle, et
 elle fait appel à des comportements spécialisés qui sont eux privés et virtuels
 (généralement virtuels purs).</p>
 
 <p>Ce pattern a deux objectifs avoués. Le premier est de découpler les interfaces
-pour les <em>utilisateurs</em> du pattern. Le code client doit passer par l&#8217;interface
+pour les <em>utilisateurs</em> du pattern. Le code client doit passer par l'interface
 publique qui est non virtuelle, tandis que le code qui spécialise doit
-s&#8217;intéresser à l&#8217;interface privée et virtuelle.</p>
+s'intéresser à l'interface privée et virtuelle.</p>
 
 <p>Le second objectif, est de créer des super-interfaces qui baignent dans la
 PpC. Les interfaces classiques à la Java (up to v7)/C#/COM/CORBA/&hellip; ne
-permettent pas d&#8217;associer nativement des contrats à leurs méthodes. Avec le
-pattern NVI on peut, avec un soupçon d&#8217;huile de coude, rajouter des contrats
+permettent pas d'associer nativement des contrats à leurs méthodes. Avec le
+pattern NVI on peut, avec un soupçon d'huile de coude, rajouter des contrats
 aux fonctions membres.</p>
 
 <p>Les fonctions publiques et non virtuelles se voient définies <code>inline</code>s, elles
@@ -212,7 +205,7 @@ la PpC. Je ne peux que vous en conseiller la lecture.</p>
 <span class='line-number'>15</span>
 <span class='line-number'>16</span>
 </pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">double</span> <span class="n">my</span><span class="o">::</span><span class="n">sqrt</span><span class="p">(</span><span class="kt">double</span> <span class="n">n</span><span class="p">)</span>
-</span><span class='line'><span class="k">if</span> <span class="n">defined</span><span class="p">(</span><span class="n">MYLIB_DBC_ACTIVATED</span><span class="p">)</span>
+</span><span class='line'><span class="cp">#if defined(MYLIB_DBC_ACTIVATED)</span>
 </span><span class='line'><span class="p">{</span>
 </span><span class='line'>    <span class="c1">// Check pre-conditions</span>
 </span><span class='line'>    <span class="n">assert</span><span class="p">(</span><span class="n">n</span><span class="o">&gt;=</span><span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="s">&quot;sqrt can&#39;t process negative numbers&quot;</span><span class="p">);</span>
@@ -223,7 +216,7 @@ la PpC. Je ne peux que vous en conseiller la lecture.</p>
 </span><span class='line'>    <span class="k">return</span> <span class="n">res</span><span class="p">;</span>
 </span><span class='line'><span class="p">}</span>
 </span><span class='line'><span class="kt">double</span> <span class="n">my</span><span class="o">::</span><span class="n">sqrt_unchecked</span><span class="p">(</span><span class="kt">double</span> <span class="n">n</span><span class="p">)</span>
-</span><span class='line'><span class="n">endif</span>
+</span><span class='line'><span class="cp">#endif</span>
 </span><span class='line'><span class="p">{</span>
 </span><span class='line'>    <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">sqrt</span><span class="p">(</span><span class="n">n</span><span class="p">);</span>
 </span><span class='line'><span class="p">}</span>
@@ -233,14 +226,14 @@ la PpC. Je ne peux que vous en conseiller la lecture.</p>
 <h3>I.3- Pré- et post-conditions de fonctions &hellip; <code>constexpr</code> C++11.</h3>
 
 <p>Les fonctions <code>constexpr</code> à la C++11 doivent renvoyer une valeur et ne rien
-faire d&#8217;autre. De plus le contrat doit pouvoir être vérifié en mode <em>appelé
+faire d'autre. De plus le contrat doit pouvoir être vérifié en mode <em>appelé
 depuis une expession constante</em> comme en mode <em>appelé depuis une expression
 variable</em>. De fait, cela nécessite quelques astuces pour pouvoir spécifier des
 contrats dans de telles fonctions.</p>
 
 <p>Pour de plus amples détails, je vous renvoie à
-l&#8217;<a href="http://ericniebler.com/2014/09/27/assert-and-constexpr-in-cxx11/">article</a>
-fort complet d&#8217;Eric Niebler sur le sujet. Andrzej présente la même technique
+l'<a href="http://ericniebler.com/2014/09/27/assert-and-constexpr-in-cxx11/">article</a>
+fort complet d'Eric Niebler sur le sujet. Andrzej présente la même technique
 dans son article
 <a href="http://akrzemi1.wordpress.com/2011/05/06/compile-time-computations/">Compile Time Computations</a>.</p>
 
@@ -333,19 +326,19 @@ dans son article
 
 
 <p>Malheureusement la rupture de contrat ne sera pas détectée lors de la
-compilation, mais à l&#8217;exécution où l&#8217;on pourra constater à minima où l&#8217;appel de
-plus haut niveau s&#8217;est produit (bien que l&#8217;on risque de ne pas pouvoir observer
-l&#8217;état des variables <em>optimized out</em> dans le débuggueur).</p>
+compilation, mais à l'exécution où l'on pourra constater à minima où l'appel de
+plus haut niveau s'est produit (bien que l'on risque de ne pas pouvoir observer
+l'état des variables <em>optimized out</em> dans le débuggueur).</p>
 
-<p>Notez que pour exprimer une post-condition sans multiplier les appels, j&#8217;ai
+<p>Notez que pour exprimer une post-condition sans multiplier les appels, j'ai
 écrit la fonction (qui aurait été récursive dans tous les cas) en
 <a href="http://fr.wikipedia.org/wiki/R%C3%A9cursion_terminale">fonction récursive terminale</a>.
-De là, il a été facile d&#8217;insérer une assertion &mdash; et de plus, le compilateur
+De là, il a été facile d'insérer une assertion &ndash; et de plus, le compilateur
 pourra optimiser la fonction en <em>Release</em> sur les appels dynamiques.</p>
 
-<p>Pour information, une autre écriture qui exploite l&#8217;opérateur virgule est
-possible, mais elle ne compile pas avec les versions de GCC que j&#8217;ai eu entre
-les mains (i.e. jusqu&#8217;à la version 4.9, GCC n&#8217;est pas d&#8217;accord).</p>
+<p>Pour information, une autre écriture qui exploite l'opérateur virgule est
+possible, mais elle ne compile pas avec les versions de GCC que j'ai eu entre
+les mains (i.e. jusqu'à la version 4.9, GCC n'est pas d'accord).</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -385,14 +378,14 @@ directement utilisable. A priori, cela sera le cas.</p>
 
 <h2>II- Invariants de classes.</h2>
 
-<h3>II.1- Petit snippet de vérification simplifiée en l&#8217;absence d&#8217;héritage.</h3>
+<h3>II.1- Petit snippet de vérification simplifiée en l'absence d'héritage.</h3>
 
-<p>Sur un petit <a href="http://ideone.com/DOCWOy">exercice d&#8217;écriture de classe fraction</a>,
-j&#8217;avais pondu une classe utilitaire dont le but était de simplifier la
+<p>Sur un petit <a href="http://ideone.com/DOCWOy">exercice d'écriture de classe fraction</a>,
+j'avais pondu une classe utilitaire dont le but était de simplifier la
 vérification des invariants. Il suffit de déclarer un objet de ce type en tout
 début des fonctions membres (et des fonctions amies) exposées aux clients.
 Ainsi les invariants sont automatiquement vérifiés en début, et en fin de
-fonction lors de la destruction de l&#8217;objet <code>InvariantChecker</code>.</p>
+fonction lors de la destruction de l'objet <code>InvariantChecker</code>.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -475,14 +468,14 @@ fonction lors de la destruction de l&#8217;objet <code>InvariantChecker</code>.<
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>N.B.: je vois à la relecture d&#8217;<em>Imperfect C++</em> que c&#8217;est très proche de ce que
-suggérait Matthew Wilson. Au détail qu&#8217;il passe par une fonction <code>is_valid</code>
-renvoyant un booléen et que l&#8217;<code>InvariantChecker</code> s&#8217;occupe de vérifier
-l&#8217;assertion si <code>MYLIB_DBC_ACTIVATED</code> est bien défini &mdash; il découple la
+<p>N.B.: je vois à la relecture d'<em>Imperfect C++</em> que c'est très proche de ce que
+suggérait Matthew Wilson. Au détail qu'il passe par une fonction <code>is_valid</code>
+renvoyant un booléen et que l'<code>InvariantChecker</code> s'occupe de vérifier
+l'assertion si <code>MYLIB_DBC_ACTIVATED</code> est bien défini &ndash; il découple la
 vérification des contrats de la macro <code>NDEBUG</code> qui est plus liée au mode de
 compilation (<em>Débug</em> VS <em>Release</em>).<br/>
 Pour ma part, je préfère avoir une assertion différente pour chaque invariant
-plutôt qu&#8217;un seul <code>assert(is_valid());</code>. Cela permet de savoir plus précisément
+plutôt qu'un seul <code>assert(is_valid());</code>. Cela permet de savoir plus précisément
 quel contrat est violé.</p>
 
 <h3><a id="NVI_Invariants"></a>II.2- Invariants et NVI.</h3>
@@ -491,7 +484,7 @@ quel contrat est violé.</p>
 finales. Je partirai sur un héritage virtuel depuis une classe de base
 virtuelle <code>WithInvariants</code> dont la fonction de vérification serait spécialisée
 par tous les intermédiaires. Et dont les intermédiaires appelleraient toutes
-les versions mères pour n&#8217;oublier personne.</p>
+les versions mères pour n'oublier personne.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -586,106 +579,108 @@ les versions mères pour n&#8217;oublier personne.</p>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>(Alors certes, c&#8217;est tordu, mais pour l&#8217;instant, je n&#8217;ai pas de meilleure idée.)</p>
+<p>(Alors certes, c'est tordu, mais pour l'instant, je n'ai pas de meilleure idée.)</p>
 
 <h3>II.3- Critiques envisageables avec ces approches.</h3>
 
-<p>On peut s&#8217;attendre qu&#8217;en cas d&#8217;exception dans une fonction membre (ou amie)
-d&#8217;un objet, l&#8217;invariant ne soit plus respecté.<br/>
-Dans ce cas là, les approches proposées juste au dessus vont poser d&#8217;énormes
+<p>On peut s'attendre qu'en cas d'exception dans une fonction membre (ou amie)
+d'un objet, l'invariant ne soit plus respecté.<br/>
+Dans ce cas là, les approches proposées juste au dessus vont poser d'énormes
 problèmes.</p>
 
-<p>Toutefois cela voudrait dire que l&#8217;exception ne laisse plus l&#8217;objet dans un
-état cohérent, et que nous n&#8217;avons pas la
+<p>Toutefois cela voudrait dire que l'exception ne laisse plus l'objet dans un
+état cohérent, et que nous n'avons pas la
 <a href="http://en.wikipedia.org/wiki/Exception_safety"><em>garantie basique</em></a>.</p>
 
-<p>Autre scénario dans le même ordre d&#8217;idée : imaginez que les flux aient pour
-invariant <code>good()</code>, et qu&#8217;une extraction ratée invalide le flux.  Cette fois,
-l&#8217;objet pourrait exister dans un état contraire à son invariant, ce qui ferait
-claquer l&#8217;assertion associée</p>
+<p>Autre scénario dans le même ordre d'idée : imaginez que les flux aient pour
+invariant <code>good()</code>, et qu'une extraction ratée invalide le flux.  Cette fois,
+l'objet pourrait exister dans un état contraire à son invariant, ce qui ferait
+claquer l'assertion associée</p>
 
-<p>Dans le même genre d&#8217;idée, nous nous retrouverions dans la même situation que
-si on utilisait des constructeurs qui ne garantissent pas l&#8217;invariant de leurs
+<p>Dans le même genre d'idée, nous nous retrouverions dans la même situation que
+si on utilisait des constructeurs qui ne garantissent pas l'invariant de leurs
 classes, et qui sont utilisés conjointement avec des fonctions <code>init()</code>. En
-effet, si l&#8217;invariant ne peut plus être assuré statiquement par programmation,
-il est nécessaire de l&#8217;assurer dynamiquement en vérifiant en début de chaque
-fonction membre (/amie) si l&#8217;objet est bien valide.</p>
+effet, si l'invariant ne peut plus être assuré statiquement par programmation,
+il est nécessaire de l'assurer dynamiquement en vérifiant en début de chaque
+fonction membre (/amie) si l'objet est bien valide.</p>
 
-<p>Effectivement il y a alors un problème. À mon avis, le problème n&#8217;est pas dans
-le fait de formuler les invariants de notre objet et de s&#8217;assurer qu&#8217;ils soient
-toujours vérifiés. Le problème est de permettre à l&#8217;objet de ne plus vérifier
-ses invariants et qu&#8217;il faille le tester dynamiquement.</p>
+<p>Effectivement il y a alors un problème. À mon avis, le problème n'est pas dans
+le fait de formuler les invariants de notre objet et de s'assurer qu'ils soient
+toujours vérifiés. Le problème est de permettre à l'objet de ne plus vérifier
+ses invariants et qu'il faille le tester dynamiquement.</p>
 
 <h4>Les objets <em>cassés</em></h4>
 
 <p>On retrouve le modèle des flux de données (fichiers, sockets, &hellip;) qui peuvent
-passer KO et qu&#8217;il faudra rétablir. Dans cette approche, plutôt que de se
+passer KO et qu'il faudra rétablir. Dans cette approche, plutôt que de se
 débarrasser du flux pour en construire un tout beau tout neuf, on le maintient
 (car après tout il est déjà initialisé) et on cherchera à le reconnecter.</p>
 
 <p>Plus je réfléchis à la question est moins je suis friand de ces objets qui
 peuvent être cassés.</p>
 
-<p>Dans un monde idéal, j&#8217;aurai tendance à dire qu&#8217;il faudrait établir des zones
-de codes qui ont des invariants de plus en plus précis &mdash; les invariants étant
+<p>Dans un monde idéal, j'aurai tendance à dire qu'il faudrait établir des zones
+de codes qui ont des invariants de plus en plus précis &ndash; les invariants étant
 organisés de façon hiérarchique.</p>
 
 <p>Dans la zone <em>descriptif de flux configuré</em>, il y aurait la zone <em>flux valide
-et connecté</em>. Quand le flux n&#8217;est plus valide, on peut retourner à la zone
-englobante de flux décrit. C&#8217;est d&#8217;ailleurs ce qu&#8217;on l&#8217;on fait d&#8217;une certaine
-façon. Sauf que nous avons pris l&#8217;habitude (avec les abstractions de sockets et
-de fichiers usuelles) de n&#8217;avoir qu&#8217;un seul objet pour contenir les deux
+et connecté</em>. Quand le flux n'est plus valide, on peut retourner à la zone
+englobante de flux décrit. C'est d'ailleurs ce qu'on l'on fait d'une certaine
+façon. Sauf que nous avons pris l'habitude (avec les abstractions de sockets et
+de fichiers usuelles) de n'avoir qu'un seul objet pour contenir les deux
 informations. Et de fait, quand on veut séparer les deux invariants à
-l&#8217;exécution, on se retrouve avec des objets cassés&hellip;</p>
+l'exécution, on se retrouve avec des objets cassés&hellip;</p>
 
 <p>La solution ? Ma foi, le SRP (<em>Single Responsability Principle</em>) me semble
-l&#8217;apporter : <em>«un object, une responsabilité»</em>. On pourrait même dire :</p>
+l'apporter : <em>«un object, une responsabilité»</em>. On pourrait même dire :</p>
 
 <blockquote><p>Deux invariants décorrélés (/non synchrones) => deux classes.</p></blockquote>
 
 <h3>II.4- Des exceptions dans les constructeurs.</h3>
 
-<p>Une technique bien connue pour prévenir la construction d&#8217;un objet dont on ne
+<p>Une technique bien connue pour prévenir la construction d'un objet dont on ne
 peut pas garantir les invariants consiste à lever une exception depuis son
 constructeur. En procédant de la sorte, soit un objet existe et il est dans un
-état pertinent et utilisable, soit il n&#8217;a jamais existé et on n&#8217;a même pas
+état pertinent et utilisable, soit il n'a jamais existé et on n'a même pas
 besoin de se poser la question de son utilisabilité.</p>
 
-<p>Cela a l&#8217;air fantastique, n&#8217;est-ce pas ?</p>
+<p>Cela a l'air fantastique, n'est-ce pas ?</p>
 
-<p>Mais &hellip; n&#8217;est-ce pas de la programmation défensive ? En effet, ce n&#8217;est pas le
-client de l&#8217;objet qui vérifie les conditions d&#8217;existence, mais l&#8217;objet.
+<p>Mais &hellip; n'est-ce pas de la programmation défensive ? En effet, ce n'est pas le
+client de l'objet qui vérifie les conditions d'existence, mais l'objet.
 Résultat, on ne dispose pas forcément du
 <a href="/blog/2014/05/24/programmation-par-contrat-un-peu-de-theorie/#ProgDefCtx">meilleur contexte</a> pour
-signaler le problème de <em>runtime</em> qui bloque la création de l&#8217;objet.</p>
+signaler le problème de <em>runtime</em> qui bloque la création de l'objet.</p>
 
-<p>Idéalement, je tendrais à dire que la vérification devrait être faite en amont,
-et ainsi le constructeur aurait des pré-conditions <em>étroitement</em> vérifiées.
-Dans la pratique, je dois bien avouer que je tends, aujourd&#8217;hui, à laisser la
-vérification au niveau des constructeurs au lieu d&#8217;exposer une fonction
-statique de vérification des pré-conditions d&#8217;existence dans les cas les plus
-complexes. Il faut dire que les exceptions ont tellement été bien vendues comme
-: c&#8217;est le seul moyen d&#8217;avorter depuis un opérateur surchargé ou depuis un
-constructeur, que j&#8217;ai jusqu&#8217;à lors totalement négligé mon instinct qui sentait
-qu&#8217;il y avait un truc louche à vérifier les conditions de création depuis un
+<dl>
+<dt>Idéalement, je tendrais à dire que la vérification devrait être faite en amont,</dt>
+<dt>et ainsi le constructeur aurait des pré-conditions <em>étroitement</em> vérifiées.</dt>
+<dt>Dans la pratique, je dois bien avouer que je tends, aujourd'hui, à laisser la</dt>
+<dt>vérification au niveau des constructeurs au lieu d'exposer une fonction</dt>
+<dt>statique de vérification des pré-conditions d'existence dans les cas les plus</dt>
+<dt>complexes. Il faut dire que les exceptions ont tellement été bien vendues comme</dt>
+<dd>c'est le seul moyen d'avorter depuis un opérateur surchargé ou depuis un
+constructeur, que j'ai jusqu'à lors totalement négligé mon instinct qui sentait
+qu'il y avait un truc louche à vérifier les conditions de création depuis un
 contexte restreint. À <em>élargir</em> les contrats, on finit par perdre des
-informations pour nos messages d&#8217;erreur.</p>
+informations pour nos messages d'erreur.</dd>
+</dl>
 
 <h2>III- Et si la Programmation Défensive est de la partie ?</h2>
 
-<p><em>Discl. : <a href="http://isocpp.org/wiki/faq/exceptions#exceptions-avoid-spreading-out-error-logic">L&#8217;utilisation de codes de retour va grandement complexifier l&#8217;application</a>,
+<p><em>Discl. : <a href="http://isocpp.org/wiki/faq/exceptions#exceptions-avoid-spreading-out-error-logic">L'utilisation de codes de retour va grandement complexifier l'application</a>,
 qui en plus de devoir tester les codes de retour relatifs au métier (dont la
 validation des entrées), devra propager des codes de retours relatifs aux
 potentielles erreurs de programmation. Au final, cela va accroitre les chances
-d&#8217;erreurs de programmation&hellip; chose antinomique avec les objectifs de la
+d'erreurs de programmation&hellip; chose antinomique avec les objectifs de la
 technique. Donc un conseil, pour de la programmation défensive en C++, préférez
-l&#8217;emploi d&#8217;exceptions &mdash; et bien évidemment, n&#8217;oubliez pas le
+l'emploi d'exceptions &ndash; et bien évidemment, n'oubliez pas le
 <a href="/blog/2012/04/04/le-c-plus-plus-moderne/#C++Moderne">RAII</a>, notre grand
 ami.</em></p>
 
 <p>Prérequis : dérivez de
 <a href="http://www.cpluscplus.com/reference/stdexcept/runtime_error/"><code>std::runtime_error</code></a>
-vos exceptions pour les cas exceptionnels pouvant se produire lors de l&#8217;exécution,
+vos exceptions pour les cas exceptionnels pouvant se produire lors de l'exécution,
 et de
 <a href="http://www.cpluscplus.com/reference/stdexcept/logic_error/"><code>std::logic_error</code></a>
 vos exceptions pour propager les erreurs de programmation.</p>
@@ -698,7 +693,7 @@ vos exceptions pour propager les erreurs de programmation.</p>
 exceptions de <code>std::exception</code> <strong>mais</strong> de <code>std::runtime_error</code> pour les cas
 exceptionnels plausibles et de <code>std::logic_error</code> pour les erreurs de logique.</p>
 
-<p>Aux points d&#8217;interfaces (communication via une API C, limites de threads en
+<p>Aux points d'interfaces (communication via une API C, limites de threads en
 C++03), ou dans le <code>main()</code>, il est possible de filtrer les erreurs de logiques
 pour avoir des coredumps en <em>Debug</em>.</p>
 
@@ -739,7 +734,7 @@ techniques de
 de
 <a href="http://isocpp.org/wiki/faq/exceptions#throw-without-an-object">factorisation</a>
 de gestion des erreurs. En effet, tout repose sur un <code>catch(...)</code>, or ce
-dernier va modifier le contexte pour la génération d&#8217;un <em>core</em> tandis que rien
+dernier va modifier le contexte pour la génération d'un <em>core</em> tandis que rien
 ne sera redispatché vers une <code>std::logic_error</code>.</p>
 
 <h3>III.2- Cas plausible&hellip;</h3>
@@ -748,8 +743,8 @@ ne sera redispatché vers une <code>std::logic_error</code>.</p>
 exceptions de <code>std::exception</code> <strong>au lieu</strong> de <code>std::runtime_error</code> pour les cas
 exceptionnels plausibles et de <code>std::logic_error</code> pour les erreurs de logique.</p>
 
-<p>Aux points d&#8217;interfaces (communication via une API C, limites de threads en
-C++03), ou dans le <code>main()</code>, il est possible d&#8217;ignorer toutes les exceptions pour
+<p>Aux points d'interfaces (communication via une API C, limites de threads en
+C++03), ou dans le <code>main()</code>, il est possible d'ignorer toutes les exceptions pour
 avoir des coredumps en <em>Debug</em> sur les exceptions dues à des erreurs de logiques et &hellip;
 sur les autres aussi.</p>
 
@@ -784,8 +779,8 @@ sur les autres aussi.</p>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>D&#8217;autres variations sont très certainement envisageables où l&#8217;on rattraperait
-l&#8217;erreur de logique pour la relancer en <em>Debug</em>.</p>
+<p>D'autres variations sont très certainement envisageables où l'on rattraperait
+l'erreur de logique pour la relancer en <em>Debug</em>.</p>
 </div>
   
   
@@ -807,14 +802,7 @@ l&#8217;erreur de logique pour la relancer en <em>Debug</em>.</p>
 
 
 
-
-
-
-
-  
-
-
-<time datetime="2014-05-28T12:07:42+02:00" pubdate data-updated="true">May 28<span>th</span>, 2014</time>
+<time class='entry-date' datetime='2014-05-28T12:07:42+02:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>28</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>12:07 pm</span></time>
         
            | <a href="/blog/2014/05/28/programmation-par-contrat-les-assertions/#disqus_thread"
              data-disqus-identifier="http://LucHermitte.github.io/blog/2014/05/28/programmation-par-contrat-les-assertions/">Comments</a>
@@ -830,36 +818,36 @@ un outil dédié à la détection les erreurs de programmation : les <em>asserti
 
 <h2>I- <a id="Documentation"></a>Documentation</h2>
 
-<p>Comme je l&#8217;avais signalé dans le précédent billet, la première chose que l&#8217;on
-peut faire à partir des contrats, c&#8217;est de les documenter clairement.
-Il s&#8217;agit probablement d&#8217;une des choses les plus importantes à documenter dans
-un code source. Et malheureusement trop souvent c&#8217;est négligé.</p>
+<p>Comme je l'avais signalé dans le précédent billet, la première chose que l'on
+peut faire à partir des contrats, c'est de les documenter clairement.
+Il s'agit probablement d'une des choses les plus importantes à documenter dans
+un code source. Et malheureusement trop souvent c'est négligé.</p>
 
-<p>L&#8217;outil <a href="http://doxygen.org">Doxygen</a> met à notre disposition les tags <code>@pre</code>,
+<p>L'outil <a href="http://doxygen.org">Doxygen</a> met à notre disposition les tags <code>@pre</code>,
 <code>@post</code>, et <code>@invariant</code> pour documenter nos contrats. Je ne peux que
-vous conseiller d&#8217;en user et d&#8217;en abuser.</p>
+vous conseiller d'en user et d'en abuser.</p>
 
 <h2>II- Comment prendre en compte les contrats dans le code ?</h2>
 
-<p>À partir d&#8217;un contrat bien établi, nous avons techniquement plusieurs choix en
+<p>À partir d'un contrat bien établi, nous avons techniquement plusieurs choix en
 C++.</p>
 
 <h3>Option 1 : on ne fait rien</h3>
 
-<p>Il est tout d&#8217;abord possible de totalement ignorer les ruptures de
+<p>Il est tout d'abord possible de totalement ignorer les ruptures de
 contrats et de ne jamais rien vérifier.</p>
 
 <p>Quand une erreur de programmation survient, quand on est chanceux, on détecte
-le problème au plus proche de l&#8217;erreur. Malheureusement, en C et en C++, les
+le problème au plus proche de l'erreur. Malheureusement, en C et en C++, les
 problèmes tendent à survenir bien plus tard.</p>
 
-<p>Cette mauvaise pratique consistant à ignorer les contrats (ou à ne pas s&#8217;en
-préoccuper) est assez répandue. Je ne cache pas que l&#8217;un des objectifs de cette
+<p>Cette mauvaise pratique consistant à ignorer les contrats (ou à ne pas s'en
+préoccuper) est assez répandue. Je ne cache pas que l'un des objectifs de cette
 série de billets est de combattre cette habitude.</p>
 
 <h3>Option 2 : on lance des exceptions dans la tradition de la Programmation Défensive</h3>
 
-<p>À l&#8217;opposé, on peut prendre la voie de la <em>Programmation Défensive</em> et vérifier
+<p>À l'opposé, on peut prendre la voie de la <em>Programmation Défensive</em> et vérifier
 chaque rupture potentielle de contrat pour lever une exception. Au delà des
 problèmes de conceptions et de déresponsabilisation évoqués dans le
 <a href="/blog/2014/05/24/programmation-par-contrat-un-peu-de-theorie/">billet précédent</a>,
@@ -868,33 +856,33 @@ il y a un soucis technique.</p>
 <p>En effet, en temps normal avec une exception en C++, on ne peut rien avoir de
 mieux que des informations sur le lieu de la détection (<em>i.e.</em> :<code>__FILE__</code> et
 <code>__LINE__</code>). Et encore faut-il disposer de classes <em>exception</em> conçues pour
-stocker une telle information ; ce n&#8217;est par exemple pas le cas des
+stocker une telle information ; ce n'est par exemple pas le cas des
 <code>std::logic_error</code> qui sont levées depuis des fonctions comme
 <code>std::vector&lt;&gt;::at()</code>.</p>
 
-<p>Par <em>&ldquo;rien de mieux que le lieu de la détection&rdquo;</em>, il faut comprendre que l&#8217;on
-ne disposera d&#8217;aucune autre information de contexte. En effet, une exception
-remonte jusqu&#8217;à un <code>catch</code> compatible ; or à l&#8217;endroit du <code>catch</code>, on ne peut
-plus avoir accès à l&#8217;état (de toutes les variables, dans tous les threads, &hellip;)
+<p>Par <em>&ldquo;rien de mieux que le lieu de la détection&rdquo;</em>, il faut comprendre que l'on
+ne disposera d'aucune autre information de contexte. En effet, une exception
+remonte jusqu'à un <code>catch</code> compatible ; or à l'endroit du <code>catch</code>, on ne peut
+plus avoir accès à l'état (de toutes les variables, dans tous les threads, &hellip;)
 au moment de la détection du problème.</p>
 
 <p>En vérité, il y existe deux moyens peu ergonomiques pour y avoir accès.</p>
 
 <ul>
-<li>Le premier consiste à mettre des points d&#8217;arrêt sur les levers ou les
-constructions d&#8217;exceptions, et à exécuter le programme depuis un débuggueur.</li>
+<li>Le premier consiste à mettre des points d'arrêt sur les levers ou les
+constructions d'exceptions, et à exécuter le programme depuis un débuggueur.</li>
 <li>Le second consiste à supprimer du code source tous les <code>catchs</code> qui sont
-compatibles avec l&#8217;erreur de logique.<br/>
+compatibles avec l'erreur de logique.<br/>
 Pour vous simplifier la vie, et être propres, faites dériver vos erreurs de
 logique de <code>std::logic_error</code> (et de ses enfants) et vos erreurs de <em>runtime</em>
 de <code>std::runtime_error</code> (&amp; fils) ; enfin dans votre code vous pourrez ne pas
 attraper les <code>std::logic_error</code> lorsque vous ne compilez pas en définissant
-<code>NDEBUG</code> histoire d&#8217;avoir un <em>coredump</em> en <em>Debug</em> sur les erreurs de
-logique, et une exception en <em>Release</em>. J&#8217;y reviendrai dans le prochain
+<code>NDEBUG</code> histoire d'avoir un <em>coredump</em> en <em>Debug</em> sur les erreurs de
+logique, et une exception en <em>Release</em>. J'y reviendrai dans le prochain
 billet.<br/>
 Le hic est que de nombreux <em>frameworks</em> font dériver leurs erreurs de
 <code>std::exception</code> et non de <code>std::runtime_error</code>, et de fait, on se retrouve
-vite à faire des <code>catch(std::exception const&amp;)</code> aux points d&#8217;interface
+vite à faire des <code>catch(std::exception const&amp;)</code> aux points d'interface
 (dialogue via API C, threads en C++03, <code>main()</code>, &hellip;) quelque soit le mode de
 compilation.<br/>
 Corolaire : ne faites pas comme ces <em>frameworks</em> et choisissez judicieusement
@@ -902,39 +890,39 @@ votre exception standard racine.</li>
 </ul>
 
 
-<p>Aucune de ces deux options n&#8217;est véritablement envisageable pour des tests
-automatisés ; et la seconde l&#8217;est encore moins pour du code qui va aller en
+<p>Aucune de ces deux options n'est véritablement envisageable pour des tests
+automatisés ; et la seconde l'est encore moins pour du code qui va aller en
 production. Ces options sont en revanche envisageables pour investiguer.</p>
 
-<p>À noter aussi qu&#8217;avec cette approche, on paie tout le temps un coût de
+<p>À noter aussi qu'avec cette approche, on paie tout le temps un coût de
 vérification des contrats, que cela soit en phase de tests comme en phase de
-production.  Et ce, même pour des morceaux de code où il est certain qu&#8217;il n&#8217;y
-a pas d&#8217;erreur de programmation.<br/>
+production.  Et ce, même pour des morceaux de code où il est certain qu'il n'y
+a pas d'erreur de programmation.<br/>
 Par exemple, <code>sqrt(1-sin(x))</code> ne devrait poser aucun soucis. Une fonction sinus
 renvoie en théorie un nombre entre -1 et 1, ce qui constitue une post-condition
 toute indiquée. De fait par construction, <code>1-sin(x)</code> est positif, et donc
 compatible avec le contrat de <code>sqrt</code>.</p>
 
-<p>En vérité, il existe une troisième façon de s&#8217;y prendre. Sous des systèmes
+<p>En vérité, il existe une troisième façon de s'y prendre. Sous des systèmes
 POSIX, on peut déclencher des <em>coredumps</em> par programmation et ce sans
-interrompre le cours de l&#8217;exécution. Cela peut être fait depuis les
+interrompre le cours de l'exécution. Cela peut être fait depuis les
 constructeurs de nos exceptions de logique (Voir
 <a href="http://stackoverflow.com/a/979297">ceci</a>, ou
 <a href="http://stackoverflow.com/a/18581317">celà</a>).</p>
 
-<h3>Option 3 : on formalise nos suppositions à l&#8217;aide d&#8217;assertions</h3>
+<h3>Option 3 : on formalise nos suppositions à l'aide d'assertions</h3>
 
 <p>Le C, et par extension le C++, nous offrent un outil tout indiqué pour traquer
 les erreurs de programmation : les assertions.</p>
 
 <p>En effet, compilé sans la directive de précompilation <code>NDEBUG</code>, une assertion
 va arrêter un programme et créer un fichier <em>core</em>. Il est ensuite possible
-d&#8217;ouvrir le fichier <em>core</em> depuis le débuggueur pour pouvoir explorer l&#8217;état du
-programme au moment de la détection de l&#8217;erreur.</p>
+d'ouvrir le fichier <em>core</em> depuis le débuggueur pour pouvoir explorer l'état du
+programme au moment de la détection de l'erreur.</p>
 
-<h4>Exemple d&#8217;exploitation des assertions</h4>
+<h4>Exemple d'exploitation des assertions</h4>
 
-<p>Sans faire un cours sur gdb, regardons ce qu&#8217;il se passe sur ce petit programme :</p>
+<p>Sans faire un cours sur gdb, regardons ce qu'il se passe sur ce petit programme :</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -1018,9 +1006,9 @@ programme au moment de la détection de l&#8217;erreur.</p>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>On dispose de suite de l&#8217;indication où l&#8217;erreur a été détectée.
+<p>On dispose de suite de l'indication où l'erreur a été détectée.
 Mais investiguons plus en avant. Si on lance <code>gdb ./test-assert core.pid42</code>
-(cela peut nécessiter de demander à <code>ulimit</code> d&#8217;autoriser les <em>coredumps</em> sur
+(cela peut nécessiter de demander à <code>ulimit</code> d'autoriser les <em>coredumps</em> sur
 votre plateforme, faites un <code>ulimit -c unlimited</code> pour cela), ou <code>gdb
 ./test-assert</code> puis <code>run</code> pour une investigation pseudo-interactive, on observe
 ceci :</p>
@@ -1078,7 +1066,7 @@ ceci :</p>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>La pile d&#8217;appels (<em>back trace</em>) contient :</p>
+<p>La pile d'appels (<em>back trace</em>) contient :</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -1105,7 +1093,7 @@ ceci :</p>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Avec un <code>up 8</code> pour se positionner au niveau où l&#8217;assertion est fausse, on peut
+<p>Avec un <code>up 8</code> pour se positionner au niveau où l'assertion est fausse, on peut
 regarder le code source local avec un <code>list</code>, ou de façon plus intéressante,
 demander ce que vaut ce fameux <code>n</code>.</p>
 
@@ -1125,26 +1113,26 @@ demander ce que vaut ce fameux <code>n</code>.</p>
 <p></p>
 
 <p>On voit que <code>my::sqrt</code> a été appelée avec <code>-1</code> comme paramètre. Avec un <code>up</code> on
-peut investiguer le contexte de la fonction appelante &mdash; avec <code>down</code> on
-progresse dans l&#8217;autre sens. Ici, la raison de l&#8217;erreur est triviale. Dans un
+peut investiguer le contexte de la fonction appelante &ndash; avec <code>down</code> on
+progresse dans l'autre sens. Ici, la raison de l'erreur est triviale. Dans un
 programme plus complexe, on aurait pu imaginer que <code>sin</code> était appelée avec une
 donnée non constante, et on aurait peut-être passé un peu plus de temps à
-comprendre que la fonction fautive n&#8217;était pas <code>sin</code> mais ce que l&#8217;on faisait
+comprendre que la fonction fautive n'était pas <code>sin</code> mais ce que l'on faisait
 avec son résultat.</p>
 
-<p>N.B.: l&#8217;équivalent existe pour d&#8217;autres environnements comme VC++.</p>
+<p>N.B.: l'équivalent existe pour d'autres environnements comme VC++.</p>
 
 <h4><a id="Phases"></a>Un outil pour les phases de développement et de tests &hellip;</h4>
 
 <p>Je vais paraphraser <a href="/blog/2014/05/24/programmation-par-contrat-un-peu-de-theorie/#Wilson2006">[Wilson2006] §1.1.</a>, qui énonçait déjà des
-évidences : <em>&ldquo;Plus tôt on détecte une erreur, mieux c&#8217;est&rdquo;</em>.  C&#8217;est un adage
-que vous devez déjà connaitre. Concrètement, cela veut dire que l&#8217;on va
-préférer trouver nos erreurs, dans l&#8217;ordre :</p>
+évidences : <em>&ldquo;Plus tôt on détecte une erreur, mieux c'est&rdquo;</em>.  C'est un adage
+que vous devez déjà connaitre. Concrètement, cela veut dire que l'on va
+préférer trouver nos erreurs, dans l'ordre :</p>
 
 <ol>
 <li>lors de la phase de conception,</li>
 <li>lors la compilation,</li>
-<li>lors de l&#8217;analyse statique du code</li>
+<li>lors de l'analyse statique du code</li>
 <li>lors des tests unitaires,</li>
 <li>lors des tests en <em>debug</em>,</li>
 <li>en pré-release/phase béta,</li>
@@ -1156,15 +1144,15 @@ préférer trouver nos erreurs, dans l&#8217;ordre :</p>
 <a href="#VerificationsStatiques">fin de ce billet</a>.<br/>
 Les assertions pour leur part interviennent lors des phases 4. et 5.</p>
 
-<p>Les assertions ne sont vérifiées que si <code>NDEBUG</code> n&#8217;est pas défini au moment de
+<p>Les assertions ne sont vérifiées que si <code>NDEBUG</code> n'est pas défini au moment de
 la précompilation. Généralement, sa définition accompagne le mode <em>Release</em> de
-VC++ et de CMake. Ce qui veut dire qu&#8217;en mode <em>Release</em> aucune assertion n&#8217;est
-vérifiée. Soit qu&#8217;en production, les assertions sont normalement ignorées. Le
+VC++ et de CMake. Ce qui veut dire qu'en mode <em>Release</em> aucune assertion n'est
+vérifiée. Soit qu'en production, les assertions sont normalement ignorées. Le
 corolaire de tout cela est que les assertions sont un outil de vérification de
-la logique applicative qui n&#8217;est utilisé qu&#8217;en phases de développement et de
+la logique applicative qui n'est utilisé qu'en phases de développement et de
 tests.</p>
 
-<p>Ce n&#8217;est certes pas le plus tôt que l&#8217;on puisse faire, mais c&#8217;est déjà quelque
+<p>Ce n'est certes pas le plus tôt que l'on puisse faire, mais c'est déjà quelque
 chose qui intervient avant que des utilisateurs manipulent le produit final.</p>
 
 <h4>&hellip; voire de production</h4>
@@ -1174,11 +1162,11 @@ est possible de les détourner en phases 6. et 7. pour tenter de rendre plus
 robuste le produit en le faisant résister aux erreurs de programmation qui ont
 échappé à notre vigilance lors des phases précédentes.</p>
 
-<p>On entre dans le royaume de la <em>Programmation Défensive</em> que j&#8217;ai déjà
+<p>On entre dans le royaume de la <em>Programmation Défensive</em> que j'ai déjà
 abondamment décrit.</p>
 
 <p>Comment peut-on détourner les assertions ? Tout simplement en détournant leur
-définition. N&#8217;oublions pas que les assertions sont des macros dont le
+définition. N'oublions pas que les assertions sont des macros dont le
 comportement exact dépend de la définition de <code>NDEBUG</code>.</p>
 
 <p>Une façon assez sale de faire serait p.ex.:</p>
@@ -1229,60 +1217,60 @@ compréhensibles en profitant du fonctionnement interne de la macro.</p>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<h4>Exploitation des assertions par les outils d&#8217;analyse statique de code</h4>
+<h4>Exploitation des assertions par les outils d'analyse statique de code</h4>
 
-<p>Les outils d&#8217;analyse statique de code comme
+<p>Les outils d'analyse statique de code comme
 <a href="http://clang-analyzer.llvm.org/">clang analyzer</a> sont très intéressants. En
 plus, ils interviennent en <a href="#Phases">phase 3</a>! Seulement, à mon grand regret,
 ils ne semblent pas exploiter les assertions pour détecter statiquement des
 erreurs de logique.
-Au contraire, ils utilisent les assertions pour inhiber l&#8217;analyse de certains
-chemins d&#8217;exécution.</p>
+Au contraire, ils utilisent les assertions pour inhiber l'analyse de certains
+chemins d'exécution.</p>
 
-<p>Ainsi, dans l&#8217;exemple de <code>test-assert.cpp</code> que j&#8217;ai donné plus haut, les outils
-d&#8217;analyse statique de code ne feront pas le rapprochement entre la
+<p>Ainsi, dans l'exemple de <code>test-assert.cpp</code> que j'ai donné plus haut, les outils
+d'analyse statique de code ne feront pas le rapprochement entre la
 post-condition de <code>my::sin</code> et la pré-condition de <code>my::sqrt</code>, mais feront
-plutôt comme si les assertions étaient toujours vraies, c&#8217;est à dire comme si
-le code n&#8217;appelait jamais <code>my::sqrt</code> avec un nombre négatif.</p>
+plutôt comme si les assertions étaient toujours vraies, c'est à dire comme si
+le code n'appelait jamais <code>my::sqrt</code> avec un nombre négatif.</p>
 
 <p>N.B.: Je généralise à partir de mon test avec <em>clang analyzer</em>. Peut-être que
-d&#8217;autres outils savent tirer parti des contrats déclarés à l&#8217;aide d&#8217;assertions,
+d'autres outils savent tirer parti des contrats déclarés à l'aide d'assertions,
 ou peut-être le sauront-ils demain.<br/>
-Pour information, je n&#8217;ai pas eu l&#8217;occasion de tester des outils comme <em>Code
-Contract</em> (pour .NET qui semble justement s&#8217;attaquer à cette tâche), Ada2012
-(si on continue hors du périmètre du C++), Eiffel (qui va jusqu&#8217;à générer
+Pour information, je n'ai pas eu l'occasion de tester des outils comme <em>Code
+Contract</em> (pour .NET qui semble justement s'attaquer à cette tâche), Ada2012
+(si on continue hors du périmètre du C++), Eiffel (qui va jusqu'à générer
 automatiquement des tests unitaires à partir des contrats exprimés),
 ni même <em>Polyspace</em>, ou <em>QA C++</em>.</p>
 
-<p>Dit autrement, je n&#8217;ai pas encore trouvé d&#8217;outil qui fasse de la preuve
-formelle en C++. A noter qu&#8217;il existe des efforts pour fournir à de tels outils
+<p>Dit autrement, je n'ai pas encore trouvé d'outil qui fasse de la preuve
+formelle en C++. A noter qu'il existe des efforts pour fournir à de tels outils
 des moyens simplifiés, et plus forts sémantiquement parlant, pour exprimer des
 contrats dans des codes C++.</p>
 
 <h3>Option 4 : On utilise des Tests Unitaires (pour les post-conditions)</h3>
 
-<p>Quand plus tôt j&#8217;indiquais que <em>sinus</em> a pour post-condition toute indiquée un
+<p>Quand plus tôt j'indiquais que <em>sinus</em> a pour post-condition toute indiquée un
 résultat inférieur à 1, peut-être avez-vous tiqué. Et vous auriez eu raison. La
 post-condition de la fonction <code>sin()</code> est de calculer &hellip; un sinus.<br/>
 Là, plusieurs problèmes se posent : comment valider que le calcul est correct ?
-Avec une seconde implémentation de la fonction ? A l&#8217;aide de <code>cos()</code> ? Et quel
-serait le prix (même en mode <em>Debug</em>) d&#8217;une telle vérification ?</p>
+Avec une seconde implémentation de la fonction ? A l'aide de <code>cos()</code> ? Et quel
+serait le prix (même en mode <em>Debug</em>) d'une telle vérification ?</p>
 
 <p>Lors de ses présentations sur le sujet, John Lakos rappelle une post-condition
-souvent négligée d&#8217;une fonction de tri : non seulement, les éléments produits
-doivent être triés, mais en plus il doit s&#8217;agir des mêmes éléments (ni plus, ni
+souvent négligée d'une fonction de tri : non seulement, les éléments produits
+doivent être triés, mais en plus il doit s'agir des mêmes éléments (ni plus, ni
 moins) que ceux qui ont été fournis à la fonction de tri. [NB: Cet exemple
 semble venir de Kevlin Henney.]</p>
 
-<p>Au final, un consensus semble se dégager vers l&#8217;utilisation de tests unitaires
-pour valider les post-conditions de fonctions. Après, je vous laisse juger s&#8217;il
+<p>Au final, un consensus semble se dégager vers l'utilisation de tests unitaires
+pour valider les post-conditions de fonctions. Après, je vous laisse juger s'il
 est pertinent de vérifier par assertion des post-conditions simples et peu
 couteuses comme le fait que le résultat de <code>sin()</code> doit appartenir à <code>[-1,
-+1]</code>. D&#8217;autant que pour l&#8217;instant, aucun (?) outil n&#8217;exploite des assertions
++1]</code>. D'autant que pour l'instant, aucun (?) outil n'exploite des assertions
 pour faire de la preuve formelle et ainsi détecter que <code>sqrt(sin(x)-1)</code> est
 problématique sur certaines plages de <code>x</code>.</p>
 
-<h2>III- Le standard s&#8217;enrichira-t-il en <del>2014 ou en</del> 2017 pour programmer avec des contrats ?</h2>
+<h2>III- Le standard s'enrichira-t-il en <del>2014 ou en</del> 2017 pour programmer avec des contrats ?</h2>
 
 <p>Il y a déjà eu des propositions de mots clés plus ou moins sémantiquement forts
 pour supporter la PpC en standard en C++. Dans le document
@@ -1293,30 +1281,30 @@ pour supporter la PpC en standard en C++. Dans le document
 <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4378.pdf">N4378</a> (et sa FAQ
 <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4379.pdf">N4379</a>),
 du dernier mailing (2015-02 mid-meeting) en date, John Lakos et Alexei Zakharov
-introduisent tout d&#8217;abord un nouveau vocabulaire pour désigner les contrats :
+introduisent tout d'abord un nouveau vocabulaire pour désigner les contrats :
 les <em>narrow contracts</em> et les <em>wide contracts</em>.  Ils introduisent également un
 ensemble de macros <code>contract_assert()</code> assez flexible.</p>
 
-<p>Ces macros supportent des niveaux d&#8217;importance de vérification (<em>optimized</em>, <em>safe</em>,
-<em>debug</em>,) un peu à l&#8217;image des niveaux <em>Error</em>/<em>Warning</em>/<em>Info</em>/<em>Debug</em> dans
+<p>Ces macros supportent des niveaux d'importance de vérification (<em>optimized</em>, <em>safe</em>,
+<em>debug</em>,) un peu à l'image des niveaux <em>Error</em>/<em>Warning</em>/<em>Info</em>/<em>Debug</em> dans
 les frameworks de log.  La proposition offre de permettre de faire de la
 programmation défensive (i.e. de lever des exceptions au lieu de simples
 assertions). Elle permettrait également de transformer les assertions en
 assertions de frameworks de tests unitaires.<br/>
-À noter qu&#8217;elle est déjà implémentée et disponible à l&#8217;intérieur de la
+À noter qu'elle est déjà implémentée et disponible à l'intérieur de la
 <a href="https://github.com/bloomberg/bde">bibliothèque BDE/BSL</a> sous licence MIT.</p>
 
 <p>Cette proposition en est à sa dixième révision. Les
 <a href="https://isocpp.org/files/papers/N4053.html#LWG8">minutes du rejet</a> de la
 révision (N4075) sont disponibles.</p>
 
-<p>Ce sujet de la PpC a part ailleurs été abordé lors d&#8217;une présentation en deux
+<p>Ce sujet de la PpC a part ailleurs été abordé lors d'une présentation en deux
 parties par John Lakos lors de la CppCon14: <em>Defensive Programming Done Right</em>
 <a href="https://www.youtube.com/watch?v=1QhtXRMp3Hg&amp;feature=youtube_gdata">Part I</a>
 et <a href="https://www.youtube.com/watch?v=tz2khnjnUx8&amp;feature=youtube_gdata">Part II</a>.</p>
 
-<p>De plus, on voit que le sujet de l&#8217;introduction de la PpC en C++ a ses
-partisans, car d&#8217;autres propositions tournent, <em>cf.</em> :</p>
+<p>De plus, on voit que le sujet de l'introduction de la PpC en C++ a ses
+partisans, car d'autres propositions tournent, <em>cf.</em> :</p>
 
 <ul>
 <li><a href="https://isocpp.org/files/papers/N4110.pdf">N4110</a>
@@ -1326,7 +1314,7 @@ partisans, car d&#8217;autres propositions tournent, <em>cf.</em> :</p>
 un résumé des discussions autour de la PpC à Urbana ;</p></li>
 <li><p><a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4160.html">N4160</a>
 <em>Value Constraints</em>, où Andrzej Krzemieŉski
-aborde l&#8217;angle de ce qui pourrait être fourni à des outils d&#8217;analyse pour réaliser de la preuve formelle ;</p></li>
+aborde l'angle de ce qui pourrait être fourni à des outils d'analyse pour réaliser de la preuve formelle ;</p></li>
 <li><a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4154.pdf">N4154</a>
 <em>Operator assert</em>, David Krauss ;</li>
 <li><a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4248.html">N4248</a>
@@ -1343,10 +1331,10 @@ quelques outils utilisés à Microsoft.</li>
 
 <p>Enfin, il est également à noter une interview de B. Stroustrup sur le C++17
 <a href="http://www.infoworld.com/article/2840344/c-plus-plus/stroustrop-c-goals-parallelism-concurrency.html">où il évoque</a>
-qu&#8217;il faut s&#8217;attendre au support des contrats.</p>
+qu'il faut s'attendre au support des contrats.</p>
 
 <p>Pour être plus précis, je vais reprendre les résumés faits par Daniel Garcia
-dans le N4293 à l&#8217;issue du meeting à Urbana :</p>
+dans le N4293 à l'issue du meeting à Urbana :</p>
 
 <ul>
 <li><em>There was a great agreement that C++ should have support for Contracts
@@ -1364,24 +1352,24 @@ final voting on this second issue.</em></li>
 
 
 <p>Bref, les choses évoluent dans le bon sens. Nous sommes bien au delà de la
-prise de conscience de l&#8217;intérêt de la PpC dans le noyau de la communauté C++
+prise de conscience de l'intérêt de la PpC dans le noyau de la communauté C++
 qui fait le langage.</p>
 
 <h2>IV- <a id="VerificationsStatiques"></a>Invariants statiques</h2>
 
 <p>Pour conclure, il est important de remarquer que certains contrats peuvent être
-retranscrit de manière plus forte qu&#8217;une assertion qui ne sera vérifiée qu&#8217;en
+retranscrit de manière plus forte qu'une assertion qui ne sera vérifiée qu'en
 phase de tests.</p>
 
 <p>En effet, le compilateur peut en prendre certains à sa charge.</p>
 
 <h4>Les assertions statiques sont nos amies</h4>
 
-<p>Elles sont beaucoup utilisées lors de l&#8217;écriture de classes et fonctions
-génériques pour s&#8217;assurer que les arguments <em>templates</em> vérifient certaines
+<p>Elles sont beaucoup utilisées lors de l'écriture de classes et fonctions
+génériques pour s'assurer que les arguments <em>templates</em> vérifient certaines
 contraintes.<br/>
-Mais c&#8217;est loin d&#8217;être le seul cas d&#8217;utilisation. Je m&#8217;en sers
-également pour vérifier que j&#8217;ai autant de chaines de caractères que de valeurs
+Mais c'est loin d'être le seul cas d'utilisation. Je m'en sers
+également pour vérifier que j'ai autant de chaines de caractères que de valeurs
 dans un énuméré. Avec mes <a href="https://code.google.com/p/lh-vim/wiki/lhCpp">plugins pour vim</a>,
 je génère automatiquement ce genre de choses avec <code>:InsertEnum MyEnum one two
 three</code> :</p>
@@ -1447,27 +1435,27 @@ three</code> :</p>
 
 <h4>Préférez les références aux pointeurs</h4>
 
-<p>Dans la signature d&#8217;une fonction, les références posent une pré-condition : la
-valeur passée en paramètre par référence doit être non nulle &mdash; à charge au
+<p>Dans la signature d'une fonction, les références posent une pré-condition : la
+valeur passée en paramètre par référence doit être non nulle &ndash; à charge au
 code client de vérifier cela.</p>
 
 <p>Dans le corps de la fonction, elles deviennent pratiquement un invariant : à
 partir de là, il est certain que la chose manipulée indirectement est censée
-exister. Il n&#8217;y a plus besoin de tester un pointeur, que cela soit avec une
+exister. Il n'y a plus besoin de tester un pointeur, que cela soit avec une
 assertion (PpC), ou avec un test dynamique (Programmation Défensive).<br/>
 Certes, cela ne protège pas des cas où la donnée est partagée depuis un
 autre thread où elle pourrait être détruite.</p>
 
 <p>John Carmack recommande leur utilisation (en place de pointeurs) dans un
-<a href="http://www.altdevblogaday.com/2011/12/24/static-code-analysis/">billet sur l&#8217;analyse statique de code</a>
+<a href="http://www.altdevblogaday.com/2011/12/24/static-code-analysis/">billet sur l'analyse statique de code</a>
 publié sur #AltDevBlog.</p>
 
 <h4>boost.unit</h4>
 
 <p><a href="http://boost.org/libs/units">boost.unit</a> est le genre de bibliothèque qui
-aurait pu sauver une fusée. L&#8217;idée est de ne plus manipuler de simples valeurs
+aurait pu sauver une fusée. L'idée est de ne plus manipuler de simples valeurs
 numériques, mais des quantités physiques. Non seulement on ne peut pas additionner des
-masses à des longueurs, mais en plus l&#8217;addition de masses va prendre en compte
+masses à des longueurs, mais en plus l'addition de masses va prendre en compte
 les ordres de grandeur.<br/>
 Bref, on type fortement toutes les quantités numériques selon les unités du
 <a href="http://fr.wikipedia.org/wiki/Syst%C3%A8me_international_d%27unit%C3%A9s">Système International</a>.</p>
@@ -1478,9 +1466,9 @@ Bref, on type fortement toutes les quantités numériques selon les unités du
 utilisable</em>. Concrètement, cela implique deux choses pour le développeur.</p>
 
 <ol>
-<li>Un tel invariant se positionne à la sortie du constructeur de l&#8217;objet.</li>
-<li>On doit retarder la définition/déclaration d&#8217;une variable jusqu&#8217;à ce que
-l&#8217;on soit capable de lui donner valeur pertinente, et préférentiellement
+<li>Un tel invariant se positionne à la sortie du constructeur de l'objet.</li>
+<li>On doit retarder la définition/déclaration d'une variable jusqu'à ce que
+l'on soit capable de lui donner valeur pertinente, et préférentiellement
 définitive.</li>
 </ol>
 
@@ -1491,49 +1479,49 @@ traite de cela plus en détails.</p>
 <h4>Corolaire : préférez les constructeurs aux fonctions <code>init()</code> et autres <em>setters</em></h4>
 
 <p>Dans la continuité du point précédent, il faut éviter toute initialisation qui
-se produit après la construction d&#8217;un objet. En effet, si l&#8217;objet nécessite
+se produit après la construction d'un objet. En effet, si l'objet nécessite
 deux appels de fonction pour être correctement initialisé, il y a de grands
 risques que le second appel soit purement et simplement oublié. Il faut de fait
-tester dynamiquement dans chaque fonction de l&#8217;objet s&#8217;il a bien été initialisé
-avant de tenter de s&#8217;en servir.</p>
+tester dynamiquement dans chaque fonction de l'objet s'il a bien été initialisé
+avant de tenter de s'en servir.</p>
 
-<p>Si le positionnement de l&#8217;invariant d&#8217;<em>utilisabilité</em> se fait en sortie du
-constructeur, nous aurions à la place la garantie que soit l&#8217;objet existe et
-il est utilisable, soit l&#8217;objet n&#8217;existe pas et aucune question ne se pose,
+<p>Si le positionnement de l'invariant d'<em>utilisabilité</em> se fait en sortie du
+constructeur, nous aurions à la place la garantie que soit l'objet existe et
+il est utilisable, soit l'objet n'existe pas et aucune question ne se pose,
 nulle part.</p>
 
 <p>N.B. : il existe des infractions à cette règle. Une des plus visible vient du
 <a href="http://google-styleguide.googlecode.com/svn/trunk/cppguide.xml?showone=Forward_Declarations#Doing_Work_in_Constructors">C++ Style Guide de Google</a>.
 Dans la mesure où les exceptions sont interdites dans leur base de code (car la
 quantité de vieux code sans exceptions est trop importante), il ne reste plus
-aucun moyen de faire échouer des constructeurs. On perd l&#8217;invariant statique,
+aucun moyen de faire échouer des constructeurs. On perd l'invariant statique,
 il devient alors nécessaire de procéder à des initialisations en deux phases.<br/>
-Si vous n&#8217;avez pas de telle contrainte de <em>&ldquo;pas d&#8217;exceptions&rdquo;</em> sur vos projets,
+Si vous n'avez pas de telle contrainte de <em>&ldquo;pas d'exceptions&rdquo;</em> sur vos projets,
 bannissez les fonctions <code>init()</code> de votre vocabulaire.</p>
 
 <p>Ceci dit, le recourt à des <em>factories</em> permet de retrouver un semblant
-d&#8217;invariant statique.</p>
+d'invariant statique.</p>
 
 <h4>Choisir le bon type de pointeur</h4>
 
-<p>Avec le C++11 nous avons l&#8217;embarras du choix pour choisir comment manipuler des
+<p>Avec le C++11 nous avons l'embarras du choix pour choisir comment manipuler des
 entités ou des données dynamiques. Entre, <code>std::unique_ptr&lt;&gt;</code>,
 <code>std::shared_ptr</code>, <code>boost::ptr_vector</code>, les références, les pointeurs bruts
-(/nus), <code>std::optional&lt;&gt;</code> (C++14), <em>etc.</em>, on peut avoir l&#8217;impression que c&#8217;est
+(/nus), <code>std::optional&lt;&gt;</code> (C++14), <em>etc.</em>, on peut avoir l'impression que c'est
 la jungle.</p>
 
 <p>Quel rapport avec les invariants statiques ? Et bien, comme pour les références
 <code>std::unique_ptr&lt;&gt;</code>, apporte une garantie supplémentaire par rapport à un
 simple pointeur brut.
 Ce type assure que la fonction qui réceptionne le pointeur en devient
-responsable alors que l&#8217;émetteur s&#8217;est débarrassé de la patate chaude. Et le
+responsable alors que l'émetteur s'est débarrassé de la patate chaude. Et le
 compilateur est là pour entériner la transaction et faire en sorte que les deux
 intervenants respectent bien ce contrat de passation de responsabilité.</p>
 
-<p>Je pense que j&#8217;y reviendrai dans un prochain billet. En attendant, je ne peux
+<p>Je pense que j'y reviendrai dans un prochain billet. En attendant, je ne peux
 que vous conseiller la lecture de cette
 <a href="http://exceptionsafecode.com/slides/svcc/2013/shared_ptr.pdf">présentation</a>
-assez exhaustive d&#8217;Ahmed Charles.</p>
+assez exhaustive d'Ahmed Charles.</p>
 </div>
   
   
@@ -1555,14 +1543,7 @@ assez exhaustive d&#8217;Ahmed Charles.</p>
 
 
 
-
-
-
-
-  
-
-
-<time datetime="2014-05-24T02:00:00+02:00" pubdate data-updated="true">May 24<span>th</span>, 2014</time>
+<time class='entry-date' datetime='2014-05-24T02:00:00+02:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>24</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>2:00 am</span></time>
         
            | <a href="/blog/2014/05/24/programmation-par-contrat-un-peu-de-theorie/#disqus_thread"
              data-disqus-identifier="http://LucHermitte.github.io/blog/2014/05/24/programmation-par-contrat-un-peu-de-theorie/">Comments</a>
@@ -1573,53 +1554,53 @@ assez exhaustive d&#8217;Ahmed Charles.</p>
 
 
   <div class="entry-content"><p>Cela faisait un moment que je voulais partager mes conclusions sur la
-<em>Programmation par Contrat</em>, et en particulier comment l&#8217;appliquer au C++.</p>
+<em>Programmation par Contrat</em>, et en particulier comment l'appliquer au C++.</p>
 
-<p>Voici un premier billet qui aborde l&#8217;aspect théorique. Dans un <a href="/blog/2014/05/28/programmation-par-contrat-les-assertions/">second billet</a>,
+<p>Voici un premier billet qui aborde l'aspect théorique. Dans un <a href="/blog/2014/05/28/programmation-par-contrat-les-assertions/">second billet</a>,
 je traiterai des <em>assertions</em>. En guise de conclusion, je présenterai des
-<a href="/blog/2015/09/17/programmation-par-contrat-snippets-pour-le-c-plus-plus/">techniques d&#8217;application de la PpC au C++</a>
-que j&#8217;ai croisées au fil des ans.</p>
+<a href="/blog/2015/09/17/programmation-par-contrat-snippets-pour-le-c-plus-plus/">techniques d'application de la PpC au C++</a>
+que j'ai croisées au fil des ans.</p>
 
 <h2>I- Les Erreurs</h2>
 
 <p>En développement, il y a toujours des problèmes qui vont venir nous ennuyer.
 Certains correspondront à des problèmes plausibles induits par le contexte
 (fichiers invalides, connexions réseau coupées, utilisateurs qui saisissent
-n&#8217;importe quoi, &hellip;), d&#8217;autres seront des <em>erreurs de programmation</em>.</p>
+n'importe quoi, &hellip;), d'autres seront des <em>erreurs de programmation</em>.</p>
 
 <p>Dans la suite de ce billet, je vais principalement traiter du cas des erreurs
 de programmation. Toutefois, la confusion étant facile, des parenthèses
 régulières seront faites sur les situations exceptionnelles mais plausibles.</p>
 
-<h3>I-1. Les types d&#8217;erreurs de programmation</h3>
+<h3>I-1. Les types d'erreurs de programmation</h3>
 
-<p>Quand on parle d&#8217;erreur de programmation, les premières qui vont nous venir à
-l&#8217;esprit sont les erreurs de syntaxe (point-virgule oublié), ou de grammaire
+<p>Quand on parle d'erreur de programmation, les premières qui vont nous venir à
+l'esprit sont les erreurs de syntaxe (point-virgule oublié), ou de grammaire
 (types non respectés). Ces erreurs-ci, les langages compilés vont nous les
-signaler. On peut considérer qu&#8217;il est impossible de livrer un exécutable sur
-une plateforme qui n&#8217;a pas passé cette phase de vérification.</p>
+signaler. On peut considérer qu'il est impossible de livrer un exécutable sur
+une plateforme qui n'a pas passé cette phase de vérification.</p>
 
-<p>Il existe de nombreuses autres erreurs de programmation qu&#8217;aucun compilateur ne
+<p>Il existe de nombreuses autres erreurs de programmation qu'aucun compilateur ne
 signalera jamais. On peut se tromper dans la conception ou la retranscription
-d&#8217;un algorithme, et ainsi renvoyer des résultats numériques aberrants. On peut
-aussi faire des suppositions totalement erronées, comme traiter les lignes d&#8217;un
-fichier qui n&#8217;existe pas, ou exploiter un élément après sa recherche
+d'un algorithme, et ainsi renvoyer des résultats numériques aberrants. On peut
+aussi faire des suppositions totalement erronées, comme traiter les lignes d'un
+fichier qui n'existe pas, ou exploiter un élément après sa recherche
 infructueuse dans une liste, &hellip; Les plus classiques sont les accès
 hors bornes, et tous les autres problèmes de déréférencement de pointeur nul
 et de <a href="http://en.wikipedia.org/wiki/Dangling_pointer"><em>dangling pointer</em></a>.</p>
 
-<p>Bien sûr, un fichier qui n&#8217;existe pas est une erreur de contexte. Mais
-réaliser un traitement sur un fichier sans vérifier préalablement qu&#8217;il existe
-est une erreur de programmation. La différence est subtile. J&#8217;y reviendrai plus
+<p>Bien sûr, un fichier qui n'existe pas est une erreur de contexte. Mais
+réaliser un traitement sur un fichier sans vérifier préalablement qu'il existe
+est une erreur de programmation. La différence est subtile. J'y reviendrai plus
 <a href="#ProgrammationDefensive">loin</a>.</p>
 
 <h3>I-2. Que faire de ces erreurs de programmation ?</h3>
 
-<p>Les erreurs qui bloquent la compilation, on n&#8217;a pas trop d&#8217;autre choix que de
-les corriger. Les autres erreurs &hellip; souvent, pas grand chose n&#8217;en est fait.
-Elles sont là, elles trainent jusqu&#8217;à ce qu&#8217;elles soient trouvées, puis
-corrigées. Les pires d&#8217;entre-elles ne sont jamais détectées. C&#8217;est souvent le
-cas des erreurs numériques, ou des fichiers que l&#8217;on croit avoir ouverts.</p>
+<p>Les erreurs qui bloquent la compilation, on n'a pas trop d'autre choix que de
+les corriger. Les autres erreurs &hellip; souvent, pas grand chose n'en est fait.
+Elles sont là, elles trainent jusqu'à ce qu'elles soient trouvées, puis
+corrigées. Les pires d'entre-elles ne sont jamais détectées. C'est souvent le
+cas des erreurs numériques, ou des fichiers que l'on croit avoir ouverts.</p>
 
 <p>Dans les meilleurs de mes mondes, on fait en sorte de ne pas pouvoir compiler
 quand on est face à une erreur de programmation. Les assertions statiques nous
@@ -1628,15 +1609,15 @@ On peut aussi appliquer des petites recettes dont le principe chapeau consiste
 à confier nos invariants au compilateur. Par exemple, on évite de disposer de
 variables dans des états non pertinents (<em>cf.</em> la
 <a href="http://cpp.developpez.com/faq/cpp/?page=Les-fonctions#Ou-dois-je-declarer-mes-variables-locales">FAQ C++ de développez</a>),
-on utilise des références à la place de pointeurs quand on sait que l&#8217;on est
+on utilise des références à la place de pointeurs quand on sait que l'on est
 censés disposer de <em>liens</em> non nuls, on annote comme <strong>transférables</strong> les
 types dont les responsables changent (<em>cf.</em> un prochain billet), on fait en
 sorte de ne pas pouvoir additionner des distances avec des masses (<em>cf.</em>
 <a href="http://boost.org/libs/units">boost.unit</a>), &hellip;</p>
 
-<p>Pour les autres cas, <a href="#Meyer1988">[Meyer1988]</a> a jeté les bases d&#8217;un outil, la
+<p>Pour les autres cas, <a href="#Meyer1988">[Meyer1988]</a> a jeté les bases d'un outil, la
 <em>programmation par contrat</em>. Le C nous offre un second outil, les <em>assertions</em>.
-Les assertions permettent d&#8217;installer des points de contrôle dans un programme
+Les assertions permettent d'installer des points de contrôle dans un programme
 pour vérifier que les traitements se passent bien. Ces points de contrôles
 seront utilisés pour vérifier les contrats préalablement définis.
 Nous les détaillerons dans
@@ -1650,17 +1631,17 @@ numériques positifs <em>x</em>, et elle renvoie des nombres toujours positifs q
 vérifient <em>result = x²</em>. On retrouve la notion de <em>domaine de définition</em> des
 <em>fonctions</em> en mathématiques.</p>
 
-<p>Dit autrement, si on respecte le contrat d&#8217;appel d&#8217;une fonction (on parle de
+<p>Dit autrement, si on respecte le contrat d'appel d'une fonction (on parle de
 ses <em>pré-conditions</em>), cette fonction est censée nous garantir respecter son
 contrat de sortie (on parle de <em>post-conditions</em>). Si les pré-conditions ne
 sont pas respectées, les post-conditions (à commencer par le bon déroulement de
 la fonction) pourront ne pas être respectées : la fonction est libre de faire
-comme elle l&#8217;entend.</p>
+comme elle l'entend.</p>
 
 <p>On peut se demander à quoi ça sert. En effet, si on passe un nombre négatif à
-<code>sqrt</code> et qu&#8217;elle plante, on n&#8217;est pas plus avancés. Le bug est toujours là. Et
+<code>sqrt</code> et qu'elle plante, on n'est pas plus avancés. Le bug est toujours là. Et
 pourtant, nous avons fait un énorme pas en avant : nous avons formalisé les
-contrats de <code>sqrt</code>. Nous disposons de spécifications précises, et d&#8217;une
+contrats de <code>sqrt</code>. Nous disposons de spécifications précises, et d'une
 <a href="/blog/2014/05/28/programmation-par-contrat-les-assertions/#Documentation">documentation</a> qui pourra accompagner le code.</p>
 
 <p>Heureusement, nous pouvons aller bien plus loin. Nous pouvons aussi marquer le
@@ -1668,10 +1649,10 @@ code avec des assertions représentatives des contrats identifiés pour repérer
 les ruptures de contrats en phases de tests et développement.</p>
 
 <p>Idéalement, nous aurions dû pouvoir aller beaucoup plus loin. En effet, les
-outils d&#8217;analyse statique de code devraient pouvoir exploiter les contrats
-exprimés avec des assertions pour vérifier qu&#8217;ils n&#8217;étaient jamais violés
-lors de leur exploration des chemins d&#8217;exécution possibles.<br/>
-Seulement, les quelques outils que j&#8217;ai pu regarder utilisent au contraire les
+outils d'analyse statique de code devraient pouvoir exploiter les contrats
+exprimés avec des assertions pour vérifier qu'ils n'étaient jamais violés
+lors de leur exploration des chemins d'exécution possibles.<br/>
+Seulement, les quelques outils que j'ai pu regarder utilisent au contraire les
 assertions pour retirer des branches à explorer.</p>
 
 <h3>II.1- Les trois contrats de la PpC</h3>
@@ -1681,41 +1662,41 @@ assertions pour retirer des branches à explorer.</p>
 <h4>Les pré-conditions</h4>
 
 <p>Elles sont le pendant des <em>domaines de définition</em> des fonctions mathématiques.
-Si l&#8217;état du système vérifie les pré-conditions d&#8217;une fonction à l&#8217;instant de
+Si l'état du système vérifie les pré-conditions d'une fonction à l'instant de
 son appel, alors la fonction est censée se dérouler correctement et de façon
 <em>prévisible</em> (je simplifie).</p>
 
-<p>Typiquement, l&#8217;<em>état du système</em> correspondra aux paramètres de la fonction,
-qu&#8217;ils soient explicites, ou implicites (<code>this</code>), mais aussi à toutes les
+<p>Typiquement, l'<em>état du système</em> correspondra aux paramètres de la fonction,
+qu'ils soient explicites, ou implicites (<code>this</code>), mais aussi à toutes les
 globales accessibles.</p>
 
 <h4>Les post-conditions</h4>
 
-<p>Les post-conditions sont les garanties que l&#8217;on a sur le résultat d&#8217;une fonction
-si les pré-conditions sont remplies et que la fonction s&#8217;est exécutée
+<p>Les post-conditions sont les garanties que l'on a sur le résultat d'une fonction
+si les pré-conditions sont remplies et que la fonction s'est exécutée
 correctement.</p>
 
-<blockquote><p><strong>Important :</strong> Si une fonction voit qu&#8217;elle ne pourra pas remplir ses
-post-conditions, alors elle <strong>doit</strong> échouer &mdash; de préférence en levant une
+<blockquote><p><strong>Important :</strong> Si une fonction voit qu'elle ne pourra pas remplir ses
+post-conditions, alors elle <strong>doit</strong> échouer &ndash; de préférence en levant une
 exception de <em>runtime</em> en ce qui me concerne.</p></blockquote>
 
-<p>Notez cet emploi du <em>futur</em>. Il ne s&#8217;agit pas de vérifier si les calculs ou
-l&#8217;algorithme sont corrects en sortie de fonction, mais de vérifier si le
+<p>Notez cet emploi du <em>futur</em>. Il ne s'agit pas de vérifier si les calculs ou
+l'algorithme sont corrects en sortie de fonction, mais de vérifier si le
 contexte permet bien à la fonction de se dérouler correctement.</p>
 
-<p>Le cas <em>&ldquo;j&#8217;ai fait tous mes calculs, ils sont faux, et je ne sais pas
-pourquoi&rdquo;</em> ne justifie pas une exception. Il s&#8217;agit d&#8217;une erreur de
+<p>Le cas <em>&ldquo;j'ai fait tous mes calculs, ils sont faux, et je ne sais pas
+pourquoi&rdquo;</em> ne justifie pas une exception. Il s'agit d'une erreur de
 programmation ou de logique.<br/>
 Prenons <a href="http://fr.wikipedia.org/wiki/Vil_Coyote">Vil Coyote</a>. Il a un plan
-splendide pour attraper Bip Bip &mdash; c&#8217;est d&#8217;ailleurs la post-condition de son
-plan. Il détourne une route pour la faire arriver au pied d&#8217;une falaise, et il
-peint un tunnel sur le rocher. C&#8217;est un algo simple et efficace, Bip Bip
-devrait s&#8217;écraser sur la roche, et Vil aura son repas. Sauf que. Il y a un bug
-avec la peinture qu&#8217;il a intégrée (ou avec Bip Bip) : le volatile emprunte le
+splendide pour attraper Bip Bip &ndash; c'est d'ailleurs la post-condition de son
+plan. Il détourne une route pour la faire arriver au pied d'une falaise, et il
+peint un tunnel sur le rocher. C'est un algo simple et efficace, Bip Bip
+devrait s'écraser sur la roche, et Vil aura son repas. Sauf que. Il y a un bug
+avec la peinture qu'il a intégrée (ou avec Bip Bip) : le volatile emprunte le
 tunnel. Vous connaissez tous la suite, Vil se lance à sa poursuite et boum. La
-post-condition n&#8217;est pas respectée car il y a un bug totalement inattendu dans
-les pièces que Vil a intégrées. Il n&#8217;y avait ici pas de raison de lancer une
-exception. La seule exception plausible c&#8217;est si Bip Bip venait à ne pas
+post-condition n'est pas respectée car il y a un bug totalement inattendu dans
+les pièces que Vil a intégrées. Il n'y avait ici pas de raison de lancer une
+exception. La seule exception plausible c'est si Bip Bip venait à ne pas
 vouloir emprunter cette route.</p>
 
 <p>Bref, nous le verrons plus loin, et dans le prochain billet, ce cas de bug non
@@ -1723,13 +1704,13 @@ anticipé est mieux traité avec des assertions.</p>
 
 <h4>Les invariants</h4>
 
-<p>Il y a plusieurs natures d&#8217;invariants. On va parler d&#8217;invariants pour des zones
+<p>Il y a plusieurs natures d'invariants. On va parler d'invariants pour des zones
 de codes durant lesquelles une propriété sera vraie :</p>
 
 <ul>
 <li>un <em>invariant de boucle</em> correspondra à ce qui est toujours vrai à
-l&#8217;intérieur de la boucle (p.ex. que <code>i &lt; N</code> dans le cas d&#8217;une boucle <code>for</code>) ;
-[NdA.: À vrai dire, c&#8217;est une appellation que l&#8217;on peut voir comme abusive. En
+l'intérieur de la boucle (p.ex. que <code>i &lt; N</code> dans le cas d'une boucle <code>for</code>) ;
+[NdA.: À vrai dire, c'est une appellation que l'on peut voir comme abusive. En
 effet, ces invariants peuvent être rompus avant de sortir de la boucle.
 Certains préfèrent utiliser le terme de <em>variant de boucle</em> pour désigner une
 propriété qui va permettre de sortir de la boucle.]</li>
@@ -1738,10 +1719,10 @@ dans un état cohérent et pertinent</em> ; cet invariant est positionné à la
 sortie de son constructeur (<em>cf.</em> la
 <a href="http://cpp.developpez.com/faq/cpp/?page=Les-fonctions#Ou-dois-je-declarer-mes-variables-locales">FAQ C++ développez</a>) ;</li>
 <li>un <em>invariant de classe</em> est une propriété toujours observable depuis
-du code extérieur aux instances de la classe &mdash; p.ex. une séquence triée garantira
+du code extérieur aux instances de la classe &ndash; p.ex. une séquence triée garantira
 que tous les éléments de la séquence sont toujours ordonnés lorsque le code
 utilisant la séquence cherche à y accéder, cependant ponctuellement, le temps
-de l&#8217;insertion d&#8217;un nouvel élément l&#8217;invariant de la classe n&#8217;a pas à être
+de l'insertion d'un nouvel élément l'invariant de la classe n'a pas à être
 vérifié depuis les fonctions internes de la séquence ;</li>
 <li>une <em>référence</em> est généralement acceptée en C++ comme un pointeur avec pour
 invariant une garantie de non-nullité.</li>
@@ -1750,8 +1731,8 @@ invariant une garantie de non-nullité.</li>
 
 <h3>II.2- Acteurs et responsabilités</h3>
 
-<p>Ces contrats sont définis entre les acteurs qui interviennent dans l&#8217;écriture
-d&#8217;un code.  On peut dans l&#8217;absolu distinguer autant d&#8217;acteurs que de fonctions.<br/>
+<p>Ces contrats sont définis entre les acteurs qui interviennent dans l'écriture
+d'un code.  On peut dans l'absolu distinguer autant d'acteurs que de fonctions.<br/>
 Prenons le bout de code suivant :</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -1770,32 +1751,32 @@ Prenons le bout de code suivant :</p>
 <ul>
 <li>le responsable UI, qui écrit <code>interrogeES</code></li>
 <li>le Mathématicien, qui écrit <code>sqrt</code></li>
-<li>et l&#8217;Intégrateur, qui intègre tout cela ensemble lorsqu&#8217;il écrit <code>metier</code>.</li>
+<li>et l'Intégrateur, qui intègre tout cela ensemble lorsqu'il écrit <code>metier</code>.</li>
 </ul>
 
 
-<p><code>sqrt</code> a un contrat simple : le nombre reçu doit être positif. Si l&#8217;appel à
+<p><code>sqrt</code> a un contrat simple : le nombre reçu doit être positif. Si l'appel à
 <code>sqrt</code> échoue (plantage, résultat renvoyé aberrant, &hellip;) tandis que le nombre
 passé en paramètre est bien positif, alors le Mathématicien est responsable du
 problème et ce peu importe ce qui est fait par les autres acteurs. En effet,
 bien que les pré-conditions de <code>sqrt</code> sont bien vérifiées, ses post-conditions
 ne le sont pas : <code>sqrt</code> ne remplit pas sa part du contrat.</p>
 
-<p>Si <code>i</code> n&#8217;est pas positif, alors le Mathématicien ne peut pas être tenu pour
+<p>Si <code>i</code> n'est pas positif, alors le Mathématicien ne peut pas être tenu pour
 responsable de quoi que ce soit. La faute incombe au code client de <code>sqrt</code>.</p>
 
-<p>À ce stade, tout va dépendre si <code>interrogeES</code> dispose d&#8217;une post-condition sur
-ses sorties du type <em>renvoie un nombre positif</em>. Si c&#8217;est le cas, la rupture de
-contrat est alors à ce niveau, et le responsable UI est responsable de l&#8217;erreur
-de programmation. En effet, l&#8217;Intégrateur est dans son droit d&#8217;enchainer
-<code>sqrt(interrogeES())</code>. C&#8217;est exactement la même chose que
-<code>sqrt(abs(whatever))</code>, personne n&#8217;irait accuser l&#8217;Intégrateur de ne pas faire
+<p>À ce stade, tout va dépendre si <code>interrogeES</code> dispose d'une post-condition sur
+ses sorties du type <em>renvoie un nombre positif</em>. Si c'est le cas, la rupture de
+contrat est alors à ce niveau, et le responsable UI est responsable de l'erreur
+de programmation. En effet, l'Intégrateur est dans son droit d'enchainer
+<code>sqrt(interrogeES())</code>. C'est exactement la même chose que
+<code>sqrt(abs(whatever))</code>, personne n'irait accuser l'Intégrateur de ne pas faire
 son boulot vu que les pré-conditions de <code>sqrt</code> sont censées être assurées par
 les post-conditions de <code>interrogeES</code>.</p>
 
-<p>En revanche, si <code>interrogeES</code> n&#8217;a aucune post-condition telle que le nombre
-renvoyé sera positif, alors l&#8217;Intégrateur est responsable au moment de l&#8217;intégration de
-s&#8217;assurer que ce qu&#8217;il va passer à <code>sqrt</code> soit bien positif. Une correction
+<p>En revanche, si <code>interrogeES</code> n'a aucune post-condition telle que le nombre
+renvoyé sera positif, alors l'Intégrateur est responsable au moment de l'intégration de
+s'assurer que ce qu'il va passer à <code>sqrt</code> soit bien positif. Une correction
 typique serait :</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -1813,52 +1794,52 @@ typique serait :</p>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Remarquez, que l&#8217;Intégrateur est alors face à une erreur de contexte
+<p>Remarquez, que l'Intégrateur est alors face à une erreur de contexte
 (/<em>runtime</em>) et nullement face à une erreur de programmation. Il est alors en
 droit de lever une exception (souvenez-vous, si une post-condition ne peut pas
-être respectée, alors la fonction doit échouer), ou de boucler jusqu&#8217;à obtenir
+être respectée, alors la fonction doit échouer), ou de boucler jusqu'à obtenir
 quelque chose qui lui permette de continuer. Sans cela nous aurions été face à
-une erreur de programmation commise par l&#8217;Intégrateur.</p>
+une erreur de programmation commise par l'Intégrateur.</p>
 
 <p>En résumé :</p>
 
 <blockquote><ul>
-<li>la responsabilité de vérifier les pré-conditions d&#8217;une fonction échoie au
+<li>la responsabilité de vérifier les pré-conditions d'une fonction échoie au
 code client, voire indirectement au code qui alimente les entrées de cette
 fonction appelée.</li>
-<li>la responsabilité de vérifier les post-conditions d&#8217;une fonction échoie à
+<li>la responsabilité de vérifier les post-conditions d'une fonction échoie à
 cette fonction appelée.</li>
 </ul>
 </blockquote>
 
-<p>NB: Jusqu&#8217;à présent je considérai seulement deux acteurs relativement aux
-responsabilités. C&#8217;est Philippe Dunski qui m&#8217;a fait entrevoir le troisième
+<p>NB: Jusqu'à présent je considérai seulement deux acteurs relativement aux
+responsabilités. C'est Philippe Dunski qui m'a fait entrevoir le troisième
 intervenant lors de ma relecture de son livre <a href="#Dunksi2014">[Dunksi2014]</a>.</p>
 
 <h3>II.3- Petite parenthèse sur les contrats commerciaux&hellip; et les licences</h3>
 
-<p>La programmation par contrat n&#8217;a pas vocation à avoir des répercutions légales
+<p>La programmation par contrat n'a pas vocation à avoir des répercutions légales
 selon qui ne remplit pas son contrat. Cependant, il y a clairement une
 intersection entre la PpC et les responsabilités légales.</p>
 
 <p>Dans le cas où le responsable UI et le Mathématicien sont deux contractants de
-l&#8217;Intégrateur. Ce que j&#8217;ai détaillé au paragraphe précédant est normalement
-directement applicable. L&#8217;Intégrateur sera responsable vis-à-vis de son client
-du bon fonctionnement de l&#8217;ensemble, mais le responsable UI et le Mathématicien
-ont des responsabilités vis-à-vis de l&#8217;Intégrateur.</p>
+l'Intégrateur. Ce que j'ai détaillé au paragraphe précédant est normalement
+directement applicable. L'Intégrateur sera responsable vis-à-vis de son client
+du bon fonctionnement de l'ensemble, mais le responsable UI et le Mathématicien
+ont des responsabilités vis-à-vis de l'Intégrateur.</p>
 
 <p>Si maintenant, le responsable UI ou le Mathématicien ne livrent plus des
 <a href="http://en.wikipedia.org/wiki/Commercial_off-the-shelf">COTS</a> (au sens
 commercial), mais des bibliothèques tierces OpenSources ou Libres, à moins que
-l&#8217;Intégrateur ait pris un contrat de maintenance auprès du responsable UI et du
+l'Intégrateur ait pris un contrat de maintenance auprès du responsable UI et du
 Mathématicien, il est peu probable que le responsable UI ou le Mathématicien
-aient la moindre responsabilité légale vis à vis de l&#8217;Intégrateur.</p>
+aient la moindre responsabilité légale vis à vis de l'Intégrateur.</p>
 
-<p>L&#8217;Intégrateur est seul responsable vis-à-vis de son client. À lui de trouver des
-contournements, ou mieux de corriger ces composants tiers qu&#8217;il a choisi
-d&#8217;utiliser, et de reverser les patchs à la communauté.</p>
+<p>L'Intégrateur est seul responsable vis-à-vis de son client. À lui de trouver des
+contournements, ou mieux de corriger ces composants tiers qu'il a choisi
+d'utiliser, et de reverser les patchs à la communauté.</p>
 
-<p>Mais je m&#8217;égare, ceci est une autre histoire.  Revenons à nos moutons.</p>
+<p>Mais je m'égare, ceci est une autre histoire.  Revenons à nos moutons.</p>
 
 <h2><a id="ProgrammationDefensive"></a>III- La Programmation Défensive, une philosophie antagoniste ou complémentaire ?</h2>
 
@@ -1866,32 +1847,32 @@ d&#8217;utiliser, et de reverser les patchs à la communauté.</p>
 Défensive</em>. Souvent ces deux approches sont confondues tant la frontière entre
 les deux est subtile.</p>
 
-<p><em>Tout d&#8217;abord une petite remarque importante, la Programmation Défensive a
-d&#8217;autres objectifs orthogonaux à ce qui est discuté dans ces billets : elle est
+<p><em>Tout d'abord une petite remarque importante, la Programmation Défensive a
+d'autres objectifs orthogonaux à ce qui est discuté dans ces billets : elle est
 aussi utilisée pour introduire une tolérance aux erreurs matérielles, limiter
-les conséquences de ces erreurs (comme les corruptions de mémoire).  C&#8217;est un
-aspect que je n&#8217;aborde pas dans le cadre de la comparaison avec la PpC.</em></p>
+les conséquences de ces erreurs (comme les corruptions de mémoire).  C'est un
+aspect que je n'aborde pas dans le cadre de la comparaison avec la PpC.</em></p>
 
 <h3><a id="ProgDefCtx"></a>III.1- Présentons la Programmation Défensive</h3>
 
-<p>La <em>Programmation Défensive</em> a pour objectif qu&#8217;un programme ne doit jamais
-s&#8217;arrêter afin de toujours pouvoir continuer. On s&#8217;intéresse à la robustesse
-d&#8217;un programme.</p>
+<p>La <em>Programmation Défensive</em> a pour objectif qu'un programme ne doit jamais
+s'arrêter afin de toujours pouvoir continuer. On s'intéresse à la robustesse
+d'un programme.</p>
 
 <p>Bien que la PpC puisse être détournée pour faire de la programmation
-défensive, ce n&#8217;est pas son objectif premier. La PpC ne fait que stipuler que
-si un contrat est respecté, alors tout se passera bien. Si le contrat n&#8217;est pas
+défensive, ce n'est pas son objectif premier. La PpC ne fait que stipuler que
+si un contrat est respecté, alors tout se passera bien. Si le contrat n'est pas
 respecté tout peut arriver : on peut assister à des plantages plus ou moins
 prévisibles, on peut produire des résultats erronés, on peut stopper
 volontairement au point de détection des erreurs, et on peut aussi remonter
-des exceptions. Avec la PpC, on s&#8217;intéresse à l&#8217;écriture de code correct.</p>
+des exceptions. Avec la PpC, on s'intéresse à l'écriture de code correct.</p>
 
 <p>Le choix de remonter des exceptions, depuis le lieu de la détection de la
-rupture de contrat, est un choix de programmation défensive. C&#8217;est un choix que
-j&#8217;assimile à une déresponsabilisation des véritables responsables.</p>
+rupture de contrat, est un choix de programmation défensive. C'est un choix que
+j'assimile à une déresponsabilisation des véritables responsables.</p>
 
 <p>Supposons une application qui lit un fichier de distances, et qui pour le besoin
-de son métier calcule des racines carrées sur ces distances. L&#8217;approche de la
+de son métier calcule des racines carrées sur ces distances. L'approche de la
 <em>programmation défensive</em> consisterait à vérifier dans la fonction <code>my::sqrt</code> que
 le paramètre reçu est positif, et à lever une exception dans le cas contraire.</p>
 
@@ -1927,12 +1908,12 @@ le paramètre reçu est positif, et à lever une exception dans le cas contraire
 
 
 <p>Si un nombre négatif devait être présent dans le fichier, nous aurions droit à
-l&#8217;exception <em>&ldquo;Negative number sent to sqrt&rdquo;</em>. Limpide, n&#8217;est-ce pas ? On ne sait
-pas quel est le nombre, ni d&#8217;où il vient. Après une longue investigation pour
-traquer l&#8217;origine de ce nombre négatif, on comprend enfin qu&#8217;il faut
-instrumenter <code>process</code> pour intercepter l&#8217;exception. Soit on fait le <code>catch</code> au
-niveau de la fonction, et on sait dans quel fichier a lieu l&#8217;erreur, soit on
-encadre l&#8217;appel à <code>my::sqrt</code> pour remonter plus d&#8217;informations.</p>
+l'exception <em>&ldquo;Negative number sent to sqrt&rdquo;</em>. Limpide, n'est-ce pas ? On ne sait
+pas quel est le nombre, ni d'où il vient. Après une longue investigation pour
+traquer l'origine de ce nombre négatif, on comprend enfin qu'il faut
+instrumenter <code>process</code> pour intercepter l'exception. Soit on fait le <code>catch</code> au
+niveau de la fonction, et on sait dans quel fichier a lieu l'erreur, soit on
+encadre l'appel à <code>my::sqrt</code> pour remonter plus d'informations.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -1975,7 +1956,7 @@ encadre l&#8217;appel à <code>my::sqrt</code> pour remonter plus d&#8217;inform
 
 <p>Et là &hellip; on fait ce que le code client aurait dû faire dès le début : assurer
 que le contrat des fonctions appelées est bien respecté.<br/>
-En effet, si on avait embrassé la PpC dans l&#8217;écriture de ces deux fonctions, ce
+En effet, si on avait embrassé la PpC dans l'écriture de ces deux fonctions, ce
 bout de code aurait ressemblé à :</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -2017,69 +1998,69 @@ bout de code aurait ressemblé à :</p>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Cela n&#8217;est-il pas plus simple et propre pour disposer d&#8217;un message non
+<p>Cela n'est-il pas plus simple et propre pour disposer d'un message non
 seulement plus explicite, mais surtout bien plus utile ? Comparez ce nouveau
 message <em>&ldquo;Invalid negative distance -28.15 at the 42th line of distances file
 distances.txt&rdquo;</em>, au précédent <em>&ldquo;Negative number sent to sqrt&rdquo;</em>.<br/>
-Notez que l&#8217;on pourrait aussi critiquer l&#8217;impact en termes de performances de
-la solution précédente (avec le <code>catch</code>). Un <code>catch</code> n&#8217;est pas si gratuit que
-cela &mdash; a contrario du <em>Stack Unwinding</em>.</p>
+Notez que l'on pourrait aussi critiquer l'impact en termes de performances de
+la solution précédente (avec le <code>catch</code>). Un <code>catch</code> n'est pas si gratuit que
+cela &ndash; a contrario du <em>Stack Unwinding</em>.</p>
 
 <h3>III.2- Des objections ?</h3>
 
-<p>Il est des objections classiques à l&#8217;utilisation de la PpC en terrain où la
+<p>Il est des objections classiques à l'utilisation de la PpC en terrain où la
 Programmation Défensive occupe déjà la place. Décortiquons-les.</p>
 
-<h4><em>&ldquo;-On utilise l&#8217;une ou l&#8217;autre&rdquo;</em></h4>
+<h4><em>&ldquo;-On utilise l'une ou l'autre&rdquo;</em></h4>
 
-<p>Oui et non. Si la PpC s&#8217;intéresse à l&#8217;écriture de code correct, la
-Programmation Défensive s&#8217;intéresse à l&#8217;écriture de code robuste.
-L&#8217;objectif premier n&#8217;est pas le même (dans un cas on essaie de repérer et
-éliminer les erreurs de programmation, dans l&#8217;autre on essaie de ne pas planter
-en cas d&#8217;erreur de programmation), de fait les deux techniques peuvent se
+<p>Oui et non. Si la PpC s'intéresse à l'écriture de code correct, la
+Programmation Défensive s'intéresse à l'écriture de code robuste.
+L'objectif premier n'est pas le même (dans un cas on essaie de repérer et
+éliminer les erreurs de programmation, dans l'autre on essaie de ne pas planter
+en cas d'erreur de programmation), de fait les deux techniques peuvent se
 compléter.<br/>
-D&#8217;abord on élimine les bugs, ensuite on essaie de résister aux bugs
+D'abord on élimine les bugs, ensuite on essaie de résister aux bugs
 récalcitrants.</p>
 
 <p>À vrai dire, on peut utiliser simultanément ces deux approches sur de mêmes
-contrats. En effet, il est possible de modifier la définition d&#8217;une assertion
+contrats. En effet, il est possible de modifier la définition d'une assertion
 en mode <em>Release</em> pour lui faire lever une exception de logique. En mode
-<em>Debug</em> elle nous aidera à contrôler les enchainements d&#8217;opérations</p>
+<em>Debug</em> elle nous aidera à contrôler les enchainements d'opérations</p>
 
-<p>Ce qui indubitable, c&#8217;est qu&#8217;en cas de certitude qu&#8217;il n&#8217;y a pas d&#8217;erreur de
-programmation sur des enchainements de fonctions, alors il n&#8217;y a pas besoin de
+<p>Ce qui indubitable, c'est qu'en cas de certitude qu'il n'y a pas d'erreur de
+programmation sur des enchainements de fonctions, alors il n'y a pas besoin de
 test dynamique sur les entrées des fonctions.<br/>
-Reste que toute la difficulté réside dans comment être certains qu&#8217;une séquence
-d&#8217;opérations est exempte de bugs.</p>
+Reste que toute la difficulté réside dans comment être certains qu'une séquence
+d'opérations est exempte de bugs.</p>
 
-<h4><em>&ldquo;&ndash; La PpC éparpille les vérifications alors que la Programmation Défensive les factorise.&rdquo;</em></h4>
+<h4><em>&ldquo;- La PpC éparpille les vérifications alors que la Programmation Défensive les factorise.&rdquo;</em></h4>
 
-<p>Il est vrai que la Programmation Défensive permet d&#8217;une certaine façon de
+<p>Il est vrai que la Programmation Défensive permet d'une certaine façon de
 centraliser et factoriser les vérifications. Mais les vérifications ainsi
 centralisées ne disposent pas du contexte qui permet de remonter des erreurs
-correctes. Il est nécessaire d&#8217;enrichir les exceptions pauvres en les
+correctes. Il est nécessaire d'enrichir les exceptions pauvres en les
 transformant au niveau du code client, et là on perd les factorisations.<br/>
-D&#8217;où la question légitime que l&#8217;on est en droit de se poser : <em>&ldquo;Mais pourquoi ne
+D'où la question légitime que l'on est en droit de se poser : <em>&ldquo;Mais pourquoi ne
 pas faire ce que le code client était censé faire dès le début ? Pourquoi ne
-pas vérifier les pré-conditions des fonctions que l&#8217;on va appeler, avant de les
+pas vérifier les pré-conditions des fonctions que l'on va appeler, avant de les
 appeler ?&rdquo;</em></p>
 
 <p>Ensuite, il est toujours possible de factoriser grâce aux assertions. Si en
 mode <em>Release</em> les assertions lèvent des exceptions, alors factorisation il y
 a.</p>
 
-<p>Ce qui me gêne avec cette <em>factorisation</em>, c&#8217;est que l&#8217;on mélange les problèmes
-de <em>runtime</em> avec les erreurs de programmation ou de logique. J&#8217;aime bien le
+<p>Ce qui me gêne avec cette <em>factorisation</em>, c'est que l'on mélange les problèmes
+de <em>runtime</em> avec les erreurs de programmation ou de logique. J'aime bien le
 <a href="http://en.wikipedia.org/wiki/Single_responsibility_principle"><em>Single Responsability Principle (SRP)</em></a>,
-mais là, j&#8217;ai la franche impression que l&#8217;on mélange les responsabilités des
+mais là, j'ai la franche impression que l'on mélange les responsabilités des
 vérifications.<br/>
 De fait, on commence à avoir des systèmes aux responsabilités de plus en plus
 confuses.</p>
 
 <p>De plus, cette factorisation implique de toujours vérifier dynamiquement ce qui
-est garantit statiquement. D&#8217;autant que idéalement s&#8217;il n&#8217;y a pas d&#8217;erreur de
-programmation, alors il n&#8217;y a pas de test à faire dans les cas où le <em>runtime</em>
-n&#8217;a pas à être vérifié.<br/>
+est garantit statiquement. D'autant que idéalement s'il n'y a pas d'erreur de
+programmation, alors il n'y a pas de test à faire dans les cas où le <em>runtime</em>
+n'a pas à être vérifié.<br/>
 Quel sens il y a-t-il à écrire ceci ?</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -2097,41 +2078,41 @@ Quel sens il y a-t-il à écrire ceci ?</p>
 
 <h4><em>&ldquo;-Le mode Debug ne doit pas se comporter différemment du mode Release!&rdquo;</em></h4>
 
-<p>Remontons à l&#8217;origine de cette exigence pour mieux appréhender son impact sur
+<p>Remontons à l'origine de cette exigence pour mieux appréhender son impact sur
 la PpC telle que je vous la propose (avec des assertions).</p>
 
 <p>Parfois, le mode <em>Debug</em> est plus permissif que le mode <em>Release</em> : il cache
-des erreurs de programmation. Souvent c&#8217;est du à des outils (comme VC++) dont le mode
+des erreurs de programmation. Souvent c'est du à des outils (comme VC++) dont le mode
 <em>Debug</em> zéro-initialise des variables même quand le code néglige de les
 initialiser.</p>
 
-<p>Avec des assertions, c&#8217;est tout le contraire. En effet, le mode <em>Debug</em> ne sera
+<p>Avec des assertions, c'est tout le contraire. En effet, le mode <em>Debug</em> ne sera
 pas plus permissif, mais au contraire il sera plus restrictif et intransigeant
 que le mode <em>Release</em>. Ainsi, si un test passe en mode <em>Debug</em>, il passera
 également en mode <em>Release</em> (relativement aux assertions) : si le test est OK,
-c&#8217;est que les assertions traversées ne détectent aucune rupture de contrat en
-<em>Debug</em>, il n&#8217;y aurait aucune raison qu&#8217;il en aille autrement en <em>Release</em>.
+c'est que les assertions traversées ne détectent aucune rupture de contrat en
+<em>Debug</em>, il n'y aurait aucune raison qu'il en aille autrement en <em>Release</em>.
 A contrario, un test qui finit en <em>coredump</em> en <em>Debug</em> aurait pu tomber en
 marche en <em>Release</em>, comme planter de façon plus ou moins compréhensible (plutôt
 moins en général).<br/>
-Ce qui est sûr, c&#8217;est qu&#8217;en phases de développement et de tests, les
-développeurs auraient vu l&#8217;erreur de programmation et ils auraient dû la
+Ce qui est sûr, c'est qu'en phases de développement et de tests, les
+développeurs auraient vu l'erreur de programmation et ils auraient dû la
 corriger pour voir le test passer.</p>
 
-<h4><em>&ldquo;&ndash; La programmation Défensive est plus adaptée aux développeurs inexpérimentés.&rdquo;</em></h4>
+<h4><em>&ldquo;- La programmation Défensive est plus adaptée aux développeurs inexpérimentés.&rdquo;</em></h4>
 
-<p>C&#8217;est possible. On ne réfléchit pas avant. On code et on voit ensuite ce qu&#8217;il
+<p>C'est possible. On ne réfléchit pas avant. On code et on voit ensuite ce qu'il
 se passe. Traditionnellement, les débutants tendent à être formés de la sorte.</p>
 
 <p>Seulement, on complexifie grandement la base de code avec cette approche.
 Les erreurs (de programmations et logiques) sont mélangées aux cas dégradés du
 <em>runtime</em>. Nous avons une vision plus floue, des fonctions plus complexes qui
 propagent et rattrapent des exceptions qui ne sont pas censées se produire.<br/>
-Bref, nous avons une logique d&#8217;ensemble plus difficile à maîtriser.</p>
+Bref, nous avons une logique d'ensemble plus difficile à maîtriser.</p>
 
 <p>Les cas dégradés induits par nos métiers complexifient déjà grandement les
 applications. Rajouter, au milieu de cela, du code pour gérer les erreurs de
-programmation complexifie encore plus les systèmes. D&#8217;ailleurs, ne
+programmation complexifie encore plus les systèmes. D'ailleurs, ne
 rajoutent-ils pas de nouveaux risques de bugs ?</p>
 
 <p>De fait, je me pose sincèrement la question : en voulant rendre plus
@@ -2140,7 +2121,7 @@ le contraire ?</p>
 
 <p>À noter aussi aussi que le diagnostic des erreurs de <em>runtime</em> ou de logique
 est plus pauvre avec la <em>factorisation</em> de la Programmation Défensive. Et de
-fait, on complexifie les tâches d&#8217;investigation des problèmes vu que l&#8217;on
+fait, on complexifie les tâches d'investigation des problèmes vu que l'on
 déresponsabilise les véritables responsables.</p>
 
 <h3>III.3- En résumé</h3>
@@ -2148,15 +2129,15 @@ déresponsabilise les véritables responsables.</p>
 <p>Sinon, voici mes conclusions personnelles sur le sujet :</p>
 
 <ul>
-<li>La PpC s&#8217;intéresse à l&#8217;écriture de codes corrects. La Programmation Défensive
-s&#8217;intéresse à l&#8217;écriture de codes qui restent robustes dans le cas où ils ne
+<li>La PpC s'intéresse à l'écriture de codes corrects. La Programmation Défensive
+s'intéresse à l'écriture de codes qui restent robustes dans le cas où ils ne
 seraient pas corrects.</li>
 <li>Philosophiquement, je préfère 100 fois la PpC à la Programmation Défensive :
 il faut assumer nos responsabilités et ne pas décharger nos utilisateurs de
 leurs devoirs.</li>
 <li>Toutefois, il est possible de détourner la PpC  basée sur des assertions en C
-et C++ pour faire de la Programmation Défensive ; p.ex. l&#8217;assertion pourrait
-être détournée en <em>Release</em> pour lever une exception. J&#8217;y reviendrai dans le
+et C++ pour faire de la Programmation Défensive ; p.ex. l'assertion pourrait
+être détournée en <em>Release</em> pour lever une exception. J'y reviendrai dans le
 <a href="/blog/2014/05/28/programmation-par-contrat-les-assertions/">prochain billet</a>.</li>
 </ul>
 
@@ -2164,16 +2145,16 @@ et C++ pour faire de la Programmation Défensive ; p.ex. l&#8217;assertion pourr
 <h3>III.4- Comment reconnaitre des contrats ?</h3>
 
 <p>Il est important de le rappeler, les contrats tels que présentés ici sont
-orientés vers la recherche des erreurs de programmation. C&#8217;est à dire, un code
+orientés vers la recherche des erreurs de programmation. C'est à dire, un code
 qui ne respecte pas les contrats de ses divers constituants présente une erreur
 de programmation.</p>
 
 <p>En aucun cas une violation de contrat correspondra à une situation
 exceptionnelle (et plausible), <em>cf.</em> <a href="#Wilson2006">[Wilson2006]</a></p>
 
-<p>Il est également à noter qu&#8217;une vérification de contrat devrait pouvoir être
-retirée d&#8217;un code source sans que son comportement ne soit impacté. En effet,
-un programme dépourvu d&#8217;erreur de logique n&#8217;aura aucun contrat qui se fasse
+<p>Il est également à noter qu'une vérification de contrat devrait pouvoir être
+retirée d'un code source sans que son comportement ne soit impacté. En effet,
+un programme dépourvu d'erreur de logique n'aura aucun contrat qui se fasse
 violer, et la vérification devient superflue.</p>
 
 <h2>IV- Parenthèse OO : PpC &amp; <em>Principe de Substitution de Liskov</em> (LSP)</h2>
@@ -2181,22 +2162,22 @@ violer, et la vérification devient superflue.</p>
 <p>Je ne rentrerai pas dans les détails du LSP. Je vous renvoie plutôt à la
 <a href="http://cpp.developpez.com/faq/cpp/?page=L-heritage#Qu-est-ce-que-le-LSP">FAQ C++ de développez</a>,
 ou à <a href="#Dunksi2014">[Dunksi2014]</a>. Il faut retenir que le LSP est un outil qui
-permet d&#8217;éviter de définir des hiérarchies de classes qui se retourneront
+permet d'éviter de définir des hiérarchies de classes qui se retourneront
 contre nous.</p>
 
 <p>Le LSP est formulé relativement aux contrats des classes pour établir quand une
-classe peut dériver (publiquement en C++) en toute quiétude d&#8217;une autre.
+classe peut dériver (publiquement en C++) en toute quiétude d'une autre.
 Le principe est que :</p>
 
 <ul>
-<li>les pré-conditions ne peuvent être qu&#8217;affaiblies, ou laissées telles quelles,</li>
+<li>les pré-conditions ne peuvent être qu'affaiblies, ou laissées telles quelles,</li>
 <li>les post-conditions ne peuvent être que renforcées, ou laissées telles
 quelles,</li>
-<li>et une classe fille ne peut qu&#8217;ajouter des invariants.</li>
+<li>et une classe fille ne peut qu'ajouter des invariants.</li>
 </ul>
 
 
-<p>Dit comme cela, cela peut paraitre abscons, et pourtant c&#8217;est très logique.</p>
+<p>Dit comme cela, cela peut paraitre abscons, et pourtant c'est très logique.</p>
 
 <h4>Quelques exemples</h4>
 
@@ -2204,26 +2185,26 @@ quelles,</li>
 bagages acceptés sans surcouts. Pour toutes les compagnies, un bagage de
 50x40x20cm sera toujours accepté. En particulier, chez les compagnies
 low-costs. En revanche, les grandes compagnies historiques (et non low-costs)
-affaiblissent cette pré-condition : on peut s&#8217;enregistrer avec un bagage
+affaiblissent cette pré-condition : on peut s'enregistrer avec un bagage
 bien plus gros sans avoir à payer de supplément (certes il partira en soute).<br/>
-Il en va de même pour les post-conditions : nous n&#8217;avons aucune garantie
-d&#8217;estomac rempli sans surcouts une fois à bord de l&#8217;avion. Sauf chez les
+Il en va de même pour les post-conditions : nous n'avons aucune garantie
+d'estomac rempli sans surcouts une fois à bord de l'avion. Sauf chez les
 compagnies traditionnelles qui assurent en sortie un estomac non vide.<br/>
-On peut donc dire a priori qu&#8217;une <em>compagnie low-cost</em> est une <em>compagnie
-aérienne</em>, de même qu&#8217;une <em>compagnie traditionnelle</em> est une <em>compagnie
+On peut donc dire a priori qu'une <em>compagnie low-cost</em> est une <em>compagnie
+aérienne</em>, de même qu'une <em>compagnie traditionnelle</em> est une <em>compagnie
 aérienne</em>.</p>
 
 <p>Côté invariants, un rectangle immuable a tous ses côtés perpendiculaires, un
 carré immuable a en plus tous ses côtés de longueur égale.</p>
 
-<p>Parmi les conséquences du LSP, on pourra déduire qu&#8217;une <em>liste triée</em> n&#8217;est pas
-substituable à une <em>liste</em>, ou qu&#8217;un <em>carré non immuable</em> n&#8217;est pas un
+<p>Parmi les conséquences du LSP, on pourra déduire qu'une <em>liste triée</em> n'est pas
+substituable à une <em>liste</em>, ou qu'un <em>carré non immuable</em> n'est pas un
 <em>rectangle non immuable</em>. Je vous renvoie à la littérature et/ou la FAQ pour
-plus d&#8217;informations sur le sujet.</p>
+plus d'informations sur le sujet.</p>
 
 <h2>V- Remerciements</h2>
 
-<p>Un grand merci à tous mes relecteurs, correcteurs et détracteurs. J&#8217;ai nommé:
+<p>Un grand merci à tous mes relecteurs, correcteurs et détracteurs. J'ai nommé:
 Julien Blanc,
 Guilhem Bonnefille,
 David Côme,
@@ -2237,13 +2218,13 @@ Cédric Poncet-Montange</p>
 <p>[<em>NdA: Je réorganiserai les liens au fur et à mesure des sorties des articles</em>]</p>
 
 <ul>
-<li><a id="Meyer1988"></a>[Meyer2000] &mdash; <a href="http://www.editions-eyrolles.com/Livre/9782212122701/conception-et-programmation-orientees-objet"><em>Conception et programmation orientées objet</em></a> de Bertrand Meyer, Eyrolles, 1988, Seconde Édition parue en 2000</li>
-<li><a id="Dunksi2014"></a>[Dunksi2014] &mdash; <a href="http://www.d-booker.fr/programmation-et-langage/157-coder-efficacement.html"><em>Coder Efficacement &mdash; Bonnes pratiques et erreurs à éviter (en C++)</em></a> de Philippe Dunski, D-Booker, Février 2014</li>
-<li><a id="IPCpp"></a>[Wilson2004] &mdash; <em>Imperfect C++</em> de Matthew Wilson, Addisson-Wesley Professionnal, Octobre 2004.</li>
-<li><a id="Wilson2006"></a>[Wilson2006] &mdash; <a href="http://www.artima.com/cppsource/deepspace3.html"><em>Contract Programming 101</em></a>, Matthew Wilson, artima, Janvier 2006.</li>
+<li><a id="Meyer1988"></a>[Meyer2000] &ndash; <a href="http://www.editions-eyrolles.com/Livre/9782212122701/conception-et-programmation-orientees-objet"><em>Conception et programmation orientées objet</em></a> de Bertrand Meyer, Eyrolles, 1988, Seconde Édition parue en 2000</li>
+<li><a id="Dunksi2014"></a>[Dunksi2014] &ndash; <a href="http://www.d-booker.fr/programmation-et-langage/157-coder-efficacement.html"><em>Coder Efficacement &ndash; Bonnes pratiques et erreurs à éviter (en C++)</em></a> de Philippe Dunski, D-Booker, Février 2014</li>
+<li><a id="IPCpp"></a>[Wilson2004] &ndash; <em>Imperfect C++</em> de Matthew Wilson, Addisson-Wesley Professionnal, Octobre 2004.</li>
+<li><a id="Wilson2006"></a>[Wilson2006] &ndash; <a href="http://www.artima.com/cppsource/deepspace3.html"><em>Contract Programming 101</em></a>, Matthew Wilson, artima, Janvier 2006.</li>
 <li><a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3753.pdf">n3753</a></li>
-<li>Billets d&#8217;Andrzej<br/>
-Il s&#8217;agit là d&#8217;une excellente série d&#8217;articles/billets sur la PpC.
+<li>Billets d'Andrzej<br/>
+Il s'agit là d'une excellente série d'articles/billets sur la PpC.
 
 <ul>
 <li><a href="http://akrzemi1.wordpress.com/2013/01/04/preconditions-part-i/">http://akrzemi1.wordpress.com/2013/01/04/preconditions-part-i/</a></li>
@@ -2260,7 +2241,7 @@ Il s&#8217;agit là d&#8217;une excellente série d&#8217;articles/billets sur l
 <li><a href="http://pempek.net/articles/2013/11/16/assertions-or-exceptions/">http://pempek.net/articles/2013/11/16/assertions-or-exceptions/</a></li>
 <li><a href="http://pempek.net/articles/2013/11/17/cross-platform-cpp-assertion-library/">http://pempek.net/articles/2013/11/17/cross-platform-cpp-assertion-library/</a></li>
 <li><a href="http://julien-blanc.developpez.com/articles/cpp/Programmation_par_contrat_cplusplus/"><em>Programmation par contrat, application en C++</em></a>, de Julien Blanc, 14 décembre 2009<br/>
-Vous trouverez d&#8217;autres explications et d&#8217;autres techniques dans son
+Vous trouverez d'autres explications et d'autres techniques dans son
 article.</li>
 </ul>
 </li>
@@ -2287,14 +2268,7 @@ article.</li>
 
 
 
-
-
-
-
-  
-
-
-<time datetime="2012-04-04T11:44:47+02:00" pubdate data-updated="true">Apr 4<span>th</span>, 2012</time>
+<time class='entry-date' datetime='2012-04-04T11:44:47+02:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>4</span><span class='date-suffix'>th</span>, <span class='date-year'>2012</span></span> <span class='time'>11:44 am</span></time>
         
            | <a href="/blog/2012/04/04/le-c-plus-plus-moderne/#disqus_thread"
              data-disqus-identifier="http://LucHermitte.github.io/blog/2012/04/04/le-c-plus-plus-moderne/">Comments</a>
@@ -2306,7 +2280,7 @@ article.</li>
 
   <div class="entry-content"><p><em>Billet initialement posté sur <a href="https://thor.si.c-s.fr/blogs/cs2/#urn:md5:a7dc48a340cd43c09c1180dd99234483">mon blog du boulot</a></em></p>
 
-<p>Suite à la grille que j&#8217;avais donnée dans mon <a href="https://thor.si.c-s.fr/blogs/cs2/#urn:md5:4bdf150032f41bbea81a4ee4a259d522">précédent billet</a>, deux questions fort pertinentes m&#8217;ont été posées :</p>
+<p>Suite à la grille que j'avais donnée dans mon <a href="https://thor.si.c-s.fr/blogs/cs2/#urn:md5:4bdf150032f41bbea81a4ee4a259d522">précédent billet</a>, deux questions fort pertinentes m'ont été posées :</p>
 
 <blockquote><p>Que signifie «simple» ?
 De même «C++ moderne» concerne la syntaxe ?</p></blockquote>
@@ -2314,23 +2288,23 @@ De même «C++ moderne» concerne la syntaxe ?</p></blockquote>
 <h2>De la simplicité</h2>
 
 <p><em>Hum &hellip; est-il simple de définir la simplicité ? Voyons voir. Ah! Même la page
-wiki du <a href="http://en.wikipedia.org/wiki/KISS_principle">principe du KISS</a> n&#8217;élabore pas sur le sujet. Bon.</em></p>
+wiki du <a href="http://en.wikipedia.org/wiki/KISS_principle">principe du KISS</a> n'élabore pas sur le sujet. Bon.</em></p>
 
-<p>J&#8217;estime qu&#8217;un code est simple quand il résout, correctement, un problème en
-peu de lignes, et qu&#8217;il demande peu d&#8217;énergie pour comprendre ce qu&#8217;il fait des
+<p>J'estime qu'un code est simple quand il résout, correctement, un problème en
+peu de lignes, et qu'il demande peu d'énergie pour comprendre ce qu'il fait des
 mois plus tard quand on a besoin de le relire, voire de le maintenir.</p>
 
 <p>Un exemple facile serait par exemple un code C qui lit depuis un fichier un
-nombre de lignes inconnu à l&#8217;avance et le même code en C++. La version robuste
+nombre de lignes inconnu à l'avance et le même code en C++. La version robuste
 (qui prend en compte les éventuels problèmes) est vite complexe en C. En effet,
 en C il faut gérer manuellement les réallocations pour chaque ligne lue, mais
 aussi pour le tableau de lignes. Le C++, mais aussi glibc, fournissent des
 <em>primitives</em> dédiées qui épargnent au développeur de devoir réinventer la roue.
-Cf l&#8217;article de Bjarne Stroustrup: <a href="http://www.research.att.com/~bs/new_learning.pdf">Learning C++ as a new language</a>.</p>
+Cf l'article de Bjarne Stroustrup: <a href="http://www.research.att.com/~bs/new_learning.pdf">Learning C++ as a new language</a>.</p>
 
 <p>On touche au paradoxe de la simplicité entre le C et le C++. Le C qui ne
 dispose uniquement que des briques élémentaires (relativement à la gestion de
-la mémoire et des chaines &mdash; et encore) est plus simple que le C++. Pourtant le
+la mémoire et des chaines &ndash; et encore) est plus simple que le C++. Pourtant le
 C++ qui offre des encapsulations de ces briques élémentaires permet de produire
 plus simplement du code robuste.</p>
 
@@ -2340,27 +2314,27 @@ de Xerces-C++ avec les autres bibliothèques plus modernes.</p>
 
 <h2>Le C++ Moderne</h2>
 
-<p>Pour comprendre ce qu&#8217;est le <em>C++ Moderne</em>, il faut d&#8217;abord voir ce qu&#8217;est le <em>C++ historique</em>.</p>
+<p>Pour comprendre ce qu'est le <em>C++ Moderne</em>, il faut d'abord voir ce qu'est le <em>C++ historique</em>.</p>
 
 <h3>Le C++ Historique</h3>
 
 <p>Un majorité écrasante, et regrettable, de ressources pédagogiques sur le C++
-suit ce que l&#8217;on appelle aujourd&#8217;hui une approche historique. « Le C++ descend
-du C, il est donc logique d&#8217;enseigner le C avant le C++ ». Après tout nous
+suit ce que l'on appelle aujourd'hui une approche historique. « Le C++ descend
+du C, il est donc logique d'enseigner le C avant le C++ ». Après tout nous
 enseignons le latin avant le français à nos enfants, non ? Certes, cette
 comparaison, comme bien des comparaisons, est fallacieuse, mais posons-nous
 tout de même la question : où est le mal à enseigner itérativement du C vers le
-C++ ? Au delà de l&#8217;aspect pédagogique qui nous fournit des abstractions plus
+C++ ? Au delà de l'aspect pédagogique qui nous fournit des abstractions plus
 simples à manipuler sur ce plan pédagogique, le soucis est dans les habitudes
 qui seront prises.</p>
 
 <p>Le C++ historique est un C++ où la bibliothèque standard ne mérite pas mieux
-qu&#8217;une note en annexe d&#8217;un cours, chose qui pousse à réinventer la roue et à
+qu'une note en annexe d'un cours, chose qui pousse à réinventer la roue et à
 verser dans le syndrome du
-<a href="http://en.wikipedia.org/wiki/Not_invented_here">NIH</a>. C&#8217;est un C++ dont les
+<a href="http://en.wikipedia.org/wiki/Not_invented_here">NIH</a>. C'est un C++ dont les
 idiomes sont maîtrisés approximativement – assez logiquement, les cours
-modernisés sont plus au fait de l&#8217;état de l&#8217;art en matière d&#8217;idiomes C++. Mais
-c&#8217;est aussi et surtout un C++ où la gestion des erreurs est confiée à des codes
+modernisés sont plus au fait de l'état de l'art en matière d'idiomes C++. Mais
+c'est aussi et surtout un C++ où la gestion des erreurs est confiée à des codes
 de retour, comme en C.</p>
 
 <p>Souvent nous le savons que trop bien, le développeur est vite laxiste et ne
@@ -2387,7 +2361,7 @@ cavalier dans sa gestion des erreurs ressemblerait à ceci :</p>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Sauf que … le C++ peut lever des exceptions. C&#8217;est le comportement par défaut
+<p>Sauf que … le C++ peut lever des exceptions. C'est le comportement par défaut
 des allocations de mémoire en C++, des types standards qui nous simplifient
 grandement la gestion des chaînes de caractères et des tableaux
 redimensionnables, des listes chaînées, des tables associatives, etc. Des COTS
@@ -2430,20 +2404,20 @@ de corriger le code précédent.</p>
 
 <p>Il semblerait que nous ayons fini. Et pourtant ce tout petit code est juste inmaintenable.</p>
 
-<p>Que se passe-t-il si <code>set_icon</code> lève une exception ? Sommes nous certains que l&#8217;icône passée sera bien libérée ?
+<p>Que se passe-t-il si <code>set_icon</code> lève une exception ? Sommes nous certains que l'icône passée sera bien libérée ?
 Pouvons-nous changer de place sans risques le <code>set_icon</code> ? Même si un jour la copie du <code>GetInfo</code> lève à son tour une exception ?
 Et si nous rajoutions une troisième ressource, comment faire pour nettoyer correctement derrière nous ?
-Bienvenu dans l&#8217;enfer de la gestion des ressources et du traitement des cas
+Bienvenu dans l'enfer de la gestion des ressources et du traitement des cas
 dégradés du C/C++ ! On aurait pu croire que ce code anodin soit simple à
-corriger avec un petit <em>catch</em>, ce n&#8217;est pourtant pas le cas.</p>
+corriger avec un petit <em>catch</em>, ce n'est pourtant pas le cas.</p>
 
 <p>NB: Ces codes proviennent de deux articles, un de Raymond Chen, et sa réponse
-par Aaron Lahman, au sujet de l&#8217;audit de codes dont le sujet est de savoir quel
+par Aaron Lahman, au sujet de l'audit de codes dont le sujet est de savoir quel
 style est le plus propice à repérer rapidement des codes incorrects. La
-traduction de la réponse est disponible à l&#8217;adresse suivante :
+traduction de la réponse est disponible à l'adresse suivante :
 <a href="http://alexandre-laurent.developpez.com/cpp/retour-fonctions-ou-exceptions/">http://alexandre-laurent.developpez.com/cpp/retour-fonctions-ou-exceptions/</a>.</p>
 
-<p>Vous trouverez dans l&#8217;article une version corrigée du code qui repose sur les
+<p>Vous trouverez dans l'article une version corrigée du code qui repose sur les
 codes de retour, avec un <code>if</code> toutes les deux lignes en moyenne pour remonter
 les erreurs, et restituer les ressources.</p>
 
@@ -2452,37 +2426,37 @@ les erreurs, et restituer les ressources.</p>
 <p>La solution aux problèmes du C++ historique réside dans le C++ moderne.
 Décryptons cette tautologie.</p>
 
-<p>Oui le C++ est extrêmement complexe, personne ne prétend d&#8217;ailleurs le
-maîtriser dans sa totalité, et l&#8217;avènement du C++11 n&#8217;est pas fait pour
+<p>Oui le C++ est extrêmement complexe, personne ne prétend d'ailleurs le
+maîtriser dans sa totalité, et l'avènement du C++11 n'est pas fait pour
 améliorer les choses. Et pourtant, paradoxalement le C++ est plus simple à
-utiliser que ce que l&#8217;on peut croire. Il s&#8217;agit d&#8217;accepter de revoir notre
+utiliser que ce que l'on peut croire. Il s'agit d'accepter de revoir notre
 façon de penser la gestion des cas dégradés. Là où la tradition nous pousse à
-envisager tous les chemins d&#8217;exécution possibles, ce qui a vite fait
-d&#8217;exploser, l&#8217;approche moderne nous pousse à surveiller toutes les ressources
+envisager tous les chemins d'exécution possibles, ce qui a vite fait
+d'exploser, l'approche moderne nous pousse à surveiller toutes les ressources
 qui devront être restituées.</p>
 
 <p>Pour cela on a recourt à une spécificité du C++ : tout objet local sera
 implicitement détruit en sortie de la portée où il vit, et ce quelque soit le
-chemin (propre &mdash; i.e. suite à un return ou une exception levée) qui conduit à
-l&#8217;extérieur de cette portée. Si l&#8217;on veut être pédant, ce comportement
-déterministe répond à l&#8217;appellation <em>Resource Finalization is Destruction idiom</em>
-(RFID). Mais généralement on se contente de l&#8217;appeler
+chemin (propre &ndash; i.e. suite à un return ou une exception levée) qui conduit à
+l'extérieur de cette portée. Si l'on veut être pédant, ce comportement
+déterministe répond à l'appellation <em>Resource Finalization is Destruction idiom</em>
+(RFID). Mais généralement on se contente de l'appeler
 <a href="http://cpp.developpez.com/faq/cpp/?page=pointeurs#POINTEURS_raii"><em>Resource Acquisition is Initialization idiom</em></a>
-(RAII) car le principe est qu&#8217;une ressource à peine est-t-elle allouée, elle
+(RAII) car le principe est qu'une ressource à peine est-t-elle allouée, elle
 doit aussitôt être confiée à une capsule RAII qui assurera sa libération
 déterministe.</p>
 
-<p>Le standard C++98/03 n&#8217;offre qu&#8217;une seule capsule RAII généraliste, mais elle
+<p>Le standard C++98/03 n'offre qu'une seule capsule RAII généraliste, mais elle
 est assez limitée et elle vient avec des effets de bord indésirables pour les
 non-avertis. Il est toutefois facile de trouver des <em>scoped guards</em> prêts à
-l&#8217;emploi, à commencer par chez <a href="http://www.boost.org/">boost</a>. Toutes les
+l'emploi, à commencer par chez <a href="http://www.boost.org/">boost</a>. Toutes les
 collections standards suivent le principe du RAII ; ce qui explique pourquoi le
 type <code>std::string</code> est si vite adopté par les développeurs, et pourquoi on
 cherche à orienter vers des <code>std::vector&lt;&gt;</code> pour gérer des tableaux. Le dernier
 standard paru en 2011 introduit enfin des scoped guards standards et sains, et
 des types dans la continuité du RAII : des pointeurs dit intelligents.</p>
 
-<p>Ainsi, si nous reprenons l&#8217;exemple de la section précédente, le code devient une fois corrigé :</p>
+<p>Ainsi, si nous reprenons l'exemple de la section précédente, le code devient une fois corrigé :</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -2539,41 +2513,41 @@ nominal.</p>
 code construit avec des exceptions, mais aussi avec un code continuant à
 fonctionner avec des codes de retour pour assurer la propagation des erreurs.</p>
 
-<p>À vrai dire bien qu&#8217;il s&#8217;agisse d&#8217;une spécificité du C++, les autres langages
-pourvus d&#8217;exceptions disposent généralement d&#8217;un équivalent avec le
+<p>À vrai dire bien qu'il s'agisse d'une spécificité du C++, les autres langages
+pourvus d'exceptions disposent généralement d'un équivalent avec le
 <a href="http://en.wikipedia.org/wiki/Dispose_pattern"><em>dispose-pattern</em></a>
-(<code>try</code>&ndash;<code>catch</code>&ndash;<code>finally</code>) qui permet d&#8217;obtenir le même comportement
+(<code>try</code>-<code>catch</code>-<code>finally</code>) qui permet d'obtenir le même comportement
 mais de façon explicite et non plus implicite. Si en plus ce langage est pourvu
-d&#8217;un garbage collector, la gestion de la mémoire est encore gérée autrement
+d'un garbage collector, la gestion de la mémoire est encore gérée autrement
 alors que le C++ nous oriente vers une solution unique pour gérer toutes les
 ressources, sans distinctions. Il est aussi à noter que C# fut le premier des
 descendants mainstream du C++ à introduire une alternative implicite et
-déterministe au dispose-pattern via le mot clé <code>using</code>, et Java s&#8217;y est également
-mis avec l&#8217;introduction des
+déterministe au dispose-pattern via le mot clé <code>using</code>, et Java s'y est également
+mis avec l'introduction des
 <a href="http://docs.oracle.com/javase/tutorial/essential/exceptions/tryResourceClose.html"><em>try-with-resources</em></a>
 dans sa version 7.</p>
 
 <p>NB : Pour certains, « C++ moderne » pourrait rimer avec méta-programmation
 template et autres joyeusetés très puissantes et vite arcaniques qui sont au
 cœur du projet qui sert de laboratoire aux évolutions de la bibliothèque
-standard : boost. Certes, c&#8217;est une utilisation moderne du langage, d&#8217;une
-certaine façon, mais ce n&#8217;est pas la modernité que l&#8217;on attend du simple
-développeur lambda d&#8217;applications. Il est attendu de lui qu&#8217;il puisse écrire
+standard : boost. Certes, c'est une utilisation moderne du langage, d'une
+certaine façon, mais ce n'est pas la modernité que l'on attend du simple
+développeur lambda d'applications. Il est attendu de lui qu'il puisse écrire
 simplement du code qui réponde aux besoins ; la robustesse et la maintenabilité
-étant deux des besoins implicites. Suivre l&#8217;«approche moderne» décrite
+étant deux des besoins implicites. Suivre l'«approche moderne» décrite
 précédemment est un premier pas dans cette direction.</p>
 
-<p>Le C++ moderne, c&#8217;est aussi la bibliothèque standard, qui non seulement est
+<p>Le C++ moderne, c'est aussi la bibliothèque standard, qui non seulement est
 dans la continuité du RAII, mais qui aussi fournit des outils génériques à des
 besoins récurrents (collections, algorithmes, chaînes de caractères
 simplifiées) et pas seulement ces flux rigolos avec des <code>&lt;&lt;</code> et des <code>&gt;&gt;</code>.</p>
 
-<p>Le C++ moderne, c&#8217;est aussi l&#8217;application d&#8217;idiomes (/patterns) modernisés. Par
-exemple, exit le test pour prévenir l&#8217;auto-affectation qui ne garantit pas
-l&#8217;<em>exception-safety</em>, mais bonjour l&#8217;idiome
+<p>Le C++ moderne, c'est aussi l'application d'idiomes (/patterns) modernisés. Par
+exemple, exit le test pour prévenir l'auto-affectation qui ne garantit pas
+l'<em>exception-safety</em>, mais bonjour l'idiome
 <a href="http://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/Copy-and-swap"><em>copy-and-swap</em></a>.
-Le C++ moderne c&#8217;est une nouvelle façon de penser en C++ qui implique une
-nouvelle façon d&#8217;enseigner le C++.</p>
+Le C++ moderne c'est une nouvelle façon de penser en C++ qui implique une
+nouvelle façon d'enseigner le C++.</p>
 
 <p>Malgré cela, le C++ reste complexe sur bien des points très techniques (comment
 changer son allocateur, comment écrire des méta-programmes template, etc.) en
@@ -2584,23 +2558,23 @@ qui est une pierre angulaire pour savoir quand on peut hériter, ou encore la
 qui cherche à nous enseigner la différence entre faire soit même et déléguer.
 Il introduit aussi des choses assez spécifiques comme la distinction entre la
 <a href="http://cpp.developpez.com/faq/cpp/?page=classes#CLASS_valeur"><em>sémantique de valeur</em></a> et la
-<a href="http://cpp.developpez.com/faq/cpp/?page=classes#CLASS_entite"><em>sémantique d&#8217;entité</em></a> à
+<a href="http://cpp.developpez.com/faq/cpp/?page=classes#CLASS_entite"><em>sémantique d'entité</em></a> à
 cause de sa dualité quant aux accès directs ou indirects aux objets.</p>
 
-<p>Et à aucun moment le C++98/03 n&#8217;adresse la question de la programmation
+<p>Et à aucun moment le C++98/03 n'adresse la question de la programmation
 concurrente ou parallèle.</p>
 
 <h3>Addendum post C++11 (EDIT de mars 2014)</h3>
 
-<p>L&#8217;arrivée des compilateurs C++11, voire C++14 peut jouer sur la définition de
-<em>moderne</em> dans le cadre du C++. Jusqu&#8217;à lors, la distinction
+<p>L'arrivée des compilateurs C++11, voire C++14 peut jouer sur la définition de
+<em>moderne</em> dans le cadre du C++. Jusqu'à lors, la distinction
 <em>moderne</em>/<em>historique</em> se limitait à C++ à la C VS C++ 98/03 avec bonnes
 pratiques dont le RAII. Le C++11 entérine les pointeurs intelligents, mais il
-apporte aussi son lot d&#8217;autres simplifications comme <code>auto</code>, les
+apporte aussi son lot d'autres simplifications comme <code>auto</code>, les
 <em>range-based for loops</em>, ou de fonctionnalités comme les lambdas.</p>
 
-<p>Mon appréciation de la pratique du C++ à la sortie de l&#8217;école, et en industrie,
-est telle que même à l&#8217;orée du C++14, je continue à employer <em>moderne</em> dans le
+<p>Mon appréciation de la pratique du C++ à la sortie de l'école, et en industrie,
+est telle que même à l'orée du C++14, je continue à employer <em>moderne</em> dans le
 sens de <em>avec RAII</em>, et pas encore dans le sens: C++11/14 en opposition au
 C++98/03 avec les bonnes pratiques associées.</p>
 
@@ -2609,7 +2583,7 @@ C++98/03 avec les bonnes pratiques associées.</p>
 <p>Votre serviteur a profité de sa soutenance N3 <em>[NdA: Les «experts» soutiennent
 sur un sujet en rapport avec leur domaine dans ma boite pour faire reconnaitre
 leur status.]</em> pour reprendre un chapitre du mémoire qui répondait à la
-question «C&#8217;est quoi le C++ moderne ?». J&#8217;espère avoir répondu à la question,
+question «C'est quoi le C++ moderne ?». J'espère avoir répondu à la question,
 mais surtout de vous avoir convaincu de la nécessité de cesser de surveiller
 tous les chemins possibles dans un code pour à la place surveiller toutes les
 ressources manipulées.</p>
@@ -2630,13 +2604,13 @@ ressources manipulées.</p>
   
     <section>
   <h1>About Me</h1>
-  <p>I&#8217;m a French C++ developper, and a long time vimmer</p>
+  <p>I'm a French C++ developper, and a long time vimmer</p>
 </section>
 <section>
   <h1>Categories</h1>
   <ul id="categories">
-    <li class='category'><a href='/blog/categories/c-plus-plus/'>C++ (4)</a>   <div style='float:right;'>
-      <a href='blog/categories/c-plus-plus/atom.xml'><img src='/images/rss_10x10.png' alt='subscribe to C++'></a>   </div>
+    <li class='category'><a href='/blog/categories/c-plus-plus/'>c++ (4)</a>   <div style='float:right;'>
+      <a href='blog/categories/c-plus-plus/atom.xml'><img src='/images/rss_10x10.png' alt='subscribe to c++'></a>   </div>
 </li>
 
   </ul>
@@ -2667,7 +2641,7 @@ ressources manipulées.</p>
 <section>
   <h1>GitHub Repos</h1>
   <ul id="gh_repos">
-    <li class="loading">Status updating&#8230;</li>
+    <li class="loading">Status updating...</li>
   </ul>
   
   <a href="https://github.com/LucHermitte">@LucHermitte</a> on GitHub

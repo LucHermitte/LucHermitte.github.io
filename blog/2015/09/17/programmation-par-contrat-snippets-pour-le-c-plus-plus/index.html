@@ -10,7 +10,7 @@
 
   
   <meta name="description" content="Dans ce dernier billet sur la Programmation par Contrat, je vais vous présenter
-quelques techniques d&#8217;application de la PpC au C++. Ce billet &hellip;">
+quelques techniques d'application de la PpC au C++. Ce billet &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -19,13 +19,13 @@ quelques techniques d&#8217;application de la PpC au C++. Ce billet &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://LucHermitte.github.io/blog/2015/09/17/programmation-par-contrat-snippets-pour-le-c-plus-plus">
+  <link rel="canonical" href="http://LucHermitte.github.io/blog/2015/09/17/programmation-par-contrat-snippets-pour-le-c-plus-plus/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="Luc Hermitte's Blog" type="application/atom+xml">
   <script src="/javascripts/modernizr-2.0.js"></script>
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
   <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
 <link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
@@ -56,7 +56,7 @@ quelques techniques d&#8217;application de la PpC au C++. Ce billet &hellip;">
   
 <form action="https://www.google.com/search" method="get">
   <fieldset role="search">
-    <input type="hidden" name="q" value="site:LucHermitte.github.io" />
+    <input type="hidden" name="sitesearch" value="LucHermitte.github.io">
     <input class="search" type="text" name="q" results="0" placeholder="Search"/>
   </fieldset>
 </form>
@@ -86,14 +86,7 @@ quelques techniques d&#8217;application de la PpC au C++. Ce billet &hellip;">
 
 
 
-
-
-
-
-  
-
-
-<time datetime="2015-09-17T19:20:15+02:00" pubdate data-updated="true">Sep 17<span>th</span>, 2015</time>
+<time class='entry-date' datetime='2015-09-17T19:20:15+02:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>17</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>7:20 pm</span></time>
         
            | <a href="#disqus_thread"
              data-disqus-identifier="http://LucHermitte.github.io">Comments</a>
@@ -104,31 +97,31 @@ quelques techniques d&#8217;application de la PpC au C++. Ce billet &hellip;">
 
 
 <div class="entry-content"><p>Dans ce dernier billet sur la <em>Programmation par Contrat</em>, je vais vous présenter
-quelques techniques d&#8217;application de la PpC au C++. Ce billet décrivant des
+quelques techniques d'application de la PpC au C++. Ce billet décrivant des
 techniques sera plus décousu que les précédents qui avaient un fil conducteur.</p>
 
-<p><em>(Désolé, j&#8217;ai mis du temps à mûrir certains de ses paragraphes)</em></p>
+<p><em>(Désolé, j'ai mis du temps à mûrir certains de ses paragraphes)</em></p>
 
 <h2>I- Pré- et post-conditions de fonctions.</h2>
 
 <h3>I.1- Pré- et post-conditions de fonctions membres, à la Non-Virtual Interface Pattern (NVI).</h3>
 
 <p>Le pattern NVI est un <em>Design Pattern</em> qui ressemble au DP <em>Template Method</em>
-mais qui n&#8217;est pas le
+mais qui n'est pas le
 <a href="http://fr.wikipedia.org/wiki/Patron_de_m%C3%A9thode"><em>Template Method</em></a>. Le
-principe du pattern est le suivant : l&#8217;interface publique est non virtuelle, et
+principe du pattern est le suivant : l'interface publique est non virtuelle, et
 elle fait appel à des comportements spécialisés qui sont eux privés et virtuels
 (généralement virtuels purs).</p>
 
 <p>Ce pattern a deux objectifs avoués. Le premier est de découpler les interfaces
-pour les <em>utilisateurs</em> du pattern. Le code client doit passer par l&#8217;interface
+pour les <em>utilisateurs</em> du pattern. Le code client doit passer par l'interface
 publique qui est non virtuelle, tandis que le code qui spécialise doit
-s&#8217;intéresser à l&#8217;interface privée et virtuelle.</p>
+s'intéresser à l'interface privée et virtuelle.</p>
 
 <p>Le second objectif, est de créer des super-interfaces qui baignent dans la
 PpC. Les interfaces classiques à la Java (up to v7)/C#/COM/CORBA/&hellip; ne
-permettent pas d&#8217;associer nativement des contrats à leurs méthodes. Avec le
-pattern NVI on peut, avec un soupçon d&#8217;huile de coude, rajouter des contrats
+permettent pas d'associer nativement des contrats à leurs méthodes. Avec le
+pattern NVI on peut, avec un soupçon d'huile de coude, rajouter des contrats
 aux fonctions membres.</p>
 
 <p>Les fonctions publiques et non virtuelles se voient définies <code>inline</code>s, elles
@@ -211,7 +204,7 @@ la PpC. Je ne peux que vous en conseiller la lecture.</p>
 <span class='line-number'>15</span>
 <span class='line-number'>16</span>
 </pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">double</span> <span class="n">my</span><span class="o">::</span><span class="n">sqrt</span><span class="p">(</span><span class="kt">double</span> <span class="n">n</span><span class="p">)</span>
-</span><span class='line'><span class="k">if</span> <span class="n">defined</span><span class="p">(</span><span class="n">MYLIB_DBC_ACTIVATED</span><span class="p">)</span>
+</span><span class='line'><span class="cp">#if defined(MYLIB_DBC_ACTIVATED)</span>
 </span><span class='line'><span class="p">{</span>
 </span><span class='line'>    <span class="c1">// Check pre-conditions</span>
 </span><span class='line'>    <span class="n">assert</span><span class="p">(</span><span class="n">n</span><span class="o">&gt;=</span><span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="s">&quot;sqrt can&#39;t process negative numbers&quot;</span><span class="p">);</span>
@@ -222,7 +215,7 @@ la PpC. Je ne peux que vous en conseiller la lecture.</p>
 </span><span class='line'>    <span class="k">return</span> <span class="n">res</span><span class="p">;</span>
 </span><span class='line'><span class="p">}</span>
 </span><span class='line'><span class="kt">double</span> <span class="n">my</span><span class="o">::</span><span class="n">sqrt_unchecked</span><span class="p">(</span><span class="kt">double</span> <span class="n">n</span><span class="p">)</span>
-</span><span class='line'><span class="n">endif</span>
+</span><span class='line'><span class="cp">#endif</span>
 </span><span class='line'><span class="p">{</span>
 </span><span class='line'>    <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">sqrt</span><span class="p">(</span><span class="n">n</span><span class="p">);</span>
 </span><span class='line'><span class="p">}</span>
@@ -232,14 +225,14 @@ la PpC. Je ne peux que vous en conseiller la lecture.</p>
 <h3>I.3- Pré- et post-conditions de fonctions &hellip; <code>constexpr</code> C++11.</h3>
 
 <p>Les fonctions <code>constexpr</code> à la C++11 doivent renvoyer une valeur et ne rien
-faire d&#8217;autre. De plus le contrat doit pouvoir être vérifié en mode <em>appelé
+faire d'autre. De plus le contrat doit pouvoir être vérifié en mode <em>appelé
 depuis une expession constante</em> comme en mode <em>appelé depuis une expression
 variable</em>. De fait, cela nécessite quelques astuces pour pouvoir spécifier des
 contrats dans de telles fonctions.</p>
 
 <p>Pour de plus amples détails, je vous renvoie à
-l&#8217;<a href="http://ericniebler.com/2014/09/27/assert-and-constexpr-in-cxx11/">article</a>
-fort complet d&#8217;Eric Niebler sur le sujet. Andrzej présente la même technique
+l'<a href="http://ericniebler.com/2014/09/27/assert-and-constexpr-in-cxx11/">article</a>
+fort complet d'Eric Niebler sur le sujet. Andrzej présente la même technique
 dans son article
 <a href="http://akrzemi1.wordpress.com/2011/05/06/compile-time-computations/">Compile Time Computations</a>.</p>
 
@@ -332,19 +325,19 @@ dans son article
 
 
 <p>Malheureusement la rupture de contrat ne sera pas détectée lors de la
-compilation, mais à l&#8217;exécution où l&#8217;on pourra constater à minima où l&#8217;appel de
-plus haut niveau s&#8217;est produit (bien que l&#8217;on risque de ne pas pouvoir observer
-l&#8217;état des variables <em>optimized out</em> dans le débuggueur).</p>
+compilation, mais à l'exécution où l'on pourra constater à minima où l'appel de
+plus haut niveau s'est produit (bien que l'on risque de ne pas pouvoir observer
+l'état des variables <em>optimized out</em> dans le débuggueur).</p>
 
-<p>Notez que pour exprimer une post-condition sans multiplier les appels, j&#8217;ai
+<p>Notez que pour exprimer une post-condition sans multiplier les appels, j'ai
 écrit la fonction (qui aurait été récursive dans tous les cas) en
 <a href="http://fr.wikipedia.org/wiki/R%C3%A9cursion_terminale">fonction récursive terminale</a>.
-De là, il a été facile d&#8217;insérer une assertion &mdash; et de plus, le compilateur
+De là, il a été facile d'insérer une assertion &ndash; et de plus, le compilateur
 pourra optimiser la fonction en <em>Release</em> sur les appels dynamiques.</p>
 
-<p>Pour information, une autre écriture qui exploite l&#8217;opérateur virgule est
-possible, mais elle ne compile pas avec les versions de GCC que j&#8217;ai eu entre
-les mains (i.e. jusqu&#8217;à la version 4.9, GCC n&#8217;est pas d&#8217;accord).</p>
+<p>Pour information, une autre écriture qui exploite l'opérateur virgule est
+possible, mais elle ne compile pas avec les versions de GCC que j'ai eu entre
+les mains (i.e. jusqu'à la version 4.9, GCC n'est pas d'accord).</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -384,14 +377,14 @@ directement utilisable. A priori, cela sera le cas.</p>
 
 <h2>II- Invariants de classes.</h2>
 
-<h3>II.1- Petit snippet de vérification simplifiée en l&#8217;absence d&#8217;héritage.</h3>
+<h3>II.1- Petit snippet de vérification simplifiée en l'absence d'héritage.</h3>
 
-<p>Sur un petit <a href="http://ideone.com/DOCWOy">exercice d&#8217;écriture de classe fraction</a>,
-j&#8217;avais pondu une classe utilitaire dont le but était de simplifier la
+<p>Sur un petit <a href="http://ideone.com/DOCWOy">exercice d'écriture de classe fraction</a>,
+j'avais pondu une classe utilitaire dont le but était de simplifier la
 vérification des invariants. Il suffit de déclarer un objet de ce type en tout
 début des fonctions membres (et des fonctions amies) exposées aux clients.
 Ainsi les invariants sont automatiquement vérifiés en début, et en fin de
-fonction lors de la destruction de l&#8217;objet <code>InvariantChecker</code>.</p>
+fonction lors de la destruction de l'objet <code>InvariantChecker</code>.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -474,14 +467,14 @@ fonction lors de la destruction de l&#8217;objet <code>InvariantChecker</code>.<
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>N.B.: je vois à la relecture d&#8217;<em>Imperfect C++</em> que c&#8217;est très proche de ce que
-suggérait Matthew Wilson. Au détail qu&#8217;il passe par une fonction <code>is_valid</code>
-renvoyant un booléen et que l&#8217;<code>InvariantChecker</code> s&#8217;occupe de vérifier
-l&#8217;assertion si <code>MYLIB_DBC_ACTIVATED</code> est bien défini &mdash; il découple la
+<p>N.B.: je vois à la relecture d'<em>Imperfect C++</em> que c'est très proche de ce que
+suggérait Matthew Wilson. Au détail qu'il passe par une fonction <code>is_valid</code>
+renvoyant un booléen et que l'<code>InvariantChecker</code> s'occupe de vérifier
+l'assertion si <code>MYLIB_DBC_ACTIVATED</code> est bien défini &ndash; il découple la
 vérification des contrats de la macro <code>NDEBUG</code> qui est plus liée au mode de
 compilation (<em>Débug</em> VS <em>Release</em>).<br/>
 Pour ma part, je préfère avoir une assertion différente pour chaque invariant
-plutôt qu&#8217;un seul <code>assert(is_valid());</code>. Cela permet de savoir plus précisément
+plutôt qu'un seul <code>assert(is_valid());</code>. Cela permet de savoir plus précisément
 quel contrat est violé.</p>
 
 <h3><a id="NVI_Invariants"></a>II.2- Invariants et NVI.</h3>
@@ -490,7 +483,7 @@ quel contrat est violé.</p>
 finales. Je partirai sur un héritage virtuel depuis une classe de base
 virtuelle <code>WithInvariants</code> dont la fonction de vérification serait spécialisée
 par tous les intermédiaires. Et dont les intermédiaires appelleraient toutes
-les versions mères pour n&#8217;oublier personne.</p>
+les versions mères pour n'oublier personne.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -585,106 +578,108 @@ les versions mères pour n&#8217;oublier personne.</p>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>(Alors certes, c&#8217;est tordu, mais pour l&#8217;instant, je n&#8217;ai pas de meilleure idée.)</p>
+<p>(Alors certes, c'est tordu, mais pour l'instant, je n'ai pas de meilleure idée.)</p>
 
 <h3>II.3- Critiques envisageables avec ces approches.</h3>
 
-<p>On peut s&#8217;attendre qu&#8217;en cas d&#8217;exception dans une fonction membre (ou amie)
-d&#8217;un objet, l&#8217;invariant ne soit plus respecté.<br/>
-Dans ce cas là, les approches proposées juste au dessus vont poser d&#8217;énormes
+<p>On peut s'attendre qu'en cas d'exception dans une fonction membre (ou amie)
+d'un objet, l'invariant ne soit plus respecté.<br/>
+Dans ce cas là, les approches proposées juste au dessus vont poser d'énormes
 problèmes.</p>
 
-<p>Toutefois cela voudrait dire que l&#8217;exception ne laisse plus l&#8217;objet dans un
-état cohérent, et que nous n&#8217;avons pas la
+<p>Toutefois cela voudrait dire que l'exception ne laisse plus l'objet dans un
+état cohérent, et que nous n'avons pas la
 <a href="http://en.wikipedia.org/wiki/Exception_safety"><em>garantie basique</em></a>.</p>
 
-<p>Autre scénario dans le même ordre d&#8217;idée : imaginez que les flux aient pour
-invariant <code>good()</code>, et qu&#8217;une extraction ratée invalide le flux.  Cette fois,
-l&#8217;objet pourrait exister dans un état contraire à son invariant, ce qui ferait
-claquer l&#8217;assertion associée</p>
+<p>Autre scénario dans le même ordre d'idée : imaginez que les flux aient pour
+invariant <code>good()</code>, et qu'une extraction ratée invalide le flux.  Cette fois,
+l'objet pourrait exister dans un état contraire à son invariant, ce qui ferait
+claquer l'assertion associée</p>
 
-<p>Dans le même genre d&#8217;idée, nous nous retrouverions dans la même situation que
-si on utilisait des constructeurs qui ne garantissent pas l&#8217;invariant de leurs
+<p>Dans le même genre d'idée, nous nous retrouverions dans la même situation que
+si on utilisait des constructeurs qui ne garantissent pas l'invariant de leurs
 classes, et qui sont utilisés conjointement avec des fonctions <code>init()</code>. En
-effet, si l&#8217;invariant ne peut plus être assuré statiquement par programmation,
-il est nécessaire de l&#8217;assurer dynamiquement en vérifiant en début de chaque
-fonction membre (/amie) si l&#8217;objet est bien valide.</p>
+effet, si l'invariant ne peut plus être assuré statiquement par programmation,
+il est nécessaire de l'assurer dynamiquement en vérifiant en début de chaque
+fonction membre (/amie) si l'objet est bien valide.</p>
 
-<p>Effectivement il y a alors un problème. À mon avis, le problème n&#8217;est pas dans
-le fait de formuler les invariants de notre objet et de s&#8217;assurer qu&#8217;ils soient
-toujours vérifiés. Le problème est de permettre à l&#8217;objet de ne plus vérifier
-ses invariants et qu&#8217;il faille le tester dynamiquement.</p>
+<p>Effectivement il y a alors un problème. À mon avis, le problème n'est pas dans
+le fait de formuler les invariants de notre objet et de s'assurer qu'ils soient
+toujours vérifiés. Le problème est de permettre à l'objet de ne plus vérifier
+ses invariants et qu'il faille le tester dynamiquement.</p>
 
 <h4>Les objets <em>cassés</em></h4>
 
 <p>On retrouve le modèle des flux de données (fichiers, sockets, &hellip;) qui peuvent
-passer KO et qu&#8217;il faudra rétablir. Dans cette approche, plutôt que de se
+passer KO et qu'il faudra rétablir. Dans cette approche, plutôt que de se
 débarrasser du flux pour en construire un tout beau tout neuf, on le maintient
 (car après tout il est déjà initialisé) et on cherchera à le reconnecter.</p>
 
 <p>Plus je réfléchis à la question est moins je suis friand de ces objets qui
 peuvent être cassés.</p>
 
-<p>Dans un monde idéal, j&#8217;aurai tendance à dire qu&#8217;il faudrait établir des zones
-de codes qui ont des invariants de plus en plus précis &mdash; les invariants étant
+<p>Dans un monde idéal, j'aurai tendance à dire qu'il faudrait établir des zones
+de codes qui ont des invariants de plus en plus précis &ndash; les invariants étant
 organisés de façon hiérarchique.</p>
 
 <p>Dans la zone <em>descriptif de flux configuré</em>, il y aurait la zone <em>flux valide
-et connecté</em>. Quand le flux n&#8217;est plus valide, on peut retourner à la zone
-englobante de flux décrit. C&#8217;est d&#8217;ailleurs ce qu&#8217;on l&#8217;on fait d&#8217;une certaine
-façon. Sauf que nous avons pris l&#8217;habitude (avec les abstractions de sockets et
-de fichiers usuelles) de n&#8217;avoir qu&#8217;un seul objet pour contenir les deux
+et connecté</em>. Quand le flux n'est plus valide, on peut retourner à la zone
+englobante de flux décrit. C'est d'ailleurs ce qu'on l'on fait d'une certaine
+façon. Sauf que nous avons pris l'habitude (avec les abstractions de sockets et
+de fichiers usuelles) de n'avoir qu'un seul objet pour contenir les deux
 informations. Et de fait, quand on veut séparer les deux invariants à
-l&#8217;exécution, on se retrouve avec des objets cassés&hellip;</p>
+l'exécution, on se retrouve avec des objets cassés&hellip;</p>
 
 <p>La solution ? Ma foi, le SRP (<em>Single Responsability Principle</em>) me semble
-l&#8217;apporter : <em>«un object, une responsabilité»</em>. On pourrait même dire :</p>
+l'apporter : <em>«un object, une responsabilité»</em>. On pourrait même dire :</p>
 
 <blockquote><p>Deux invariants décorrélés (/non synchrones) => deux classes.</p></blockquote>
 
 <h3>II.4- Des exceptions dans les constructeurs.</h3>
 
-<p>Une technique bien connue pour prévenir la construction d&#8217;un objet dont on ne
+<p>Une technique bien connue pour prévenir la construction d'un objet dont on ne
 peut pas garantir les invariants consiste à lever une exception depuis son
 constructeur. En procédant de la sorte, soit un objet existe et il est dans un
-état pertinent et utilisable, soit il n&#8217;a jamais existé et on n&#8217;a même pas
+état pertinent et utilisable, soit il n'a jamais existé et on n'a même pas
 besoin de se poser la question de son utilisabilité.</p>
 
-<p>Cela a l&#8217;air fantastique, n&#8217;est-ce pas ?</p>
+<p>Cela a l'air fantastique, n'est-ce pas ?</p>
 
-<p>Mais &hellip; n&#8217;est-ce pas de la programmation défensive ? En effet, ce n&#8217;est pas le
-client de l&#8217;objet qui vérifie les conditions d&#8217;existence, mais l&#8217;objet.
+<p>Mais &hellip; n'est-ce pas de la programmation défensive ? En effet, ce n'est pas le
+client de l'objet qui vérifie les conditions d'existence, mais l'objet.
 Résultat, on ne dispose pas forcément du
 <a href="/blog/2014/05/24/programmation-par-contrat-un-peu-de-theorie/#ProgDefCtx">meilleur contexte</a> pour
-signaler le problème de <em>runtime</em> qui bloque la création de l&#8217;objet.</p>
+signaler le problème de <em>runtime</em> qui bloque la création de l'objet.</p>
 
-<p>Idéalement, je tendrais à dire que la vérification devrait être faite en amont,
-et ainsi le constructeur aurait des pré-conditions <em>étroitement</em> vérifiées.
-Dans la pratique, je dois bien avouer que je tends, aujourd&#8217;hui, à laisser la
-vérification au niveau des constructeurs au lieu d&#8217;exposer une fonction
-statique de vérification des pré-conditions d&#8217;existence dans les cas les plus
-complexes. Il faut dire que les exceptions ont tellement été bien vendues comme
-: c&#8217;est le seul moyen d&#8217;avorter depuis un opérateur surchargé ou depuis un
-constructeur, que j&#8217;ai jusqu&#8217;à lors totalement négligé mon instinct qui sentait
-qu&#8217;il y avait un truc louche à vérifier les conditions de création depuis un
+<dl>
+<dt>Idéalement, je tendrais à dire que la vérification devrait être faite en amont,</dt>
+<dt>et ainsi le constructeur aurait des pré-conditions <em>étroitement</em> vérifiées.</dt>
+<dt>Dans la pratique, je dois bien avouer que je tends, aujourd'hui, à laisser la</dt>
+<dt>vérification au niveau des constructeurs au lieu d'exposer une fonction</dt>
+<dt>statique de vérification des pré-conditions d'existence dans les cas les plus</dt>
+<dt>complexes. Il faut dire que les exceptions ont tellement été bien vendues comme</dt>
+<dd>c'est le seul moyen d'avorter depuis un opérateur surchargé ou depuis un
+constructeur, que j'ai jusqu'à lors totalement négligé mon instinct qui sentait
+qu'il y avait un truc louche à vérifier les conditions de création depuis un
 contexte restreint. À <em>élargir</em> les contrats, on finit par perdre des
-informations pour nos messages d&#8217;erreur.</p>
+informations pour nos messages d'erreur.</dd>
+</dl>
 
 <h2>III- Et si la Programmation Défensive est de la partie ?</h2>
 
-<p><em>Discl. : <a href="http://isocpp.org/wiki/faq/exceptions#exceptions-avoid-spreading-out-error-logic">L&#8217;utilisation de codes de retour va grandement complexifier l&#8217;application</a>,
+<p><em>Discl. : <a href="http://isocpp.org/wiki/faq/exceptions#exceptions-avoid-spreading-out-error-logic">L'utilisation de codes de retour va grandement complexifier l'application</a>,
 qui en plus de devoir tester les codes de retour relatifs au métier (dont la
 validation des entrées), devra propager des codes de retours relatifs aux
 potentielles erreurs de programmation. Au final, cela va accroitre les chances
-d&#8217;erreurs de programmation&hellip; chose antinomique avec les objectifs de la
+d'erreurs de programmation&hellip; chose antinomique avec les objectifs de la
 technique. Donc un conseil, pour de la programmation défensive en C++, préférez
-l&#8217;emploi d&#8217;exceptions &mdash; et bien évidemment, n&#8217;oubliez pas le
+l'emploi d'exceptions &ndash; et bien évidemment, n'oubliez pas le
 <a href="/blog/2012/04/04/le-c-plus-plus-moderne/#C++Moderne">RAII</a>, notre grand
 ami.</em></p>
 
 <p>Prérequis : dérivez de
 <a href="http://www.cpluscplus.com/reference/stdexcept/runtime_error/"><code>std::runtime_error</code></a>
-vos exceptions pour les cas exceptionnels pouvant se produire lors de l&#8217;exécution,
+vos exceptions pour les cas exceptionnels pouvant se produire lors de l'exécution,
 et de
 <a href="http://www.cpluscplus.com/reference/stdexcept/logic_error/"><code>std::logic_error</code></a>
 vos exceptions pour propager les erreurs de programmation.</p>
@@ -697,7 +692,7 @@ vos exceptions pour propager les erreurs de programmation.</p>
 exceptions de <code>std::exception</code> <strong>mais</strong> de <code>std::runtime_error</code> pour les cas
 exceptionnels plausibles et de <code>std::logic_error</code> pour les erreurs de logique.</p>
 
-<p>Aux points d&#8217;interfaces (communication via une API C, limites de threads en
+<p>Aux points d'interfaces (communication via une API C, limites de threads en
 C++03), ou dans le <code>main()</code>, il est possible de filtrer les erreurs de logiques
 pour avoir des coredumps en <em>Debug</em>.</p>
 
@@ -738,7 +733,7 @@ techniques de
 de
 <a href="http://isocpp.org/wiki/faq/exceptions#throw-without-an-object">factorisation</a>
 de gestion des erreurs. En effet, tout repose sur un <code>catch(...)</code>, or ce
-dernier va modifier le contexte pour la génération d&#8217;un <em>core</em> tandis que rien
+dernier va modifier le contexte pour la génération d'un <em>core</em> tandis que rien
 ne sera redispatché vers une <code>std::logic_error</code>.</p>
 
 <h3>III.2- Cas plausible&hellip;</h3>
@@ -747,8 +742,8 @@ ne sera redispatché vers une <code>std::logic_error</code>.</p>
 exceptions de <code>std::exception</code> <strong>au lieu</strong> de <code>std::runtime_error</code> pour les cas
 exceptionnels plausibles et de <code>std::logic_error</code> pour les erreurs de logique.</p>
 
-<p>Aux points d&#8217;interfaces (communication via une API C, limites de threads en
-C++03), ou dans le <code>main()</code>, il est possible d&#8217;ignorer toutes les exceptions pour
+<p>Aux points d'interfaces (communication via une API C, limites de threads en
+C++03), ou dans le <code>main()</code>, il est possible d'ignorer toutes les exceptions pour
 avoir des coredumps en <em>Debug</em> sur les exceptions dues à des erreurs de logiques et &hellip;
 sur les autres aussi.</p>
 
@@ -783,8 +778,8 @@ sur les autres aussi.</p>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>D&#8217;autres variations sont très certainement envisageables où l&#8217;on rattraperait
-l&#8217;erreur de logique pour la relancer en <em>Debug</em>.</p>
+<p>D'autres variations sont très certainement envisageables où l'on rattraperait
+l'erreur de logique pour la relancer en <em>Debug</em>.</p>
 </div>
 
 
@@ -800,19 +795,12 @@ l&#8217;erreur de logique pour la relancer en <em>Debug</em>.</p>
 
 
 
-
-
-
-
-  
-
-
-<time datetime="2015-09-17T19:20:15+02:00" pubdate data-updated="true">Sep 17<span>th</span>, 2015</time>
+<time class='entry-date' datetime='2015-09-17T19:20:15+02:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>17</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>7:20 pm</span></time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/c-plus-plus/'>C++</a>
+    <a class='category' href='/blog/categories/c-plus-plus/'>c++</a>
   
 </span>
 
@@ -852,8 +840,8 @@ l&#8217;erreur de logique pour la relancer en <em>Debug</em>.</p>
 <section>
   <h1>Categories</h1>
   <ul id="categories">
-    <li class='category'><a href='/blog/categories/c-plus-plus/'>C++ (4)</a>   <div style='float:right;'>
-      <a href='blog/categories/c-plus-plus/atom.xml'><img src='/images/rss_10x10.png' alt='subscribe to C++'></a>   </div>
+    <li class='category'><a href='/blog/categories/c-plus-plus/'>c++ (4)</a>   <div style='float:right;'>
+      <a href='blog/categories/c-plus-plus/atom.xml'><img src='/images/rss_10x10.png' alt='subscribe to c++'></a>   </div>
 </li>
 
   </ul>
