@@ -350,7 +350,7 @@ passer KO et qu'il faudra rétablir. Dans cette approche, plutôt que de se
 débarrasser du flux pour en construire un tout beau tout neuf, on le maintient
 (car après tout il est déjà initialisé) et on cherchera à le reconnecter.
 
-Plus je réfléchis à la question est moins je suis friand de ces objets qui
+Plus je réfléchis à la question et moins je suis friand de ces objets qui
 peuvent être cassés.
 
 Dans un monde idéal, j'aurai tendance à dire qu'il faudrait établir des zones
