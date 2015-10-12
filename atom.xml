@@ -4,7 +4,7 @@
   <title><![CDATA[Luc Hermitte's Blog]]></title>
   <link href="http://LucHermitte.github.io/atom.xml" rel="self"/>
   <link href="http://LucHermitte.github.io/"/>
-  <updated>2015-09-30T12:16:31+02:00</updated>
+  <updated>2015-10-12T11:39:32+02:00</updated>
   <id>http://LucHermitte.github.io/</id>
   <author>
     <name><![CDATA[Luc Hermitte]]></name>
@@ -537,7 +537,7 @@ passer KO et qu'il faudra rétablir. Dans cette approche, plutôt que de se
 débarrasser du flux pour en construire un tout beau tout neuf, on le maintient
 (car après tout il est déjà initialisé) et on cherchera à le reconnecter.</p>
 
-<p>Plus je réfléchis à la question est moins je suis friand de ces objets qui
+<p>Plus je réfléchis à la question et moins je suis friand de ces objets qui
 peuvent être cassés.</p>
 
 <p>Dans un monde idéal, j'aurai tendance à dire qu'il faudrait établir des zones
