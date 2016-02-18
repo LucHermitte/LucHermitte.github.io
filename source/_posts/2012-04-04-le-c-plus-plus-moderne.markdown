@@ -48,7 +48,7 @@ Pour comprendre ce qu'est le _C++ Moderne_, il faut d'abord voir ce qu'est le _C
 
 ### Le C++ Historique
 
-Un majorité écrasante, et regrettable, de ressources pédagogiques sur le C++
+Une majorité écrasante, et regrettable, de ressources pédagogiques sur le C++
 suit ce que l'on appelle aujourd'hui une approche historique. « Le C++ descend
 du C, il est donc logique d'enseigner le C avant le C++ ». Après tout nous
 enseignons le latin avant le français à nos enfants, non ? Certes, cette
