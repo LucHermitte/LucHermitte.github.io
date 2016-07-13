@@ -860,7 +860,7 @@ entre deux nombres positifs est juste un&hellip; nombre. Même si le compilateur
 optimisera au point de neutraliser le poids de ces surcouches, même avec
 <code>auto</code>, cela représente beaucoup de travail : des types à définir, les
 fonctions du standard à encapsuler (imaginez le code d'un <code>pow()</code> sachant
-reconnaïtre des puissances entières paires pour retourner dans ces cas précis
+reconnaître des puissances entières paires pour retourner dans ces cas précis
 des <code>positive_number</code>), et un utilisateur possiblement perdu au milieu de tout
 ça. Heureusement, on n'a pas encore introduit les <code>positive_length</code>. Et
 puisqu'on parle des unités SI, parlons de boost.unit.</p>
@@ -922,7 +922,7 @@ d'invariant statique.</p>
 <p>Avec le C++11 nous avons l'embarras du choix pour choisir comment manipuler des
 entités ou des données dynamiques. Entre, <code>std::unique_ptr&lt;&gt;</code>,
 <code>std::shared_ptr</code>, <code>boost::ptr_vector</code>, les références, les pointeurs bruts
-(/nus), <code>std::optional&lt;&gt;</code> (C++14), <em>etc.</em>, on peut avoir l'impression que c'est
+(/nus), <code>std::optional&lt;&gt;</code> (C++17), <em>etc.</em>, on peut avoir l'impression que c'est
 la jungle.</p>
 
 <p>Quel rapport avec les invariants statiques ? Et bien, comme pour les références
