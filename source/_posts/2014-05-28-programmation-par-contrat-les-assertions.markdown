@@ -516,8 +516,93 @@ Certes, cela ne protège pas des cas où la donnée est partagée depuis un
 autre thread où elle pourrait être détruite.
 
 John Carmack recommande leur utilisation (en place de pointeurs) dans un
-[billet sur l'analyse statique de code](http://www.altdevblogaday.com/2011/12/24/static-code-analysis/)
-publié sur #AltDevBlog.
+[billet sur l'analyse statique de code](http://www.viva64.com/en/a/0087/)
+initialement publié sur feu #AltDevBlog.
+
+##### Ou a défaut `gsl::non_null`
+
+Il est à noter que l'emploi d'un pointeur brut que l'on testerait à chaque
+appel d'un ensemble de fonctions, dans la tradition de la programmation
+défensive, offre de bien piètres performances comparativement à l'emploi d'une
+référence, ou d'un type tel que `gsl::not_null`. Voir à ce sujet la
+[présentation de Bartosz Szurgot _C Vs C++: the embedded perspective_](http://codedive.pl/en/speaker/speaker/bartosz-szurgot/)
+donnée pour les code::dive 2015.
+
+Le type `gsl::not_null<>` est fourni avec le
+[projet GSL](http://github.com/Microsoft/GSL) qui accompagne les
+[_Cpp Core Guidelines_](http://github.com/isocpp/CppCoreGuidelines). L'idée est
+que l'on garde un pointeur qui peut être construit implicitement à partir d'une
+référence ou d'un autre pointeur `not_null`, ou explicitement à partir de tout
+pointeur autre que `nullptr`. La construction explicite vérifiant que le
+pointeur reçu est bien non nul -- la vérification pouvant être inhibée, ou se
+faire avec lancé d'exception, assertion ou équivalent.
+
+#### Une solution fortement typée pour `sqrt`.
+Dans le même ordre d'idée que `not_null`, le problème `sqrt` pourrait se
+résoudre avec un type `positive_number`. Si l'utilisateur néglige de s'assurer
+de passer un nombre qui offre cette garantie de positivité, le compilateur sera
+là pour le rappeler à l'ordre, même en C++11 et ses `auto`.
+
+```c++
+// Le prérequis
+[[expects: x >= 0]] // redondant avec `positive_number`
+[[ensures ret_val: abs(ret_val*ret_val - x) <= epsilon]]
+positive_number sqrt(positive_number x);
+
+//--------------------------------------------------
+// La version où le Responsable UI doit renvoyer un truc positif.
+// et qui compilera
+positive_number interrogeES();
+
+double metier() {          // écrit par l'Intégrateur
+   auto i = interrogeES(); // écrit par le Responsable UI
+   return sqrt(i);         // écrit par le Mathématicien
+}
+// Note: on pourrait effectivement retourner un positive_number, mais faisons
+// comme si l'intégrateur n'avait pas vu cette garantie qu'il pourrait offrir,
+// vu que ce n'est pas le sujet ici.
+
+//--------------------------------------------------
+// La version où le Responsable UI renvoie ce qu'il veut
+// et qui ne compilera pas
+// metier() reste identique.
+double interrogeES();
+
+//--------------------------------------------------
+// La version où l'on intègre comme des sagouins
+// et qui compile
+double interrogeES();
+double metier() {
+   auto i = interrogeES();
+   return sqrt(positive_number(i));
+}
+// Ça, c'est mal ! On a été prévenu du problème et on le cache sous le tapis.
+
+//--------------------------------------------------
+// La version où l'on intègre correctement
+// et qui compile
+double interrogeES();
+double metier() {
+   auto i = interrogeES();
+   if (i < 0) {
+       throw std::range_error("Cannot work on a negative number. Please start again`.")`
+   }
+   return sqrt(positive_number(i));
+}
+```
+
+Le hic avec cette technique prometteuse ?
+
+Il faudrait un `positive_number`, un `not_null_number` pour les divisions, un
+`strictly_positive_number` et ainsi de suite, et prévoir que la différence
+entre deux nombres positifs est juste un... nombre. Même si le compilateur
+optimisera au point de neutraliser le poids de ces surcouches, même avec
+`auto`, cela représente beaucoup de travail : des types à définir, les
+fonctions du standard à encapsuler (imaginez le code d'un `pow()` sachant
+reconnaïtre des puissances entières paires pour retourner dans ces cas précis
+des `positive_number`), et un utilisateur possiblement perdu au milieu de tout
+ça. Heureusement, on n'a pas encore introduit les `positive_length`. Et
+puisqu'on parle des unités SI, parlons de boost.unit.
 
 #### boost.unit
 [boost.unit](http://boost.org/libs/units) est le genre de bibliothèque qui
