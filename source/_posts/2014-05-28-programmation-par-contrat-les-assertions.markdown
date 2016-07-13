@@ -599,7 +599,7 @@ entre deux nombres positifs est juste un... nombre. Même si le compilateur
 optimisera au point de neutraliser le poids de ces surcouches, même avec
 `auto`, cela représente beaucoup de travail : des types à définir, les
 fonctions du standard à encapsuler (imaginez le code d'un `pow()` sachant
-reconnaïtre des puissances entières paires pour retourner dans ces cas précis
+reconnaître des puissances entières paires pour retourner dans ces cas précis
 des `positive_number`), et un utilisateur possiblement perdu au milieu de tout
 ça. Heureusement, on n'a pas encore introduit les `positive_length`. Et
 puisqu'on parle des unités SI, parlons de boost.unit.
