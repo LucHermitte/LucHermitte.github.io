@@ -104,21 +104,21 @@ je traiterai des <em>assertions</em>. En guise de conclusion, je présenterai de
 <a href="/blog/2015/09/17/programmation-par-contrat-snippets-pour-le-c-plus-plus/">techniques d'application de la PpC au C++</a>
 que j'ai croisées au fil des ans.</p>
 
-<h2>I- Les Erreurs</h2>
+<h2>I- Les erreurs</h2>
 
 <p>En développement, il y a toujours des problèmes qui vont venir nous ennuyer.
 Certains correspondront à des problèmes plausibles induits par le contexte
 (fichiers invalides, connexions réseau coupées, utilisateurs qui saisissent
-n'importe quoi, &hellip;), d'autres seront des <em>erreurs de programmation</em>.</p>
+n'importe quoi&hellip;), d'autres seront des <em>erreurs de programmation</em>.</p>
 
 <p>Dans la suite de ce billet, je vais principalement traiter du cas des erreurs
 de programmation. Toutefois, la confusion étant facile, des parenthèses
-régulières seront faites sur les situations exceptionnelles mais plausibles.</p>
+régulières seront faites sur les situations exceptionnelles, mais plausibles.</p>
 
 <h3>I-1. Les types d'erreurs de programmation</h3>
 
 <p>Quand on parle d'erreur de programmation, les premières qui vont nous venir à
-l'esprit sont les erreurs de syntaxe (point-virgule oublié), ou de grammaire
+l'esprit sont les erreurs de syntaxe (points-virgules oubliés), ou de grammaire
 (types non respectés). Ces erreurs-ci, les langages compilés vont nous les
 signaler. On peut considérer qu'il est impossible de livrer un exécutable sur
 une plateforme qui n'a pas passé cette phase de vérification.</p>
@@ -128,7 +128,7 @@ signalera jamais. On peut se tromper dans la conception ou la retranscription
 d'un algorithme, et ainsi renvoyer des résultats numériques aberrants. On peut
 aussi faire des suppositions totalement erronées, comme traiter les lignes d'un
 fichier qui n'existe pas, ou exploiter un élément après sa recherche
-infructueuse dans une liste, &hellip; Les plus classiques sont les accès
+infructueuse dans une liste&hellip; Les plus classiques sont les accès
 hors bornes, et tous les autres problèmes de déréférencement de pointeur nul
 et de <a href="http://en.wikipedia.org/wiki/Dangling_pointer"><em>dangling pointer</em></a>.</p>
 
@@ -140,9 +140,9 @@ est une erreur de programmation. La différence est subtile. J'y reviendrai plus
 <h3>I-2. Que faire de ces erreurs de programmation ?</h3>
 
 <p>Les erreurs qui bloquent la compilation, on n'a pas trop d'autre choix que de
-les corriger. Les autres erreurs &hellip; souvent, pas grand chose n'en est fait.
-Elles sont là, elles trainent jusqu'à ce qu'elles soient trouvées, puis
-corrigées. Les pires d'entre-elles ne sont jamais détectées. C'est souvent le
+les corriger. Les autres erreurs&hellip; souvent, pas grand-chose n'en est fait.
+Elles sont là, elles traînent jusqu'à ce qu'elles soient trouvées, puis
+corrigées. Les pires d'entre elles ne sont jamais détectées. C'est souvent le
 cas des erreurs numériques, ou des fichiers que l'on croit avoir ouverts.</p>
 
 <p>Dans les meilleurs de mes mondes, on fait en sorte de ne pas pouvoir compiler
@@ -156,7 +156,7 @@ on utilise des références à la place de pointeurs quand on sait que l'on est
 censés disposer de <em>liens</em> non nuls, on annote comme <strong>transférables</strong> les
 types dont les responsables changent (<em>cf.</em> un prochain billet), on fait en
 sorte de ne pas pouvoir additionner des distances avec des masses (<em>cf.</em>
-<a href="http://boost.org/libs/units">boost.unit</a>), &hellip;</p>
+<a href="http://boost.org/libs/units">boost.unit</a>)&hellip;</p>
 
 <p>Pour les autres cas, <a href="#Meyer1988">[Meyer1988]</a> a jeté les bases d'un outil, la
 <em>programmation par contrat</em>. Le C nous offre un second outil, les <em>assertions</em>.
@@ -175,9 +175,9 @@ vérifient <em>result = x²</em>. On retrouve la notion de <em>domaine de défin
 <em>fonctions</em> en mathématiques.</p>
 
 <p>Dit autrement, si on respecte le contrat d'appel d'une fonction (on parle de
-ses <em>pré-conditions</em>), cette fonction est censée nous garantir respecter son
-contrat de sortie (on parle de <em>post-conditions</em>). Si les pré-conditions ne
-sont pas respectées, les post-conditions (à commencer par le bon déroulement de
+ses <em>préconditions</em>), cette fonction est censée nous garantir respecter son
+contrat de sortie (on parle de <em>postconditions</em>). Si les préconditions ne
+sont pas respectées, les postconditions (à commencer par le bon déroulement de
 la fonction) pourront ne pas être respectées : la fonction est libre de faire
 comme elle l'entend.</p>
 
@@ -189,7 +189,7 @@ contrats de <code>sqrt</code>. Nous disposons de spécifications précises, et d
 
 <p>Heureusement, nous pouvons aller bien plus loin. Nous pouvons aussi marquer le
 code avec des assertions représentatives des contrats identifiés pour repérer
-les ruptures de contrats en phases de tests et développement.</p>
+les ruptures de contrats en phases de test et développement.</p>
 
 <p>Idéalement, nous aurions dû pouvoir aller beaucoup plus loin. En effet, les
 outils d'analyse statique de code devraient pouvoir exploiter les contrats
@@ -202,10 +202,10 @@ assertions pour retirer des branches à explorer.</p>
 
 <p>La PpC définit trois contrats :</p>
 
-<h4>Les pré-conditions</h4>
+<h4>Les préconditions</h4>
 
 <p>Elles sont le pendant des <em>domaines de définition</em> des fonctions mathématiques.
-Si l'état du système vérifie les pré-conditions d'une fonction à l'instant de
+Si l'état du système vérifie les préconditions d'une fonction à l'instant de
 son appel, alors la fonction est censée se dérouler correctement et de façon
 <em>prévisible</em> (je simplifie).</p>
 
@@ -213,31 +213,31 @@ son appel, alors la fonction est censée se dérouler correctement et de façon
 qu'ils soient explicites, ou implicites (<code>this</code>), mais aussi à toutes les
 globales accessibles.</p>
 
-<h4>Les post-conditions</h4>
+<h4>Les postconditions</h4>
 
-<p>Les post-conditions sont les garanties que l'on a sur le résultat d'une fonction
-si les pré-conditions sont remplies et que la fonction s'est exécutée
+<p>Les postconditions sont les garanties que l'on a sur le résultat d'une fonction
+si les préconditions sont remplies et que la fonction s'est exécutée
 correctement.</p>
 
 <blockquote><p><strong>Important :</strong> Si une fonction voit qu'elle ne pourra pas remplir ses
-post-conditions, alors elle <strong>doit</strong> échouer &ndash; de préférence en levant une
+postconditions, alors elle <strong>doit</strong> échouer &ndash; de préférence en levant une
 exception de <em>runtime</em> en ce qui me concerne.</p></blockquote>
 
 <p>Notez cet emploi du <em>futur</em>. Il ne s'agit pas de vérifier si les calculs ou
 l'algorithme sont corrects en sortie de fonction, mais de vérifier si le
 contexte permet bien à la fonction de se dérouler correctement.</p>
 
-<p>Le cas <em>&ldquo;j'ai fait tous mes calculs, ils sont faux, et je ne sais pas
-pourquoi&rdquo;</em> ne justifie pas une exception. Il s'agit d'une erreur de
+<p>Le cas <em>«j'ai fait tous mes calculs, ils sont faux, et je ne sais pas
+pourquoi»</em> ne justifie pas une exception. Il s'agit d'une erreur de
 programmation ou de logique.<br/>
 Prenons <a href="http://fr.wikipedia.org/wiki/Vil_Coyote">Vil Coyote</a>. Il a un plan
-splendide pour attraper Bip Bip &ndash; c'est d'ailleurs la post-condition de son
+splendide pour attraper Bip Bip &ndash; c'est d'ailleurs la postcondition de son
 plan. Il détourne une route pour la faire arriver au pied d'une falaise, et il
 peint un tunnel sur le rocher. C'est un algo simple et efficace, Bip Bip
 devrait s'écraser sur la roche, et Vil aura son repas. Sauf que. Il y a un bug
 avec la peinture qu'il a intégrée (ou avec Bip Bip) : le volatile emprunte le
 tunnel. Vous connaissez tous la suite, Vil se lance à sa poursuite et boum. La
-post-condition n'est pas respectée car il y a un bug totalement inattendu dans
+postcondition n'est pas respectée car il y a un bug totalement inattendu dans
 les pièces que Vil a intégrées. Il n'y avait ici pas de raison de lancer une
 exception. La seule exception plausible c'est si Bip Bip venait à ne pas
 vouloir emprunter cette route.</p>
@@ -252,11 +252,11 @@ de codes durant lesquelles une propriété sera vraie :</p>
 
 <ul>
 <li>un <em>invariant de boucle</em> correspondra à ce qui est toujours vrai à
-l'intérieur de la boucle (p.ex. que <code>i &lt; N</code> dans le cas d'une boucle <code>for</code>) ;
+l'intérieur de la boucle (p.ex. que <code>i &lt; N</code> dans le cas d'une boucle <code>for</code>).
 [NdA.: À vrai dire, c'est une appellation que l'on peut voir comme abusive. En
 effet, ces invariants peuvent être rompus avant de sortir de la boucle.
 Certains préfèrent utiliser le terme de <em>variant de boucle</em> pour désigner une
-propriété qui va permettre de sortir de la boucle.]</li>
+propriété qui va permettre de sortir de la boucle.] ;</li>
 <li>une variable devrait toujours avoir pour invariant : <em>est utilisable, et est
 dans un état cohérent et pertinent</em> ; cet invariant est positionné à la
 sortie de son constructeur (<em>cf.</em> la
@@ -282,8 +282,8 @@ Prenons le bout de code suivant :</p>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">double</span> <span class="n">metier</span><span class="p">()</span> <span class="p">{</span>                  <span class="c1">// écrit par l&#39;Intégrateur</span>
-</span><span class='line'>   <span class="k">const</span> <span class="kt">double</span> <span class="n">i</span> <span class="o">=</span> <span class="n">interrogeES</span><span class="p">();</span> <span class="c1">// écrit par le responsable UI</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">double</span> <span class="nf">metier</span><span class="p">()</span> <span class="p">{</span>                  <span class="c1">// écrit par l&#39;Intégrateur</span>
+</span><span class='line'>   <span class="k">const</span> <span class="kt">double</span> <span class="n">i</span> <span class="o">=</span> <span class="n">interrogeES</span><span class="p">();</span> <span class="c1">// écrit par le Responsable UI</span>
 </span><span class='line'>   <span class="k">return</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">i</span><span class="p">);</span>                 <span class="c1">// écrit par le Mathématicien</span>
 </span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
@@ -292,32 +292,32 @@ Prenons le bout de code suivant :</p>
 <p>Nous pouvons distinguer trois acteurs :</p>
 
 <ul>
-<li>le responsable UI, qui écrit <code>interrogeES</code></li>
+<li>le Responsable UI, qui écrit <code>interrogeES</code></li>
 <li>le Mathématicien, qui écrit <code>sqrt</code></li>
 <li>et l'Intégrateur, qui intègre tout cela ensemble lorsqu'il écrit <code>metier</code>.</li>
 </ul>
 
 
 <p><code>sqrt</code> a un contrat simple : le nombre reçu doit être positif. Si l'appel à
-<code>sqrt</code> échoue (plantage, résultat renvoyé aberrant, &hellip;) tandis que le nombre
+<code>sqrt</code> échoue (plantage, résultat renvoyé aberrant&hellip;) tandis que le nombre
 passé en paramètre est bien positif, alors le Mathématicien est responsable du
 problème et ce peu importe ce qui est fait par les autres acteurs. En effet,
-bien que les pré-conditions de <code>sqrt</code> sont bien vérifiées, ses post-conditions
+bien que les préconditions de <code>sqrt</code> soient bien vérifiées, ses postconditions
 ne le sont pas : <code>sqrt</code> ne remplit pas sa part du contrat.</p>
 
 <p>Si <code>i</code> n'est pas positif, alors le Mathématicien ne peut pas être tenu pour
 responsable de quoi que ce soit. La faute incombe au code client de <code>sqrt</code>.</p>
 
-<p>À ce stade, tout va dépendre si <code>interrogeES</code> dispose d'une post-condition sur
+<p>À ce stade, tout va dépendre si <code>interrogeES</code> dispose d'une postcondition sur
 ses sorties du type <em>renvoie un nombre positif</em>. Si c'est le cas, la rupture de
 contrat est alors à ce niveau, et le responsable UI est responsable de l'erreur
 de programmation. En effet, l'Intégrateur est dans son droit d'enchainer
 <code>sqrt(interrogeES())</code>. C'est exactement la même chose que
 <code>sqrt(abs(whatever))</code>, personne n'irait accuser l'Intégrateur de ne pas faire
-son boulot vu que les pré-conditions de <code>sqrt</code> sont censées être assurées par
-les post-conditions de <code>interrogeES</code>.</p>
+son boulot vu que les préconditions de <code>sqrt</code> sont censées être assurées par
+les postconditions de <code>interrogeES</code>.</p>
 
-<p>En revanche, si <code>interrogeES</code> n'a aucune post-condition telle que le nombre
+<p>En revanche, si <code>interrogeES</code> n'a aucune postcondition telle que le nombre
 renvoyé sera positif, alors l'Intégrateur est responsable au moment de l'intégration de
 s'assurer que ce qu'il va passer à <code>sqrt</code> soit bien positif. Une correction
 typique serait :</p>
@@ -339,7 +339,7 @@ typique serait :</p>
 
 <p>Remarquez, que l'Intégrateur est alors face à une erreur de contexte
 (/<em>runtime</em>) et nullement face à une erreur de programmation. Il est alors en
-droit de lever une exception (souvenez-vous, si une post-condition ne peut pas
+droit de lever une exception (souvenez-vous, si une postcondition ne peut pas
 être respectée, alors la fonction doit échouer), ou de boucler jusqu'à obtenir
 quelque chose qui lui permette de continuer. Sans cela nous aurions été face à
 une erreur de programmation commise par l'Intégrateur.</p>
@@ -347,26 +347,26 @@ une erreur de programmation commise par l'Intégrateur.</p>
 <p>En résumé :</p>
 
 <blockquote><ul>
-<li>la responsabilité de vérifier les pré-conditions d'une fonction échoie au
+<li>la responsabilité de vérifier les préconditions d'une fonction échoit au
 code client, voire indirectement au code qui alimente les entrées de cette
-fonction appelée.</li>
-<li>la responsabilité de vérifier les post-conditions d'une fonction échoie à
+fonction appelée ;</li>
+<li>la responsabilité de vérifier les postconditions d'une fonction échoit à
 cette fonction appelée.</li>
 </ul>
 </blockquote>
 
-<p>NB: Jusqu'à présent je considérai seulement deux acteurs relativement aux
+<p>N.B.: Jusqu'à présent je considérais seulement deux acteurs relativement aux
 responsabilités. C'est Philippe Dunski qui m'a fait entrevoir le troisième
 intervenant lors de ma relecture de son livre <a href="#Dunksi2014">[Dunksi2014]</a>.</p>
 
 <h3>II.3- Petite parenthèse sur les contrats commerciaux&hellip; et les licences</h3>
 
-<p>La programmation par contrat n'a pas vocation à avoir des répercutions légales
+<p>La programmation par contrat n'a pas vocation à avoir des répercussions légales
 selon qui ne remplit pas son contrat. Cependant, il y a clairement une
 intersection entre la PpC et les responsabilités légales.</p>
 
 <p>Dans le cas où le responsable UI et le Mathématicien sont deux contractants de
-l'Intégrateur. Ce que j'ai détaillé au paragraphe précédant est normalement
+l'Intégrateur. Ce que j'ai détaillé au paragraphe précédent est normalement
 directement applicable. L'Intégrateur sera responsable vis-à-vis de son client
 du bon fonctionnement de l'ensemble, mais le responsable UI et le Mathématicien
 ont des responsabilités vis-à-vis de l'Intégrateur.</p>
@@ -390,13 +390,13 @@ d'utiliser, et de reverser les patchs à la communauté.</p>
 Défensive</em>. Souvent ces deux approches sont confondues tant la frontière entre
 les deux est subtile.</p>
 
-<p><em>Tout d'abord une petite remarque importante, la Programmation Défensive a
+<p><em>Tout d'abord une petite remarque importante, la programmation défensive a
 d'autres objectifs orthogonaux à ce qui est discuté dans ces billets : elle est
 aussi utilisée pour introduire une tolérance aux erreurs matérielles, limiter
 les conséquences de ces erreurs (comme les corruptions de mémoire).  C'est un
 aspect que je n'aborde pas dans le cadre de la comparaison avec la PpC.</em></p>
 
-<h3><a id="ProgDefCtx"></a>III.1- Présentons la Programmation Défensive</h3>
+<h3><a id="ProgDefCtx"></a>III.1- Présentons la programmation défensive</h3>
 
 <p>La <em>Programmation Défensive</em> a pour objectif qu'un programme ne doit jamais
 s'arrêter afin de toujours pouvoir continuer. On s'intéresse à la robustesse
@@ -405,7 +405,7 @@ d'un programme.</p>
 <p>Bien que la PpC puisse être détournée pour faire de la programmation
 défensive, ce n'est pas son objectif premier. La PpC ne fait que stipuler que
 si un contrat est respecté, alors tout se passera bien. Si le contrat n'est pas
-respecté tout peut arriver : on peut assister à des plantages plus ou moins
+respecté, tout peut arriver : on peut assister à des plantages plus ou moins
 prévisibles, on peut produire des résultats erronés, on peut stopper
 volontairement au point de détection des erreurs, et on peut aussi remonter
 des exceptions. Avec la PpC, on s'intéresse à l'écriture de code correct.</p>
@@ -452,7 +452,7 @@ le paramètre reçu est positif, et à lever une exception dans le cas contraire
 
 <p>Si un nombre négatif devait être présent dans le fichier, nous aurions droit à
 l'exception <em>&ldquo;Negative number sent to sqrt&rdquo;</em>. Limpide, n'est-ce pas ? On ne sait
-pas quel est le nombre, ni d'où il vient. Après une longue investigation pour
+pas quel est le nombre ni d'où il vient. Après une longue investigation pour
 traquer l'origine de ce nombre négatif, on comprend enfin qu'il faut
 instrumenter <code>process</code> pour intercepter l'exception. Soit on fait le <code>catch</code> au
 niveau de la fonction, et on sait dans quel fichier a lieu l'erreur, soit on
@@ -552,12 +552,12 @@ cela &ndash; a contrario du <em>Stack Unwinding</em>.</p>
 <h3>III.2- Des objections ?</h3>
 
 <p>Il est des objections classiques à l'utilisation de la PpC en terrain où la
-Programmation Défensive occupe déjà la place. Décortiquons-les.</p>
+programmation défensive occupe déjà la place. Décortiquons-les.</p>
 
-<h4><em>&ldquo;-On utilise l'une ou l'autre&rdquo;</em></h4>
+<h4><em>- « On utilise l'une ou l'autre »</em></h4>
 
 <p>Oui et non. Si la PpC s'intéresse à l'écriture de code correct, la
-Programmation Défensive s'intéresse à l'écriture de code robuste.
+programmation défensive s'intéresse à l'écriture de code robuste.
 L'objectif premier n'est pas le même (dans un cas on essaie de repérer et
 éliminer les erreurs de programmation, dans l'autre on essaie de ne pas planter
 en cas d'erreur de programmation), de fait les deux techniques peuvent se
@@ -568,25 +568,25 @@ récalcitrants.</p>
 <p>À vrai dire, on peut utiliser simultanément ces deux approches sur de mêmes
 contrats. En effet, il est possible de modifier la définition d'une assertion
 en mode <em>Release</em> pour lui faire lever une exception de logique. En mode
-<em>Debug</em> elle nous aidera à contrôler les enchainements d'opérations</p>
+<em>Debug</em> elle nous aidera à contrôler les enchaînements d'opérations.</p>
 
 <p>Ce qui indubitable, c'est qu'en cas de certitude qu'il n'y a pas d'erreur de
-programmation sur des enchainements de fonctions, alors il n'y a pas besoin de
+programmation sur des enchaînements de fonctions, alors il n'y a pas besoin de
 test dynamique sur les entrées des fonctions.<br/>
 Reste que toute la difficulté réside dans comment être certains qu'une séquence
 d'opérations est exempte de bugs.</p>
 
-<h4><em>&ldquo;- La PpC éparpille les vérifications alors que la Programmation Défensive les factorise.&rdquo;</em></h4>
+<h4><em>- « La PpC éparpille les vérifications alors que la Programmation Défensive les factorise. »</em></h4>
 
-<p>Il est vrai que la Programmation Défensive permet d'une certaine façon de
+<p>Il est vrai que la programmation défensive permet d'une certaine façon de
 centraliser et factoriser les vérifications. Mais les vérifications ainsi
 centralisées ne disposent pas du contexte qui permet de remonter des erreurs
 correctes. Il est nécessaire d'enrichir les exceptions pauvres en les
 transformant au niveau du code client, et là on perd les factorisations.<br/>
-D'où la question légitime que l'on est en droit de se poser : <em>&ldquo;Mais pourquoi ne
+D'où la question légitime que l'on est en droit de se poser : <em>« Mais pourquoi ne
 pas faire ce que le code client était censé faire dès le début ? Pourquoi ne
-pas vérifier les pré-conditions des fonctions que l'on va appeler, avant de les
-appeler ?&rdquo;</em></p>
+pas vérifier les préconditions des fonctions que l'on va appeler, avant de les
+appeler ? »</em></p>
 
 <p>Ensuite, il est toujours possible de factoriser grâce aux assertions. Si en
 mode <em>Release</em> les assertions lèvent des exceptions, alors factorisation il y
@@ -601,10 +601,10 @@ De fait, on commence à avoir des systèmes aux responsabilités de plus en plus
 confuses.</p>
 
 <p>De plus, cette factorisation implique de toujours vérifier dynamiquement ce qui
-est garantit statiquement. D'autant que idéalement s'il n'y a pas d'erreur de
+est garanti statiquement. D'autant qu'idéalement s'il n'y a pas d'erreur de
 programmation, alors il n'y a pas de test à faire dans les cas où le <em>runtime</em>
 n'a pas à être vérifié.<br/>
-Quel sens il y a-t-il à écrire ceci ?</p>
+Quel sens y a-t-il à écrire ceci ?</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -619,18 +619,18 @@ Quel sens il y a-t-il à écrire ceci ?</p>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<h4><em>&ldquo;-Le mode Debug ne doit pas se comporter différemment du mode Release!&rdquo;</em></h4>
+<h4><em>-« Le mode Debug ne doit pas se comporter différemment du mode Release! »</em></h4>
 
 <p>Remontons à l'origine de cette exigence pour mieux appréhender son impact sur
 la PpC telle que je vous la propose (avec des assertions).</p>
 
 <p>Parfois, le mode <em>Debug</em> est plus permissif que le mode <em>Release</em> : il cache
-des erreurs de programmation. Souvent c'est du à des outils (comme VC++) dont le mode
+des erreurs de programmation. Souvent c'est dû à des outils (comme VC++) dont le mode
 <em>Debug</em> zéro-initialise des variables même quand le code néglige de les
 initialiser.</p>
 
 <p>Avec des assertions, c'est tout le contraire. En effet, le mode <em>Debug</em> ne sera
-pas plus permissif, mais au contraire il sera plus restrictif et intransigeant
+pas plus permissif, mais au contraire, il sera plus restrictif et intransigeant
 que le mode <em>Release</em>. Ainsi, si un test passe en mode <em>Debug</em>, il passera
 également en mode <em>Release</em> (relativement aux assertions) : si le test est OK,
 c'est que les assertions traversées ne détectent aucune rupture de contrat en
@@ -642,7 +642,7 @@ Ce qui est sûr, c'est qu'en phases de développement et de tests, les
 développeurs auraient vu l'erreur de programmation et ils auraient dû la
 corriger pour voir le test passer.</p>
 
-<h4><em>&ldquo;- La programmation Défensive est plus adaptée aux développeurs inexpérimentés.&rdquo;</em></h4>
+<h4><em>- « La programmation défensive est plus adaptée aux développeurs inexpérimentés. »</em></h4>
 
 <p>C'est possible. On ne réfléchit pas avant. On code et on voit ensuite ce qu'il
 se passe. Traditionnellement, les débutants tendent à être formés de la sorte.</p>
@@ -662,8 +662,8 @@ rajoutent-ils pas de nouveaux risques de bugs ?</p>
 accessibles nos systèmes à des développeurs inexpérimentés, ne faisons-nous pas
 le contraire ?</p>
 
-<p>À noter aussi aussi que le diagnostic des erreurs de <em>runtime</em> ou de logique
-est plus pauvre avec la <em>factorisation</em> de la Programmation Défensive. Et de
+<p>À noter aussi que le diagnostic des erreurs de <em>runtime</em> ou de logique
+est plus pauvre avec la <em>factorisation</em> de la programmation défensive. Et de
 fait, on complexifie les tâches d'investigation des problèmes vu que l'on
 déresponsabilise les véritables responsables.</p>
 
@@ -672,28 +672,28 @@ déresponsabilise les véritables responsables.</p>
 <p>Sinon, voici mes conclusions personnelles sur le sujet :</p>
 
 <ul>
-<li>La PpC s'intéresse à l'écriture de codes corrects. La Programmation Défensive
+<li>la PpC s'intéresse à l'écriture de codes corrects. La programmation défensive
 s'intéresse à l'écriture de codes qui restent robustes dans le cas où ils ne
-seraient pas corrects.</li>
-<li>Philosophiquement, je préfère 100 fois la PpC à la Programmation Défensive :
+seraient pas corrects ;</li>
+<li>philosophiquement, je préfère 100 fois la PpC à la programmation défensive :
 il faut assumer nos responsabilités et ne pas décharger nos utilisateurs de
-leurs devoirs.</li>
-<li>Toutefois, il est possible de détourner la PpC  basée sur des assertions en C
-et C++ pour faire de la Programmation Défensive ; p.ex. l'assertion pourrait
+leurs devoirs ;</li>
+<li>toutefois, il est possible de détourner la PpC basée sur des assertions en C
+et C++ pour faire de la programmation défensive ; p.ex. l'assertion pourrait
 être détournée en <em>Release</em> pour lever une exception. J'y reviendrai dans le
 <a href="/blog/2014/05/28/programmation-par-contrat-les-assertions/">prochain billet</a>.</li>
 </ul>
 
 
-<h3>III.4- Comment reconnaitre des contrats ?</h3>
+<h3>III.4- Comment reconnaître des contrats ?</h3>
 
 <p>Il est important de le rappeler, les contrats tels que présentés ici sont
-orientés vers la recherche des erreurs de programmation. C'est à dire, un code
+orientés vers la recherche des erreurs de programmation. C'est-à-dire, un code
 qui ne respecte pas les contrats de ses divers constituants présente une erreur
 de programmation.</p>
 
-<p>En aucun cas une violation de contrat correspondra à une situation
-exceptionnelle (et plausible), <em>cf.</em> <a href="#Wilson2006">[Wilson2006]</a></p>
+<p>En aucun cas une violation de contrat ne correspondra à une situation
+exceptionnelle (et plausible), <em>cf.</em> <a href="#Wilson2006">[Wilson2006]</a>.</p>
 
 <p>Il est également à noter qu'une vérification de contrat devrait pouvoir être
 retirée d'un code source sans que son comportement ne soit impacté. En effet,
@@ -713,25 +713,26 @@ classe peut dériver (publiquement en C++) en toute quiétude d'une autre.
 Le principe est que :</p>
 
 <ul>
-<li>les pré-conditions ne peuvent être qu'affaiblies, ou laissées telles quelles,</li>
-<li>les post-conditions ne peuvent être que renforcées, ou laissées telles
-quelles,</li>
+<li>les préconditions ne peuvent être qu'affaiblies, ou laissées telles
+quelles ;</li>
+<li>les postconditions ne peuvent être que renforcées, ou laissées telles
+quelles ;</li>
 <li>et une classe fille ne peut qu'ajouter des invariants.</li>
 </ul>
 
 
-<p>Dit comme cela, cela peut paraitre abscons, et pourtant c'est très logique.</p>
+<p>Dit comme cela, cela peut paraître abscons, et pourtant c'est très logique.</p>
 
 <h4>Quelques exemples</h4>
 
-<p>Prenons par exemple, une compagnie aérienne. Elle a des pré-requis sur les
-bagages acceptés sans surcouts. Pour toutes les compagnies, un bagage de
+<p>Prenons par exemple, une compagnie aérienne. Elle a des prérequis sur les
+bagages acceptés sans surcoûts. Pour toutes les compagnies, un bagage de
 50x40x20cm sera toujours accepté. En particulier, chez les compagnies
 low-costs. En revanche, les grandes compagnies historiques (et non low-costs)
-affaiblissent cette pré-condition : on peut s'enregistrer avec un bagage
+affaiblissent cette précondition : on peut s'enregistrer avec un bagage
 bien plus gros sans avoir à payer de supplément (certes il partira en soute).<br/>
-Il en va de même pour les post-conditions : nous n'avons aucune garantie
-d'estomac rempli sans surcouts une fois à bord de l'avion. Sauf chez les
+Il en va de même pour les postconditions : nous n'avons aucune garantie
+d'estomac rempli sans surcoûts une fois à bord de l'avion. Sauf chez les
 compagnies traditionnelles qui assurent en sortie un estomac non vide.<br/>
 On peut donc dire a priori qu'une <em>compagnie low-cost</em> est une <em>compagnie
 aérienne</em>, de même qu'une <em>compagnie traditionnelle</em> est une <em>compagnie
@@ -918,7 +919,7 @@ article.</li>
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2012-2015 - Luc Hermitte -
+  Copyright &copy; 2012-2016 - Luc Hermitte -
   Distributed under Licence Creative Commons CC-BY-NC-SA -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>

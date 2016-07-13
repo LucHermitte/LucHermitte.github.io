@@ -129,10 +129,10 @@ problèmes tendent à survenir bien plus tard.</p>
 préoccuper) est assez répandue. Je ne cache pas que l'un des objectifs de cette
 série de billets est de combattre cette habitude.</p>
 
-<h3>Option 2 : on lance des exceptions dans la tradition de la Programmation Défensive</h3>
+<h3>Option 2 : on lance des exceptions dans la tradition de la programmation défensive</h3>
 
 <p>À l'opposé, on peut prendre la voie de la <em>Programmation Défensive</em> et vérifier
-chaque rupture potentielle de contrat pour lever une exception. Au delà des
+chaque rupture potentielle de contrat pour lancer une exception. Au delà des
 problèmes de conceptions et de déresponsabilisation évoqués dans le
 <a href="/blog/2014/05/24/programmation-par-contrat-un-peu-de-theorie/">billet précédent</a>,
 il y a un soucis technique.</p>
@@ -147,13 +147,13 @@ stocker une telle information ; ce n'est par exemple pas le cas des
 <p>Par <em>&ldquo;rien de mieux que le lieu de la détection&rdquo;</em>, il faut comprendre que l'on
 ne disposera d'aucune autre information de contexte. En effet, une exception
 remonte jusqu'à un <code>catch</code> compatible ; or à l'endroit du <code>catch</code>, on ne peut
-plus avoir accès à l'état (de toutes les variables, dans tous les threads, &hellip;)
+plus avoir accès à l'état (de toutes les variables, dans tous les threads&hellip;)
 au moment de la détection du problème.</p>
 
 <p>En vérité, il y existe deux moyens peu ergonomiques pour y avoir accès.</p>
 
 <ul>
-<li>Le premier consiste à mettre des points d'arrêt sur les levers ou les
+<li>Le premier consiste à mettre des points d'arrêt sur les lancers ou les
 constructions d'exceptions, et à exécuter le programme depuis un débuggueur.</li>
 <li>Le second consiste à supprimer du code source tous les <code>catchs</code> qui sont
 compatibles avec l'erreur de logique.<br/>
@@ -167,7 +167,7 @@ billet.<br/>
 Le hic est que de nombreux <em>frameworks</em> font dériver leurs erreurs de
 <code>std::exception</code> et non de <code>std::runtime_error</code>, et de fait, on se retrouve
 vite à faire des <code>catch(std::exception const&amp;)</code> aux points d'interface
-(dialogue via API C, threads en C++03, <code>main()</code>, &hellip;) quelque soit le mode de
+(dialogue via API C, threads en C++03, <code>main()</code>&hellip;) quelque soit le mode de
 compilation.<br/>
 Corolaire : ne faites pas comme ces <em>frameworks</em> et choisissez judicieusement
 votre exception standard racine.</li>
@@ -183,7 +183,7 @@ vérification des contrats, que cela soit en phase de tests comme en phase de
 production.  Et ce, même pour des morceaux de code où il est certain qu'il n'y
 a pas d'erreur de programmation.<br/>
 Par exemple, <code>sqrt(1-sin(x))</code> ne devrait poser aucun soucis. Une fonction sinus
-renvoie en théorie un nombre entre -1 et 1, ce qui constitue une post-condition
+renvoie en théorie un nombre entre -1 et 1, ce qui constitue une postcondition
 toute indiquée. De fait par construction, <code>1-sin(x)</code> est positif, et donc
 compatible avec le contrat de <code>sqrt</code>.</p>
 
@@ -446,7 +446,7 @@ est possible de les détourner en phases 6. et 7. pour tenter de rendre plus
 robuste le produit en le faisant résister aux erreurs de programmation qui ont
 échappé à notre vigilance lors des phases précédentes.</p>
 
-<p>On entre dans le royaume de la <em>Programmation Défensive</em> que j'ai déjà
+<p>On entre dans le royaume de la <em>programmation défensive</em> que j'ai déjà
 abondamment décrit.</p>
 
 <p>Comment peut-on détourner les assertions ? Tout simplement en détournant leur
@@ -505,7 +505,7 @@ compréhensibles en profitant du fonctionnement interne de la macro.</p>
 
 <p>Les outils d'analyse statique de code comme
 <a href="http://clang-analyzer.llvm.org/">clang analyzer</a> sont très intéressants. En
-plus, ils interviennent en <a href="#Phases">phase 3</a>! Seulement, à mon grand regret,
+plus, ils interviennent en <a href="#Phases">phase 3</a> ! Seulement, à mon grand regret,
 ils ne semblent pas exploiter les assertions pour détecter statiquement des
 erreurs de logique.
 Au contraire, ils utilisent les assertions pour inhiber l'analyse de certains
@@ -513,7 +513,7 @@ chemins d'exécution.</p>
 
 <p>Ainsi, dans l'exemple de <code>test-assert.cpp</code> que j'ai donné plus haut, les outils
 d'analyse statique de code ne feront pas le rapprochement entre la
-post-condition de <code>my::sin</code> et la pré-condition de <code>my::sqrt</code>, mais feront
+postcondition de <code>my::sin</code> et la précondition de <code>my::sqrt</code>, mais feront
 plutôt comme si les assertions étaient toujours vraies, c'est à dire comme si
 le code n'appelait jamais <code>my::sqrt</code> avec un nombre négatif.</p>
 
@@ -531,25 +531,25 @@ formelle en C++. A noter qu'il existe des efforts pour fournir à de tels outils
 des moyens simplifiés, et plus forts sémantiquement parlant, pour exprimer des
 contrats dans des codes C++.</p>
 
-<h3>Option 4 : On utilise des Tests Unitaires (pour les post-conditions)</h3>
+<h3>Option 4 : On utilise des Tests Unitaires (pour les postconditions)</h3>
 
-<p>Quand plus tôt j'indiquais que <em>sinus</em> a pour post-condition toute indiquée un
+<p>Quand plus tôt j'indiquais que <em>sinus</em> a pour postcondition toute indiquée un
 résultat inférieur à 1, peut-être avez-vous tiqué. Et vous auriez eu raison. La
-post-condition de la fonction <code>sin()</code> est de calculer &hellip; un sinus.<br/>
+postcondition de la fonction <code>sin()</code> est de calculer &hellip; un sinus.<br/>
 Là, plusieurs problèmes se posent : comment valider que le calcul est correct ?
 Avec une seconde implémentation de la fonction ? A l'aide de <code>cos()</code> ? Et quel
 serait le prix (même en mode <em>Debug</em>) d'une telle vérification ?</p>
 
-<p>Lors de ses présentations sur le sujet, John Lakos rappelle une post-condition
+<p>Lors de ses présentations sur le sujet, John Lakos rappelle une postcondition
 souvent négligée d'une fonction de tri : non seulement, les éléments produits
 doivent être triés, mais en plus il doit s'agir des mêmes éléments (ni plus, ni
-moins) que ceux qui ont été fournis à la fonction de tri. [NB: Cet exemple
+moins) que ceux qui ont été fournis à la fonction de tri. [N.B.: Cet exemple
 semble venir de Kevlin Henney.]</p>
 
 <p>Au final, un consensus semble se dégager vers l'utilisation de tests unitaires
-pour valider les post-conditions de fonctions. Après, je vous laisse juger s'il
-est pertinent de vérifier par assertion des post-conditions simples et peu
-couteuses comme le fait que le résultat de <code>sin()</code> doit appartenir à <code>[-1,
+pour valider les postconditions de fonctions. Après, je vous laisse juger s'il
+est pertinent de vérifier par assertion des postconditions simples et peu
+coûteuses comme le fait que le résultat de <code>sin()</code> doit appartenir à <code>[-1,
 +1]</code>. D'autant que pour l'instant, aucun (?) outil n'exploite des assertions
 pour faire de la preuve formelle et ainsi détecter que <code>sqrt(sin(x)-1)</code> est
 problématique sur certaines plages de <code>x</code>.</p>
@@ -572,7 +572,7 @@ ensemble de macros <code>contract_assert()</code> assez flexible.</p>
 <p>Ces macros supportent des niveaux d'importance de vérification (<em>optimized</em>, <em>safe</em>,
 <em>debug</em>,) un peu à l'image des niveaux <em>Error</em>/<em>Warning</em>/<em>Info</em>/<em>Debug</em> dans
 les frameworks de log.  La proposition offre de permettre de faire de la
-programmation défensive (i.e. de lever des exceptions au lieu de simples
+programmation défensive (i.e. de lancer des exceptions au lieu de simples
 assertions). Elle permettrait également de transformer les assertions en
 assertions de frameworks de tests unitaires.<br/>
 À noter qu'elle est déjà implémentée et disponible à l'intérieur de la
@@ -592,7 +592,7 @@ partisans, car d'autres propositions tournent, <em>cf.</em> :</p>
 
 <ul>
 <li><a href="https://isocpp.org/files/papers/N4110.pdf">N4110</a>
-<em>Exploring the design space of contract specications for C++</em>, J. Daniel Garcia ;</li>
+<em>Exploring the design space of contract specifications for C++</em>, J. Daniel Garcia ;</li>
 <li><p><a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4293.pdf">N4293</a>
 <em>C++ language support for contract programming</em>, où J. Daniel Garcia présente
 un résumé des discussions autour de la PpC à Urbana ;</p></li>
@@ -653,8 +653,8 @@ phase de tests.</p>
 génériques pour s'assurer que les arguments <em>templates</em> vérifient certaines
 contraintes.<br/>
 Mais c'est loin d'être le seul cas d'utilisation. Je m'en sers
-également pour vérifier que j'ai autant de chaines de caractères que de valeurs
-dans un énuméré. Avec mes <a href="https://code.google.com/p/lh-vim/wiki/lhCpp">plugins pour vim</a>,
+également pour vérifier que j'ai autant de chaînes de caractères que de valeurs
+dans un énuméré. Avec mes <a href="http://github.com/LucHermitte/lh-cpp">plugins pour vim</a>,
 je génère automatiquement ce genre de choses avec <code>:InsertEnum MyEnum one two
 three</code> :</p>
 
@@ -719,7 +719,7 @@ three</code> :</p>
 
 <h4>Préférez les références aux pointeurs</h4>
 
-<p>Dans la signature d'une fonction, les références posent une pré-condition : la
+<p>Dans la signature d'une fonction, les références posent une précondition : la
 valeur passée en paramètre par référence doit être non nulle &ndash; à charge au
 code client de vérifier cela.</p>
 
@@ -731,8 +731,139 @@ Certes, cela ne protège pas des cas où la donnée est partagée depuis un
 autre thread où elle pourrait être détruite.</p>
 
 <p>John Carmack recommande leur utilisation (en place de pointeurs) dans un
-<a href="http://www.altdevblogaday.com/2011/12/24/static-code-analysis/">billet sur l'analyse statique de code</a>
-publié sur #AltDevBlog.</p>
+<a href="http://www.viva64.com/en/a/0087/">billet sur l'analyse statique de code</a>
+initialement publié sur feu #AltDevBlog.</p>
+
+<h5>Ou a défaut <code>gsl::non_null</code></h5>
+
+<p>Il est à noter que l'emploi d'un pointeur brut que l'on testerait à chaque
+appel d'un ensemble de fonctions, dans la tradition de la programmation
+défensive, offre de bien piètres performances comparativement à l'emploi d'une
+référence, ou d'un type tel que <code>gsl::not_null</code>. Voir à ce sujet la
+<a href="http://codedive.pl/en/speaker/speaker/bartosz-szurgot/">présentation de Bartosz Szurgot <em>C Vs C++: the embedded perspective</em></a>
+donnée pour les code::dive 2015.</p>
+
+<p>Le type <code>gsl::not_null&lt;&gt;</code> est fourni avec le
+<a href="http://github.com/Microsoft/GSL">projet GSL</a> qui accompagne les
+<a href="http://github.com/isocpp/CppCoreGuidelines"><em>Cpp Core Guidelines</em></a>. L'idée est
+que l'on garde un pointeur qui peut être construit implicitement à partir d'une
+référence ou d'un autre pointeur <code>not_null</code>, ou explicitement à partir de tout
+pointeur autre que <code>nullptr</code>. La construction explicite vérifiant que le
+pointeur reçu est bien non nul &ndash; la vérification pouvant être inhibée, ou se
+faire avec lancé d'exception, assertion ou équivalent.</p>
+
+<h4>Une solution fortement typée pour <code>sqrt</code>.</h4>
+
+<p>Dans le même ordre d'idée que <code>not_null</code>, le problème <code>sqrt</code> pourrait se
+résoudre avec un type <code>positive_number</code>. Si l'utilisateur néglige de s'assurer
+de passer un nombre qui offre cette garantie de positivité, le compilateur sera
+là pour le rappeler à l'ordre, même en C++11 et ses <code>auto</code>.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="c1">// Le prérequis</span>
+</span><span class='line'><span class="p">[[</span><span class="nl">expects</span><span class="p">:</span> <span class="n">x</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">]]</span> <span class="c1">// redondant avec `positive_number`</span>
+</span><span class='line'><span class="p">[[</span><span class="n">ensures</span> <span class="nl">ret_val</span><span class="p">:</span> <span class="n">abs</span><span class="p">(</span><span class="n">ret_val</span><span class="o">*</span><span class="n">ret_val</span> <span class="o">-</span> <span class="n">x</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">epsilon</span><span class="p">]]</span>
+</span><span class='line'><span class="n">positive_number</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">positive_number</span> <span class="n">x</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//--------------------------------------------------</span>
+</span><span class='line'><span class="c1">// La version où le Responsable UI doit renvoyer un truc positif.</span>
+</span><span class='line'><span class="c1">// et qui compilera</span>
+</span><span class='line'><span class="n">positive_number</span> <span class="nf">interrogeES</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">double</span> <span class="nf">metier</span><span class="p">()</span> <span class="p">{</span>          <span class="c1">// écrit par l&#39;Intégrateur</span>
+</span><span class='line'>   <span class="k">auto</span> <span class="n">i</span> <span class="o">=</span> <span class="n">interrogeES</span><span class="p">();</span> <span class="c1">// écrit par le Responsable UI</span>
+</span><span class='line'>   <span class="k">return</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">i</span><span class="p">);</span>         <span class="c1">// écrit par le Mathématicien</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="c1">// Note: on pourrait effectivement retourner un positive_number, mais faisons</span>
+</span><span class='line'><span class="c1">// comme si l&#39;intégrateur n&#39;avait pas vu cette garantie qu&#39;il pourrait offrir,</span>
+</span><span class='line'><span class="c1">// vu que ce n&#39;est pas le sujet ici.</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//--------------------------------------------------</span>
+</span><span class='line'><span class="c1">// La version où le Responsable UI renvoie ce qu&#39;il veut</span>
+</span><span class='line'><span class="c1">// et qui ne compilera pas</span>
+</span><span class='line'><span class="c1">// metier() reste identique.</span>
+</span><span class='line'><span class="kt">double</span> <span class="nf">interrogeES</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//--------------------------------------------------</span>
+</span><span class='line'><span class="c1">// La version où l&#39;on intègre comme des sagouins</span>
+</span><span class='line'><span class="c1">// et qui compile</span>
+</span><span class='line'><span class="kt">double</span> <span class="nf">interrogeES</span><span class="p">();</span>
+</span><span class='line'><span class="kt">double</span> <span class="nf">metier</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>   <span class="k">auto</span> <span class="n">i</span> <span class="o">=</span> <span class="n">interrogeES</span><span class="p">();</span>
+</span><span class='line'>   <span class="k">return</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">positive_number</span><span class="p">(</span><span class="n">i</span><span class="p">));</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="c1">// Ça, c&#39;est mal ! On a été prévenu du problème et on le cache sous le tapis.</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//--------------------------------------------------</span>
+</span><span class='line'><span class="c1">// La version où l&#39;on intègre correctement</span>
+</span><span class='line'><span class="c1">// et qui compile</span>
+</span><span class='line'><span class="kt">double</span> <span class="nf">interrogeES</span><span class="p">();</span>
+</span><span class='line'><span class="kt">double</span> <span class="nf">metier</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>   <span class="k">auto</span> <span class="n">i</span> <span class="o">=</span> <span class="n">interrogeES</span><span class="p">();</span>
+</span><span class='line'>   <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>       <span class="k">throw</span> <span class="n">std</span><span class="o">::</span><span class="n">range_error</span><span class="p">(</span><span class="s">&quot;Cannot work on a negative number. Please start again`.&quot;</span><span class="p">)</span><span class="err">`</span>
+</span><span class='line'>   <span class="p">}</span>
+</span><span class='line'>   <span class="k">return</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">positive_number</span><span class="p">(</span><span class="n">i</span><span class="p">));</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Le hic avec cette technique prometteuse ?</p>
+
+<p>Il faudrait un <code>positive_number</code>, un <code>not_null_number</code> pour les divisions, un
+<code>strictly_positive_number</code> et ainsi de suite, et prévoir que la différence
+entre deux nombres positifs est juste un&hellip; nombre. Même si le compilateur
+optimisera au point de neutraliser le poids de ces surcouches, même avec
+<code>auto</code>, cela représente beaucoup de travail : des types à définir, les
+fonctions du standard à encapsuler (imaginez le code d'un <code>pow()</code> sachant
+reconnaïtre des puissances entières paires pour retourner dans ces cas précis
+des <code>positive_number</code>), et un utilisateur possiblement perdu au milieu de tout
+ça. Heureusement, on n'a pas encore introduit les <code>positive_length</code>. Et
+puisqu'on parle des unités SI, parlons de boost.unit.</p>
 
 <h4>boost.unit</h4>
 
@@ -934,7 +1065,7 @@ assez exhaustive d'Ahmed Charles.</p>
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2012-2015 - Luc Hermitte -
+  Copyright &copy; 2012-2016 - Luc Hermitte -
   Distributed under Licence Creative Commons CC-BY-NC-SA -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
