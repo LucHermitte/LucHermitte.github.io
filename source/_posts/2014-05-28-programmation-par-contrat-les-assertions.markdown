@@ -46,10 +46,10 @@ Cette mauvaise pratique consistant à ignorer les contrats (ou à ne pas s'en
 préoccuper) est assez répandue. Je ne cache pas que l'un des objectifs de cette
 série de billets est de combattre cette habitude.
 
-### Option 2 : on lance des exceptions dans la tradition de la Programmation Défensive
+### Option 2 : on lance des exceptions dans la tradition de la programmation défensive
 
 À l'opposé, on peut prendre la voie de la _Programmation Défensive_ et vérifier
-chaque rupture potentielle de contrat pour lever une exception. Au delà des
+chaque rupture potentielle de contrat pour lancer une exception. Au delà des
 problèmes de conceptions et de déresponsabilisation évoqués dans le
 [billet précédent]({%post_url 2014-05-24-programmation-par-contrat-un-peu-de-theorie%}),
 il y a un soucis technique.
@@ -64,12 +64,12 @@ stocker une telle information ; ce n'est par exemple pas le cas des
 Par _"rien de mieux que le lieu de la détection"_, il faut comprendre que l'on
 ne disposera d'aucune autre information de contexte. En effet, une exception
 remonte jusqu'à un `catch` compatible ; or à l'endroit du `catch`, on ne peut
-plus avoir accès à l'état (de toutes les variables, dans tous les threads, ...)
+plus avoir accès à l'état (de toutes les variables, dans tous les threads...)
 au moment de la détection du problème.
 
 En vérité, il y existe deux moyens peu ergonomiques pour y avoir accès. 
 
-* Le premier consiste à mettre des points d'arrêt sur les levers ou les
+* Le premier consiste à mettre des points d'arrêt sur les lancers ou les
   constructions d'exceptions, et à exécuter le programme depuis un débuggueur.
 * Le second consiste à supprimer du code source tous les `catchs` qui sont
   compatibles avec l'erreur de logique.  
@@ -83,7 +83,7 @@ En vérité, il y existe deux moyens peu ergonomiques pour y avoir accès.
   Le hic est que de nombreux _frameworks_ font dériver leurs erreurs de
   `std::exception` et non de `std::runtime_error`, et de fait, on se retrouve
   vite à faire des `catch(std::exception const&)` aux points d'interface
-  (dialogue via API C, threads en C++03, `main()`, ...) quelque soit le mode de
+  (dialogue via API C, threads en C++03, `main()`...) quelque soit le mode de
   compilation.  
   Corolaire : ne faites pas comme ces _frameworks_ et choisissez judicieusement
   votre exception standard racine.
@@ -97,7 +97,7 @@ vérification des contrats, que cela soit en phase de tests comme en phase de
 production.  Et ce, même pour des morceaux de code où il est certain qu'il n'y
 a pas d'erreur de programmation.  
 Par exemple, `sqrt(1-sin(x))` ne devrait poser aucun soucis. Une fonction sinus
-renvoie en théorie un nombre entre -1 et 1, ce qui constitue une post-condition
+renvoie en théorie un nombre entre -1 et 1, ce qui constitue une postcondition
 toute indiquée. De fait par construction, `1-sin(x)` est positif, et donc
 compatible avec le contrat de `sqrt`.
 
@@ -278,7 +278,7 @@ est possible de les détourner en phases 6. et 7. pour tenter de rendre plus
 robuste le produit en le faisant résister aux erreurs de programmation qui ont
 échappé à notre vigilance lors des phases précédentes.
 
-On entre dans le royaume de la _Programmation Défensive_ que j'ai déjà
+On entre dans le royaume de la _programmation défensive_ que j'ai déjà
 abondamment décrit.
 
 Comment peut-on détourner les assertions ? Tout simplement en détournant leur
@@ -321,7 +321,7 @@ switch (myEnum) {
 
 Les outils d'analyse statique de code comme
 [clang analyzer](http://clang-analyzer.llvm.org/) sont très intéressants. En
-plus, ils interviennent en [phase 3](#Phases)! Seulement, à mon grand regret,
+plus, ils interviennent en [phase 3](#Phases) ! Seulement, à mon grand regret,
 ils ne semblent pas exploiter les assertions pour détecter statiquement des
 erreurs de logique.
 Au contraire, ils utilisent les assertions pour inhiber l'analyse de certains
@@ -329,7 +329,7 @@ chemins d'exécution.
 
 Ainsi, dans l'exemple de `test-assert.cpp` que j'ai donné plus haut, les outils
 d'analyse statique de code ne feront pas le rapprochement entre la
-post-condition de `my::sin` et la pré-condition de `my::sqrt`, mais feront
+postcondition de `my::sin` et la précondition de `my::sqrt`, mais feront
 plutôt comme si les assertions étaient toujours vraies, c'est à dire comme si
 le code n'appelait jamais `my::sqrt` avec un nombre négatif.
 
@@ -348,25 +348,25 @@ des moyens simplifiés, et plus forts sémantiquement parlant, pour exprimer des
 contrats dans des codes C++.
 
 
-### Option 4 : On utilise des Tests Unitaires (pour les post-conditions)
+### Option 4 : On utilise des Tests Unitaires (pour les postconditions)
 
-Quand plus tôt j'indiquais que _sinus_ a pour post-condition toute indiquée un
+Quand plus tôt j'indiquais que _sinus_ a pour postcondition toute indiquée un
 résultat inférieur à 1, peut-être avez-vous tiqué. Et vous auriez eu raison. La
-post-condition de la fonction `sin()` est de calculer ... un sinus.  
+postcondition de la fonction `sin()` est de calculer ... un sinus.  
 Là, plusieurs problèmes se posent : comment valider que le calcul est correct ?
 Avec une seconde implémentation de la fonction ? A l'aide de `cos()` ? Et quel
 serait le prix (même en mode _Debug_) d'une telle vérification ?
 
-Lors de ses présentations sur le sujet, John Lakos rappelle une post-condition
+Lors de ses présentations sur le sujet, John Lakos rappelle une postcondition
 souvent négligée d'une fonction de tri : non seulement, les éléments produits
 doivent être triés, mais en plus il doit s'agir des mêmes éléments (ni plus, ni
-moins) que ceux qui ont été fournis à la fonction de tri. [NB: Cet exemple
+moins) que ceux qui ont été fournis à la fonction de tri. [N.B.: Cet exemple
 semble venir de Kevlin Henney.]
 
 Au final, un consensus semble se dégager vers l'utilisation de tests unitaires
-pour valider les post-conditions de fonctions. Après, je vous laisse juger s'il
-est pertinent de vérifier par assertion des post-conditions simples et peu
-couteuses comme le fait que le résultat de `sin()` doit appartenir à `[-1,
+pour valider les postconditions de fonctions. Après, je vous laisse juger s'il
+est pertinent de vérifier par assertion des postconditions simples et peu
+coûteuses comme le fait que le résultat de `sin()` doit appartenir à `[-1,
 +1]`. D'autant que pour l'instant, aucun (?) outil n'exploite des assertions
 pour faire de la preuve formelle et ainsi détecter que `sqrt(sin(x)-1)` est
 problématique sur certaines plages de `x`.
@@ -390,7 +390,7 @@ ensemble de macros `contract_assert()` assez flexible.
 Ces macros supportent des niveaux d'importance de vérification (_optimized_, _safe_,
 _debug_,) un peu à l'image des niveaux _Error_/_Warning_/_Info_/_Debug_ dans
 les frameworks de log.  La proposition offre de permettre de faire de la
-programmation défensive (i.e. de lever des exceptions au lieu de simples
+programmation défensive (i.e. de lancer des exceptions au lieu de simples
 assertions). Elle permettrait également de transformer les assertions en
 assertions de frameworks de tests unitaires.  
 À noter qu'elle est déjà implémentée et disponible à l'intérieur de la
@@ -409,7 +409,7 @@ De plus, on voit que le sujet de l'introduction de la PpC en C++ a ses
 partisans, car d'autres propositions tournent, _cf._ :
 
 - [N4110](https://isocpp.org/files/papers/N4110.pdf)
-  _Exploring the design space of contract specications for C++_, J. Daniel Garcia ;
+  _Exploring the design space of contract specifications for C++_, J. Daniel Garcia ;
 - [N4293](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4293.pdf)
   _C++ language support for contract programming_, où J. Daniel Garcia présente
   un résumé des discussions autour de la PpC à Urbana ;
@@ -467,8 +467,8 @@ Elles sont beaucoup utilisées lors de l'écriture de classes et fonctions
 génériques pour s'assurer que les arguments _templates_ vérifient certaines
 contraintes.  
 Mais c'est loin d'être le seul cas d'utilisation. Je m'en sers
-également pour vérifier que j'ai autant de chaines de caractères que de valeurs
-dans un énuméré. Avec mes [plugins pour vim](https://code.google.com/p/lh-vim/wiki/lhCpp),
+également pour vérifier que j'ai autant de chaînes de caractères que de valeurs
+dans un énuméré. Avec mes [plugins pour vim](http://github.com/LucHermitte/lh-cpp),
 je génère automatiquement ce genre de choses avec `:InsertEnum MyEnum one two
 three` :
 
@@ -504,7 +504,7 @@ char const* MyEnum::toString() const
 ```
 
 #### Préférez les références aux pointeurs
-Dans la signature d'une fonction, les références posent une pré-condition : la
+Dans la signature d'une fonction, les références posent une précondition : la
 valeur passée en paramètre par référence doit être non nulle -- à charge au
 code client de vérifier cela.
 
