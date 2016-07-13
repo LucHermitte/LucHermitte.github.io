@@ -655,7 +655,7 @@ d'invariant statique.
 Avec le C++11 nous avons l'embarras du choix pour choisir comment manipuler des
 entités ou des données dynamiques. Entre, `std::unique_ptr<>`,
 `std::shared_ptr`, `boost::ptr_vector`, les références, les pointeurs bruts
-(/nus), `std::optional<>` (C++14), _etc._, on peut avoir l'impression que c'est
+(/nus), `std::optional<>` (C++17), _etc._, on peut avoir l'impression que c'est
 la jungle.
 
 Quel rapport avec les invariants statiques ? Et bien, comme pour les références
