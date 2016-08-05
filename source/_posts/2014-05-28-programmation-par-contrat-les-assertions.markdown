@@ -372,70 +372,19 @@ pour faire de la preuve formelle et ainsi détecter que `sqrt(sin(x)-1)` est
 problématique sur certaines plages de `x`.
 
 
-## III- Le standard s'enrichira-t-il en <del>2014 ou en</del> 2017 pour programmer avec des contrats ?
+## III- Le standard s'enrichira-t-il en <del>2014 ou en 2017, ou en</del> 2020 pour programmer avec des contrats ?
 
-Il y a déjà eu des propositions de mots clés plus ou moins sémantiquement forts
-pour supporter la PpC en standard en C++. Dans le document
-<del>[N3753](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3753.pdf)</del>
-<del>[N4075](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4075.pdf)</del>
-<del>[N4135](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4135.pdf)</del>
-<del>[N4253](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4253.pdf)</del>
-[N4378](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4378.pdf) (et sa FAQ
-[N4379](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4379.pdf)),
-du dernier mailing (2015-02 mid-meeting) en date, John Lakos et Alexei Zakharov
-introduisent tout d'abord un nouveau vocabulaire pour désigner les contrats :
-les _narrow contracts_ et les _wide contracts_.  Ils introduisent également un
-ensemble de macros `contract_assert()` assez flexible.
+_Juillet 2016. Note : Ce paragraphe a été entièrement remanié depuis la
+première version de ce billet pour retranscrire les dernières évolutions du
+côté du comité de standardisation._
 
-Ces macros supportent des niveaux d'importance de vérification (_optimized_, _safe_,
-_debug_,) un peu à l'image des niveaux _Error_/_Warning_/_Info_/_Debug_ dans
-les frameworks de log.  La proposition offre de permettre de faire de la
-programmation défensive (i.e. de lancer des exceptions au lieu de simples
-assertions). Elle permettrait également de transformer les assertions en
-assertions de frameworks de tests unitaires.  
-À noter qu'elle est déjà implémentée et disponible à l'intérieur de la
-[bibliothèque BDE/BSL](https://github.com/bloomberg/bde) sous licence MIT.
+Au vu des diverses discussions et de la quantité de documents produits, il
+parait évident que le C++ supportera la PpC en standard.
+Bjarne Stroustrup l'évoquait d'ailleurs dans une
+[interview sur le C++17](http://www.infoworld.com/article/2840344/c-plus-plus/stroustrop-c-goals-parallelism-concurrency.html).
 
-Cette proposition en est à sa dixième révision. Les
-[minutes du rejet](https://isocpp.org/files/papers/N4053.html#LWG8) de la
-révision (N4075) sont disponibles.
-
-Ce sujet de la PpC a part ailleurs été abordé lors d'une présentation en deux
-parties par John Lakos lors de la CppCon14: _Defensive Programming Done Right_ 
-[Part I](https://www.youtube.com/watch?v=1QhtXRMp3Hg&feature=youtube_gdata)
-et [Part II](https://www.youtube.com/watch?v=tz2khnjnUx8&feature=youtube_gdata).
-
-De plus, on voit que le sujet de l'introduction de la PpC en C++ a ses
-partisans, car d'autres propositions tournent, _cf._ :
-
-- [N4110](https://isocpp.org/files/papers/N4110.pdf)
-  _Exploring the design space of contract specifications for C++_, J. Daniel Garcia ;
-- [N4293](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4293.pdf)
-  _C++ language support for contract programming_, où J. Daniel Garcia présente
-  un résumé des discussions autour de la PpC à Urbana ;
-  
-- [N4160](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4160.html)
-  _Value Constraints_, où Andrzej Krzemieŉski
-  aborde l'angle de ce qui pourrait être fourni à des outils d'analyse pour réaliser de la preuve formelle ;
-- [N4154](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4154.pdf)
-  _Operator assert_, David Krauss ;
-- [N4248](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4248.html)
-  _Library Preconditions are a Language Feature_, où Alisdair Meredith lance
-  une discussion pour faire évoluer le langage en vue de se donner de
-  meilleurs moyens pour vérifier les contrats ;
-- N4289, N4290, N4291, et N4292 par Nathan Myers ;
-- [N4319](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4319.pdf)
-  _Contracts for C++, what are the choices ?_, où Gabriel Dos Reis et al.
-  présentent les exigences derrière le support des contrat en C++, ainsi que
-  quelques outils utilisés à Microsoft.
-
-
-Enfin, il est également à noter une interview de B. Stroustrup sur le C++17
-[où il évoque](http://www.infoworld.com/article/2840344/c-plus-plus/stroustrop-c-goals-parallelism-concurrency.html)
-qu'il faut s'attendre au support des contrats.
-
-Pour être plus précis, je vais reprendre les résumés faits par Daniel Garcia
-dans le N4293 à l'issue du meeting à Urbana :
+Et Daniel Garcia résumait la situation dans le N4293 (écrit à l'issue du
+meeting à Urbana) :
 
 - _There was a great agreement that C++ should have support for Contracts
   Programming._
@@ -449,9 +398,88 @@ dans le N4293 à l'issue du meeting à Urbana :
   final voting on this second issue._
 - _There was a consensus that build modes shall not be standardized._
 
-Bref, les choses évoluent dans le bon sens. Nous sommes bien au delà de la
-prise de conscience de l'intérêt de la PpC dans le noyau de la communauté C++
-qui fait le langage.
+Bref, les choses évoluent dans le bon sens.
+Certes, la PpC a moins de visibilité que les _modules_ ou les _concepts_ qui
+ont également été tous deux repoussés au delà du C++17. 
+Toujours est-il que nous sommes bien au delà de la prise de conscience de
+l'intérêt de la PpC dans le noyau de la communauté C++ qui fait le langage.
+
+
+Pour les curieux, dans les premières propositions émises par John Lakos, le
+support des contrats se faisait via des macros dédiées assez flexibles.
+Divers niveaux de vérification et de compilation étaient prévus, un peu à
+l'image des niveaux _Error_/_Warning_/_Info_/_Debug_ dans les frameworks de
+log. La proposition permettait également de transformer les assertions en
+assertions de frameworks de tests unitaires.  
+À noter qu'elle était implémentée et disponible à l'intérieur de la
+[bibliothèque BDE/BSL](https://github.com/bloomberg/bde) sous licence MIT.
+
+Ce sujet de la PpC a part ailleurs été abordé lors d'une présentation en deux
+parties par John Lakos lors de la CppCon14: _Defensive Programming Done Right_ 
+[Part I](https://www.youtube.com/watch?v=1QhtXRMp3Hg&feature=youtube_gdata)
+et [Part II](https://www.youtube.com/watch?v=tz2khnjnUx8&feature=youtube_gdata).
+On notera l'emploi d'un vocabulaire fort intéressant pour désigner les
+contrats : les _narrow contracts_ et les _wide contracts_.
+
+### p0380r1
+
+Depuis, diverses personnes se sont investies sur le sujet et on est arrivés à
+la proposition d'évolution
+[p0380r1](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0380r1.pdf),
+qui n'est certainement pas la dernière.
+
+En substance, ce document propose d'utiliser les attributs introduits avec le
+C++11 avec une syntaxe allégée (sans les parenthèses!) pour spécifier des
+contrats :
+
+ * préconditions : `[[expects: x >= 0]]`
+ * postconditions : `[[ensures ret: abs(ret*ret - x) < epsilon_constant]]`
+ * assertions : `[[asserts: q.is_ok()]]`
+
+Vous noterez qu'il n'y a pas encore de support officiel pour les invariants. Il
+est proposé d'utiliser les nouveaux attributs pour en définir. Si le besoin
+s'en fait ressentir, ils pourraient proposer un attribut dédié, mais dans un
+second temps.
+
+De nouveau des modes sont prévus. D'un côté il y a les modes de vérification :
+
+ * `default` (implicite), pour les vérifications qui ont un coût faible ;
+ * `audit`, pour les vérifications qui ont un coût élevé ;
+ * `axiom`, pour exprimer des vérifications à destination d'humains ou d'outils
+   d'analyse statique de code (aucune vérification dynamique ne sera faite avec
+   ce niveau).
+
+Et de l'autre côté, il y a les modes de compilation :
+
+ * `off`, qui inhibe toute vérification dynamique (typiquement pour les modes _release_) ;
+ * `default`, qui implique une vérification dynamique bornée aux contrats
+   simples ;
+ * `audit`, pour vérifier tous les contrats exprimés (hormis les axiomes).
+
+L'introduction de modes de compilation fut un point bloquant des premières
+propositions. Les exigences de disposer d'une ABI stable, d'éviter de disposer
+de multiples versions d'une même bibliothèque, ont pesé lors des discussions.
+L'introduction officielle de la notion de mode dans le processus de compilation
+a d'ailleurs été un point bloquant -- je suis de fait assez surpris à la
+lecture de cette dernière proposition.
+
+D'autres problématiques ont également été abordée. P.ex. Comment permettre à
+une exception de s'échapper d'un contrat en échec depuis une fonction déclarée
+`noexcept` ? i.e. comment faire de la programmation défensive à l'intérieur de
+fonctions `noexcept` ?
+
+Les dernières propositions évoquent un _violation handler_ permettant de
+décider quoi faire en cas de violation de contrat. Par défaut, une violation de
+contrat invoquerait `std::abort`.
+
+TODO: 
+- continuation option
+ - pas code, mais compiler-specific
+- et maintenant ?
+- LSP
+- no old value
+- `catch throw` in gdb
+
 
 
 ## IV- <a id="VerificationsStatiques"></a>Invariants statiques
