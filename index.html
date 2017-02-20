@@ -818,10 +818,12 @@ un outil dédié à la détection les erreurs de programmation : les <em>asserti
 
 <h2>I- <a id="Documentation"></a>Documentation</h2>
 
-<p>Comme je l'avais signalé dans le précédent billet, la première chose que l'on
-peut faire à partir des contrats, c'est de les documenter clairement.
-Il s'agit probablement d'une des choses les plus importantes à documenter dans
-un code source. Et malheureusement trop souvent c'est négligé.</p>
+<p>Comme je l'avais signalé dans le
+<a href="/blog/2014/05/24/programmation-par-contrat-un-peu-de-theorie/">précédent billet</a>,
+la première chose que l'on peut faire à partir des contrats, c'est de les
+documenter clairement. Il s'agit probablement d'une des choses les plus
+importantes à documenter dans un code source. Et malheureusement trop souvent
+c'est négligé.</p>
 
 <p>L'outil <a href="http://doxygen.org">Doxygen</a> met à notre disposition les tags <code>@pre</code>,
 <code>@post</code>, et <code>@invariant</code> pour documenter nos contrats. Je ne peux que
@@ -834,12 +836,13 @@ C++.</p>
 
 <h3>Option 1 : on ne fait rien</h3>
 
-<p>Il est tout d'abord possible de totalement ignorer les ruptures de
-contrats et de ne jamais rien vérifier.</p>
+<p>Il est tout d'abord possible d'ignorer totalement les ruptures de contrats et
+de ne jamais rien vérifier.</p>
 
-<p>Quand une erreur de programmation survient, quand on est chanceux, on détecte
+<p>Quand une erreur de programmation survient, et que l'on est chanceux, on détecte
 le problème au plus proche de l'erreur. Malheureusement, en C et en C++, les
-problèmes tendent à survenir bien plus tard.</p>
+problèmes tendent à survenir bien plus tard. Qui n'a jamais expérimenté des
+plantages qui apparaissent et disparaissent au gré d'ajouts de <code>printf()</code> ?</p>
 
 <p>Cette mauvaise pratique consistant à ignorer les contrats (ou à ne pas s'en
 préoccuper) est assez répandue. Je ne cache pas que l'un des objectifs de cette
@@ -857,7 +860,7 @@ il y a un soucis technique.</p>
 mieux que des informations sur le lieu de la détection (<em>i.e.</em> :<code>__FILE__</code> et
 <code>__LINE__</code>). Et encore faut-il disposer de classes <em>exception</em> conçues pour
 stocker une telle information ; ce n'est par exemple pas le cas des
-<code>std::logic_error</code> qui sont levées depuis des fonctions comme
+<code>std::logic_error</code> qui sont lancées depuis des fonctions comme
 <code>std::vector&lt;&gt;::at()</code>.</p>
 
 <p>Par <em>&ldquo;rien de mieux que le lieu de la détection&rdquo;</em>, il faut comprendre que l'on
@@ -866,12 +869,13 @@ remonte jusqu'à un <code>catch</code> compatible ; or à l'endroit du <code>cat
 plus avoir accès à l'état (de toutes les variables, dans tous les threads&hellip;)
 au moment de la détection du problème.</p>
 
-<p>En vérité, il y existe deux moyens peu ergonomiques pour y avoir accès.</p>
+<p>En vérité, il y existe des moyens peu ergonomiques pour y avoir accès.</p>
 
 <ul>
-<li>Le premier consiste à mettre des points d'arrêt sur les lancers ou les
-constructions d'exceptions, et à exécuter le programme depuis un débuggueur.</li>
-<li>Le second consiste à supprimer du code source tous les <code>catchs</code> qui sont
+<li>Un premier consiste à mettre des points d'arrêt sur les lancers ou les
+constructions d'exceptions, et à exécuter le programme depuis un débuggueur
+&ndash; <em>cf.</em> <code>catch throw</code> dans gdb.</li>
+<li>Un second consiste à supprimer du code source tous les <code>catchs</code> qui sont
 compatibles avec l'erreur de logique.<br/>
 Pour vous simplifier la vie, et être propres, faites dériver vos erreurs de
 logique de <code>std::logic_error</code> (et de ses enfants) et vos erreurs de <em>runtime</em>
@@ -1158,9 +1162,9 @@ chose qui intervient avant que des utilisateurs manipulent le produit final.</p>
 <h4>&hellip; voire de production</h4>
 
 <p>Bien que les assertions ne soient censées porter que sur ces phases 4. et 5., il
-est possible de les détourner en phases 6. et 7. pour tenter de rendre plus
-robuste le produit en le faisant résister aux erreurs de programmation qui ont
-échappé à notre vigilance lors des phases précédentes.</p>
+est possible de les détourner en phases 6. et 7. pour tenter de rendre le
+produit plus robuste en le faisant résister aux erreurs de programmation qui
+ont échappé à notre vigilance lors des phases précédentes.</p>
 
 <p>On entre dans le royaume de la <em>programmation défensive</em> que j'ai déjà
 abondamment décrit.</p>
@@ -1245,7 +1249,8 @@ ni même <em>Polyspace</em>, ou <em>QA C++</em>.</p>
 <p>Dit autrement, je n'ai pas encore trouvé d'outil qui fasse de la preuve
 formelle en C++. A noter qu'il existe des efforts pour fournir à de tels outils
 des moyens simplifiés, et plus forts sémantiquement parlant, pour exprimer des
-contrats dans des codes C++.</p>
+contrats dans des codes C++. Les plus proche est FRAMA-C qui connait une
+mouture en cours d'élaboration pour le C++: FRAMA-clang.</p>
 
 <h3>Option 4 : On utilise des Tests Unitaires (pour les postconditions)</h3>
 
@@ -1270,71 +1275,19 @@ coûteuses comme le fait que le résultat de <code>sin()</code> doit appartenir 
 pour faire de la preuve formelle et ainsi détecter que <code>sqrt(sin(x)-1)</code> est
 problématique sur certaines plages de <code>x</code>.</p>
 
-<h2>III- Le standard s'enrichira-t-il en <del>2014 ou en</del> 2017 pour programmer avec des contrats ?</h2>
+<h2>III- Le standard s'enrichira-t-il en <del>2014 ou en 2017, ou en</del> 2020 pour programmer avec des contrats ?</h2>
 
-<p>Il y a déjà eu des propositions de mots clés plus ou moins sémantiquement forts
-pour supporter la PpC en standard en C++. Dans le document
-<del><a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3753.pdf">N3753</a></del>
-<del><a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4075.pdf">N4075</a></del>
-<del><a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4135.pdf">N4135</a></del>
-<del><a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4253.pdf">N4253</a></del>
-<a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4378.pdf">N4378</a> (et sa FAQ
-<a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4379.pdf">N4379</a>),
-du dernier mailing (2015-02 mid-meeting) en date, John Lakos et Alexei Zakharov
-introduisent tout d'abord un nouveau vocabulaire pour désigner les contrats :
-les <em>narrow contracts</em> et les <em>wide contracts</em>.  Ils introduisent également un
-ensemble de macros <code>contract_assert()</code> assez flexible.</p>
+<p><em>Février 2017. Note : Ce paragraphe a été entièrement remanié depuis la
+première version de ce billet pour retranscrire les dernières évolutions du
+côté du comité de standardisation.</em></p>
 
-<p>Ces macros supportent des niveaux d'importance de vérification (<em>optimized</em>, <em>safe</em>,
-<em>debug</em>,) un peu à l'image des niveaux <em>Error</em>/<em>Warning</em>/<em>Info</em>/<em>Debug</em> dans
-les frameworks de log.  La proposition offre de permettre de faire de la
-programmation défensive (i.e. de lancer des exceptions au lieu de simples
-assertions). Elle permettrait également de transformer les assertions en
-assertions de frameworks de tests unitaires.<br/>
-À noter qu'elle est déjà implémentée et disponible à l'intérieur de la
-<a href="https://github.com/bloomberg/bde">bibliothèque BDE/BSL</a> sous licence MIT.</p>
+<p>Au vu des diverses discussions et de la quantité de documents produits, il
+parait évident que le C++ supportera la PpC en standard.
+Bjarne Stroustrup l'évoquait d'ailleurs dans une
+<a href="http://www.infoworld.com/article/2840344/c-plus-plus/stroustrop-c-goals-parallelism-concurrency.html">interview sur le C++17</a>.</p>
 
-<p>Cette proposition en est à sa dixième révision. Les
-<a href="https://isocpp.org/files/papers/N4053.html#LWG8">minutes du rejet</a> de la
-révision (N4075) sont disponibles.</p>
-
-<p>Ce sujet de la PpC a part ailleurs été abordé lors d'une présentation en deux
-parties par John Lakos lors de la CppCon14: <em>Defensive Programming Done Right</em>
-<a href="https://www.youtube.com/watch?v=1QhtXRMp3Hg&amp;feature=youtube_gdata">Part I</a>
-et <a href="https://www.youtube.com/watch?v=tz2khnjnUx8&amp;feature=youtube_gdata">Part II</a>.</p>
-
-<p>De plus, on voit que le sujet de l'introduction de la PpC en C++ a ses
-partisans, car d'autres propositions tournent, <em>cf.</em> :</p>
-
-<ul>
-<li><a href="https://isocpp.org/files/papers/N4110.pdf">N4110</a>
-<em>Exploring the design space of contract specifications for C++</em>, J. Daniel Garcia ;</li>
-<li><p><a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4293.pdf">N4293</a>
-<em>C++ language support for contract programming</em>, où J. Daniel Garcia présente
-un résumé des discussions autour de la PpC à Urbana ;</p></li>
-<li><p><a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4160.html">N4160</a>
-<em>Value Constraints</em>, où Andrzej Krzemieŉski
-aborde l'angle de ce qui pourrait être fourni à des outils d'analyse pour réaliser de la preuve formelle ;</p></li>
-<li><a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4154.pdf">N4154</a>
-<em>Operator assert</em>, David Krauss ;</li>
-<li><a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4248.html">N4248</a>
-<em>Library Preconditions are a Language Feature</em>, où Alisdair Meredith lance
-une discussion pour faire évoluer le langage en vue de se donner de
-meilleurs moyens pour vérifier les contrats ;</li>
-<li>N4289, N4290, N4291, et N4292 par Nathan Myers ;</li>
-<li><a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4319.pdf">N4319</a>
-<em>Contracts for C++, what are the choices ?</em>, où Gabriel Dos Reis et al.
-présentent les exigences derrière le support des contrat en C++, ainsi que
-quelques outils utilisés à Microsoft.</li>
-</ul>
-
-
-<p>Enfin, il est également à noter une interview de B. Stroustrup sur le C++17
-<a href="http://www.infoworld.com/article/2840344/c-plus-plus/stroustrop-c-goals-parallelism-concurrency.html">où il évoque</a>
-qu'il faut s'attendre au support des contrats.</p>
-
-<p>Pour être plus précis, je vais reprendre les résumés faits par Daniel Garcia
-dans le N4293 à l'issue du meeting à Urbana :</p>
+<p>Et Daniel Garcia résumait la situation dans le N4293 (écrit à l'issue du
+meeting à Urbana) :</p>
 
 <ul>
 <li><em>There was a great agreement that C++ should have support for Contracts
@@ -1351,9 +1304,147 @@ final voting on this second issue.</em></li>
 </ul>
 
 
-<p>Bref, les choses évoluent dans le bon sens. Nous sommes bien au delà de la
-prise de conscience de l'intérêt de la PpC dans le noyau de la communauté C++
-qui fait le langage.</p>
+<p>Bref, les choses évoluent dans le bon sens.
+Certes, la PpC a moins de visibilité que les <em>modules</em> ou les <em>concepts</em> qui
+ont également été tous deux repoussés au delà du C++17.
+Toujours est-il que nous sommes bien au delà de la prise de conscience de
+l'intérêt de la PpC dans le noyau de la communauté C++ qui fait le langage.</p>
+
+<p>Pour les curieux, dans les premières propositions émises par John Lakos, le
+support des contrats se faisait via des macros dédiées assez flexibles.
+Divers niveaux de vérification et de compilation étaient prévus, un peu à
+l'image des niveaux <em>Error</em>/<em>Warning</em>/<em>Info</em>/<em>Debug</em> dans les frameworks de
+log. La proposition permettait également de transformer les assertions en
+assertions de frameworks de tests unitaires.<br/>
+À noter qu'elle était implémentée et disponible à l'intérieur de la
+<a href="https://github.com/bloomberg/bde">bibliothèque BDE/BSL</a> sous licence MIT.</p>
+
+<p>Ce sujet de la PpC a part ailleurs été abordé lors d'une présentation en deux
+parties par John Lakos lors de la CppCon14: <em>Defensive Programming Done Right</em>
+<a href="https://www.youtube.com/watch?v=1QhtXRMp3Hg&amp;feature=youtube_gdata">Part I</a>
+et <a href="https://www.youtube.com/watch?v=tz2khnjnUx8&amp;feature=youtube_gdata">Part II</a>.
+On notera l'emploi d'un vocabulaire fort intéressant pour désigner les
+contrats : les <em>narrow contracts</em> et les <em>wide contracts</em>.</p>
+
+<h3>p0380r1</h3>
+
+<p>Depuis, diverses personnes se sont investies sur le sujet et on est arrivés à
+la proposition d'évolution
+<a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0380r1.pdf">p0380r1</a>,
+et à la spécification formelle
+<a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0542r0.pdf">p0542r0</a>.</p>
+
+<h4>Les contrats</h4>
+
+<p>En substance, ces document proposent d'utiliser les attributs introduits avec le
+C++11 avec une syntaxe allégée (sans les parenthèses!) pour spécifier des
+contrats :</p>
+
+<ul>
+<li>préconditions : <code>[[expects: x &gt;= 0]]</code></li>
+<li>postconditions : <code>[[ensures ret: abs(ret*ret - x) &lt; epsilon_constant]]</code></li>
+<li>assertions : <code>[[asserts: q.is_ok()]]</code></li>
+</ul>
+
+
+<p>Vous noterez qu'il n'y a pas encore de support officiel pour les invariants. Il
+est proposé d'utiliser les nouveaux attributs pour en définir. Si le besoin
+s'en fait ressentir, ils pourraient proposer un attribut dédié, mais dans un
+second temps.</p>
+
+<h4>Modes et options</h4>
+
+<p>De nouveau des modes sont prévus. D'un côté il y a les modes de vérification :</p>
+
+<ul>
+<li><code>default</code> (implicite), pour les vérifications qui ont un coût faible ;</li>
+<li><code>audit</code>, pour les vérifications qui ont un coût élevé ;</li>
+<li><code>axiom</code>, pour exprimer des vérifications à destination d'humains ou d'outils
+d'analyse statique de code (aucune vérification dynamique ne sera faite avec
+ce niveau).</li>
+</ul>
+
+
+<p>Et de l'autre côté, il y a les modes de compilation :</p>
+
+<ul>
+<li><code>off</code>, qui inhibe toute vérification dynamique (typiquement pour les modes <em>release</em>) ;</li>
+<li><code>default</code>, qui implique une vérification dynamique bornée aux contrats
+simples ;</li>
+<li><code>audit</code>, pour vérifier tous les contrats exprimés (hormis les axiomes).</li>
+</ul>
+
+
+<p>L'introduction de modes de compilation fut un point bloquant des premières
+propositions. Les exigences de disposer d'une ABI stable, et d'éviter de
+disposer de multiples versions d'une même bibliothèque, ont pesé lors des
+discussions.
+Je suis de fait assez surpris à la lecture de cette dernière proposition.</p>
+
+<p>D'autres problématiques ont également été abordées. P.ex. Comment permettre à
+une exception de s'échapper d'un contrat en échec depuis une fonction déclarée
+<code>noexcept</code> ? i.e. comment faire de la programmation défensive à l'intérieur de
+fonctions <code>noexcept</code> ?</p>
+
+<p>Les dernières propositions évoquent un <em>violation handler</em> permettant de
+décider quoi faire en cas de violation de contrat. Par défaut, une violation de
+contrat invoquerait <code>std::abort</code>.</p>
+
+<p>Une <em>continuation option</em> booléenne est également prévue pour décider si on
+peut reprendre le cours de l'exécution après le <em>violation handler</em>, ou si on
+doit l'avorter avec <code>std::abort</code>.</p>
+
+<p>Le positionnement de ces options est pour l'instant volontairement prévu pour
+être laissé à la discrétion de chaque fournisseur de compilateur C++, et
+surtout pour ne pas pouvoir être piloté par du code C++.</p>
+
+<h4>Limitations</h4>
+
+<p>J'ai déjà évoqué les invariants qui sont repoussés à plus tard si la preuve de
+leur nécessité venait à être faite. Il en va de même pour les deux limitations
+qui suivent.</p>
+
+<p>Il est intéressant de noter que dans le cas où l'on voudrait modifier un
+paramètre, il n'est pas prévu pour l'instant de moyen de se souvenir d'une
+ancienne valeur en vue de spécifier des contrats. Ils proposent pour l'instant
+cette bidouille :</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='c++'><span class='line'><span class="kt">void</span> <span class="n">incr</span><span class="p">(</span><span class="kt">int</span> <span class="o">&amp;</span> <span class="n">r</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">[[</span><span class="nl">expects</span><span class="p">:</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="n">r</span><span class="p">]]</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">old</span> <span class="o">=</span> <span class="n">r</span><span class="p">;</span>
+</span><span class='line'>    <span class="o">++</span><span class="n">r</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">[[</span><span class="nl">assert</span><span class="p">:</span> <span class="n">r</span> <span class="o">=</span> <span class="n">old</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]];</span> <span class="c1">// faking a post-condition</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>De même, ils ont considéré les implications du
+<a href="/blog/2014/05/24/programmation-par-contrat-un-peu-de-theorie/#LSP">LSP</a>
+(il doit être possible de relaxer une précondition sur une fonction
+spécialisée, ou de renforcer une postcondition), mais ils bottent en touche à
+nouveau dans l'immédiat.</p>
+
+<h4>Et maintenant ?</h4>
+
+<p>Tout d'abord, le C++17 est en cours de finalisation. Le comité de
+standardisation pourra ensuite s'occuper des contrats et des autres gros
+chantiers que sont les modules et les concepts.</p>
+
+<p>J'imagine qu'une fois que tout le monde sera d'accord sur une formulation on
+pourra voir l'implémentation de la bibliothèque standard spécifier dans le code
+les contrats documentés dans la norme.</p>
+
+<p>Et après &hellip; plus qu'à attendre l'émergence d'outils de preuve formelle pour le
+C++. Il ne sera plus nécessaire de passer par une syntaxe dédiée comme c'est le
+cas aujourd'hui avec FRAMA-C.</p>
 
 <h2>IV- <a id="VerificationsStatiques"></a>Invariants statiques</h2>
 
@@ -1604,7 +1695,7 @@ définitive.</li>
 </ol>
 
 
-<p>Un <a href="http://cpp.developpez.com/faq/cpp/?page=Les-fonctions#Ou-dois-je-declarer-mes-variables-locales">nouveau point de la FAQ C++ de développez</a>
+<p>Un <a href="http://cpp.developpez.com/faq/cpp/?page=Les-fonctions#Ou-dois-je-declarer-mes-variables-locales">point de la FAQ C++ de développez</a>
 traite de cela plus en détails.</p>
 
 <h4>Corolaire : préférez les constructeurs aux fonctions <code>init()</code> et autres <em>setters</em></h4>
@@ -2288,7 +2379,7 @@ retirée d'un code source sans que son comportement ne soit impacté. En effet,
 un programme dépourvu d'erreur de logique n'aura aucun contrat qui se fasse
 violer, et la vérification devient superflue.</p>
 
-<h2>IV- Parenthèse OO : PpC &amp; <em>Principe de Substitution de Liskov</em> (LSP)</h2>
+<h2>IV- <a id="LSP"></a>Parenthèse OO : PpC &amp; <em>Principe de Substitution de Liskov</em> (LSP)</h2>
 
 <p>Je ne rentrerai pas dans les détails du LSP. Je vous renvoie plutôt à la
 <a href="http://cpp.developpez.com/faq/cpp/?page=L-heritage#Qu-est-ce-que-le-LSP">FAQ C++ de développez</a>,
@@ -2806,7 +2897,7 @@ ressources manipulées.</p>
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2012-2016 - Luc Hermitte -
+  Copyright &copy; 2012-2017 - Luc Hermitte -
   Distributed under Licence Creative Commons CC-BY-NC-SA -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
