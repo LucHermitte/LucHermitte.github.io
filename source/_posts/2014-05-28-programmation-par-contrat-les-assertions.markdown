@@ -349,7 +349,7 @@ ni même _Polyspace_, ou _QA C++_.
 Dit autrement, je n'ai pas encore trouvé d'outil qui fasse de la preuve
 formelle en C++. A noter qu'il existe des efforts pour fournir à de tels outils
 des moyens simplifiés, et plus forts sémantiquement parlant, pour exprimer des
-contrats dans des codes C++. Les plus proche est FRAMA-C qui connait une
+contrats dans des codes C++. Le plus proche est FRAMA-C qui connait une
 mouture en cours d'élaboration pour le C++: FRAMA-clang.
 
 
@@ -426,7 +426,7 @@ et [Part II](https://www.youtube.com/watch?v=tz2khnjnUx8&feature=youtube_gdata).
 On notera l'emploi d'un vocabulaire fort intéressant pour désigner les
 contrats : les _narrow contracts_ et les _wide contracts_.
 
-### p0380r1
+### p0380r1 & p0542r0
 
 Depuis, diverses personnes se sont investies sur le sujet et on est arrivés à
 la proposition d'évolution
@@ -436,7 +436,7 @@ et à la spécification formelle
 
 #### Les contrats
 
-En substance, ces document proposent d'utiliser les attributs introduits avec le
+En substance, ces documents proposent d'utiliser les attributs introduits avec le
 C++11 avec une syntaxe allégée (sans les parenthèses!) pour spécifier des
 contrats :
 
@@ -496,7 +496,7 @@ qui suivent.
 
 Il est intéressant de noter que dans le cas où l'on voudrait modifier un
 paramètre, il n'est pas prévu pour l'instant de moyen de se souvenir d'une
-ancienne valeur en vue de spécifier des contrats. Ils proposent pour l'instant
+ancienne valeur en vue de spécifier des contrats. Ils proposent en attendant
 cette bidouille :
 
 ```c++
@@ -526,7 +526,8 @@ les contrats documentés dans la norme.
 
 Et après ... plus qu'à attendre l'émergence d'outils de preuve formelle pour le
 C++. Il ne sera plus nécessaire de passer par une syntaxe dédiée comme c'est le
-cas aujourd'hui avec FRAMA-C.
+cas aujourd'hui avec FRAMA-C. Et qui sait, on peut rêver que les contrats
+soient absorbés à leur tour par la norme du C.
 
 
 ## IV- <a id="VerificationsStatiques"></a>Invariants statiques
