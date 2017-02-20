@@ -533,7 +533,7 @@ ni même <em>Polyspace</em>, ou <em>QA C++</em>.</p>
 <p>Dit autrement, je n'ai pas encore trouvé d'outil qui fasse de la preuve
 formelle en C++. A noter qu'il existe des efforts pour fournir à de tels outils
 des moyens simplifiés, et plus forts sémantiquement parlant, pour exprimer des
-contrats dans des codes C++. Les plus proche est FRAMA-C qui connait une
+contrats dans des codes C++. Le plus proche est FRAMA-C qui connait une
 mouture en cours d'élaboration pour le C++: FRAMA-clang.</p>
 
 <h3>Option 4 : On utilise des Tests Unitaires (pour les postconditions)</h3>
@@ -610,7 +610,7 @@ et <a href="https://www.youtube.com/watch?v=tz2khnjnUx8&amp;feature=youtube_gdat
 On notera l'emploi d'un vocabulaire fort intéressant pour désigner les
 contrats : les <em>narrow contracts</em> et les <em>wide contracts</em>.</p>
 
-<h3>p0380r1</h3>
+<h3>p0380r1 &amp; p0542r0</h3>
 
 <p>Depuis, diverses personnes se sont investies sur le sujet et on est arrivés à
 la proposition d'évolution
@@ -620,7 +620,7 @@ et à la spécification formelle
 
 <h4>Les contrats</h4>
 
-<p>En substance, ces document proposent d'utiliser les attributs introduits avec le
+<p>En substance, ces documents proposent d'utiliser les attributs introduits avec le
 C++11 avec une syntaxe allégée (sans les parenthèses!) pour spécifier des
 contrats :</p>
 
@@ -690,7 +690,7 @@ qui suivent.</p>
 
 <p>Il est intéressant de noter que dans le cas où l'on voudrait modifier un
 paramètre, il n'est pas prévu pour l'instant de moyen de se souvenir d'une
-ancienne valeur en vue de spécifier des contrats. Ils proposent pour l'instant
+ancienne valeur en vue de spécifier des contrats. Ils proposent en attendant
 cette bidouille :</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -728,7 +728,8 @@ les contrats documentés dans la norme.</p>
 
 <p>Et après &hellip; plus qu'à attendre l'émergence d'outils de preuve formelle pour le
 C++. Il ne sera plus nécessaire de passer par une syntaxe dédiée comme c'est le
-cas aujourd'hui avec FRAMA-C.</p>
+cas aujourd'hui avec FRAMA-C. Et qui sait, on peut rêver que les contrats
+soient absorbés à leur tour par la norme du C.</p>
 
 <h2>IV- <a id="VerificationsStatiques"></a>Invariants statiques</h2>
 
