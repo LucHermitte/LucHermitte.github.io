@@ -535,7 +535,7 @@ retirée d'un code source sans que son comportement ne soit impacté. En effet,
 un programme dépourvu d'erreur de logique n'aura aucun contrat qui se fasse
 violer, et la vérification devient superflue.
 
-## IV- Parenthèse OO : PpC & _Principe de Substitution de Liskov_ (LSP)
+## IV- <a id="LSP"></a>Parenthèse OO : PpC & _Principe de Substitution de Liskov_ (LSP)
 
 Je ne rentrerai pas dans les détails du LSP. Je vous renvoie plutôt à la
 [FAQ C++ de développez](http://cpp.developpez.com/faq/cpp/?page=L-heritage#Qu-est-ce-que-le-LSP),

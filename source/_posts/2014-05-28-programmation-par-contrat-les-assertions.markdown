@@ -17,10 +17,12 @@ un outil dédié à la détection les erreurs de programmation : les _assertions
 
 ## I- <a id="Documentation"></a>Documentation
 
-Comme je l'avais signalé dans le précédent billet, la première chose que l'on
-peut faire à partir des contrats, c'est de les documenter clairement.
-Il s'agit probablement d'une des choses les plus importantes à documenter dans
-un code source. Et malheureusement trop souvent c'est négligé.
+Comme je l'avais signalé dans le
+[précédent billet]({%post_url 2014-05-24-programmation-par-contrat-un-peu-de-theorie%}),
+la première chose que l'on peut faire à partir des contrats, c'est de les
+documenter clairement. Il s'agit probablement d'une des choses les plus
+importantes à documenter dans un code source. Et malheureusement trop souvent
+c'est négligé.
 
 L'outil [Doxygen](http://doxygen.org) met à notre disposition les tags `@pre`,
 `@post`, et `@invariant` pour documenter nos contrats. Je ne peux que
@@ -35,12 +37,13 @@ C++.
 
 ### Option 1 : on ne fait rien
 
-Il est tout d'abord possible de totalement ignorer les ruptures de
-contrats et de ne jamais rien vérifier.
+Il est tout d'abord possible d'ignorer totalement les ruptures de contrats et
+de ne jamais rien vérifier.
 
-Quand une erreur de programmation survient, quand on est chanceux, on détecte
+Quand une erreur de programmation survient, et que l'on est chanceux, on détecte
 le problème au plus proche de l'erreur. Malheureusement, en C et en C++, les
-problèmes tendent à survenir bien plus tard.
+problèmes tendent à survenir bien plus tard. Qui n'a jamais expérimenté des
+plantages qui apparaissent et disparaissent au gré d'ajouts de `printf()` ?
 
 Cette mauvaise pratique consistant à ignorer les contrats (ou à ne pas s'en
 préoccuper) est assez répandue. Je ne cache pas que l'un des objectifs de cette
@@ -58,7 +61,7 @@ En effet, en temps normal avec une exception en C++, on ne peut rien avoir de
 mieux que des informations sur le lieu de la détection (_i.e._ :` __FILE__` et
 `__LINE__`). Et encore faut-il disposer de classes _exception_ conçues pour
 stocker une telle information ; ce n'est par exemple pas le cas des
-`std::logic_error` qui sont levées depuis des fonctions comme
+`std::logic_error` qui sont lancées depuis des fonctions comme
 `std::vector<>::at()`.
 
 Par _"rien de mieux que le lieu de la détection"_, il faut comprendre que l'on
@@ -67,11 +70,12 @@ remonte jusqu'à un `catch` compatible ; or à l'endroit du `catch`, on ne peut
 plus avoir accès à l'état (de toutes les variables, dans tous les threads...)
 au moment de la détection du problème.
 
-En vérité, il y existe deux moyens peu ergonomiques pour y avoir accès. 
+En vérité, il y existe des moyens peu ergonomiques pour y avoir accès. 
 
-* Le premier consiste à mettre des points d'arrêt sur les lancers ou les
-  constructions d'exceptions, et à exécuter le programme depuis un débuggueur.
-* Le second consiste à supprimer du code source tous les `catchs` qui sont
+* Un premier consiste à mettre des points d'arrêt sur les lancers ou les
+  constructions d'exceptions, et à exécuter le programme depuis un débuggueur
+  -- _cf._ `catch throw` dans gdb.
+* Un second consiste à supprimer du code source tous les `catchs` qui sont
   compatibles avec l'erreur de logique.  
   Pour vous simplifier la vie, et être propres, faites dériver vos erreurs de
   logique de `std::logic_error` (et de ses enfants) et vos erreurs de _runtime_
@@ -274,9 +278,9 @@ chose qui intervient avant que des utilisateurs manipulent le produit final.
 #### ... voire de production
 
 Bien que les assertions ne soient censées porter que sur ces phases 4. et 5., il
-est possible de les détourner en phases 6. et 7. pour tenter de rendre plus
-robuste le produit en le faisant résister aux erreurs de programmation qui ont
-échappé à notre vigilance lors des phases précédentes.
+est possible de les détourner en phases 6. et 7. pour tenter de rendre le
+produit plus robuste en le faisant résister aux erreurs de programmation qui
+ont échappé à notre vigilance lors des phases précédentes.
 
 On entre dans le royaume de la _programmation défensive_ que j'ai déjà
 abondamment décrit.
@@ -345,7 +349,8 @@ ni même _Polyspace_, ou _QA C++_.
 Dit autrement, je n'ai pas encore trouvé d'outil qui fasse de la preuve
 formelle en C++. A noter qu'il existe des efforts pour fournir à de tels outils
 des moyens simplifiés, et plus forts sémantiquement parlant, pour exprimer des
-contrats dans des codes C++.
+contrats dans des codes C++. Les plus proche est FRAMA-C qui connait une
+mouture en cours d'élaboration pour le C++: FRAMA-clang.
 
 
 ### Option 4 : On utilise des Tests Unitaires (pour les postconditions)
@@ -374,7 +379,7 @@ problématique sur certaines plages de `x`.
 
 ## III- Le standard s'enrichira-t-il en <del>2014 ou en 2017, ou en</del> 2020 pour programmer avec des contrats ?
 
-_Juillet 2016. Note : Ce paragraphe a été entièrement remanié depuis la
+_Février 2017. Note : Ce paragraphe a été entièrement remanié depuis la
 première version de ce billet pour retranscrire les dernières évolutions du
 côté du comité de standardisation._
 
@@ -426,9 +431,12 @@ contrats : les _narrow contracts_ et les _wide contracts_.
 Depuis, diverses personnes se sont investies sur le sujet et on est arrivés à
 la proposition d'évolution
 [p0380r1](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0380r1.pdf),
-qui n'est certainement pas la dernière.
+et à la spécification formelle
+[p0542r0](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0542r0.pdf).
 
-En substance, ce document propose d'utiliser les attributs introduits avec le
+#### Les contrats
+
+En substance, ces document proposent d'utiliser les attributs introduits avec le
 C++11 avec une syntaxe allégée (sans les parenthèses!) pour spécifier des
 contrats :
 
@@ -440,6 +448,8 @@ Vous noterez qu'il n'y a pas encore de support officiel pour les invariants. Il
 est proposé d'utiliser les nouveaux attributs pour en définir. Si le besoin
 s'en fait ressentir, ils pourraient proposer un attribut dédié, mais dans un
 second temps.
+
+#### Modes et options
 
 De nouveau des modes sont prévus. D'un côté il y a les modes de vérification :
 
@@ -457,13 +467,12 @@ Et de l'autre côté, il y a les modes de compilation :
  * `audit`, pour vérifier tous les contrats exprimés (hormis les axiomes).
 
 L'introduction de modes de compilation fut un point bloquant des premières
-propositions. Les exigences de disposer d'une ABI stable, d'éviter de disposer
-de multiples versions d'une même bibliothèque, ont pesé lors des discussions.
-L'introduction officielle de la notion de mode dans le processus de compilation
-a d'ailleurs été un point bloquant -- je suis de fait assez surpris à la
-lecture de cette dernière proposition.
+propositions. Les exigences de disposer d'une ABI stable, et d'éviter de
+disposer de multiples versions d'une même bibliothèque, ont pesé lors des
+discussions.
+Je suis de fait assez surpris à la lecture de cette dernière proposition.
 
-D'autres problématiques ont également été abordée. P.ex. Comment permettre à
+D'autres problématiques ont également été abordées. P.ex. Comment permettre à
 une exception de s'échapper d'un contrat en échec depuis une fonction déclarée
 `noexcept` ? i.e. comment faire de la programmation défensive à l'intérieur de
 fonctions `noexcept` ?
@@ -472,14 +481,52 @@ Les dernières propositions évoquent un _violation handler_ permettant de
 décider quoi faire en cas de violation de contrat. Par défaut, une violation de
 contrat invoquerait `std::abort`.
 
-TODO: 
-- continuation option
- - pas code, mais compiler-specific
-- et maintenant ?
-- LSP
-- no old value
-- `catch throw` in gdb
+Une _continuation option_ booléenne est également prévue pour décider si on
+peut reprendre le cours de l'exécution après le _violation handler_, ou si on
+doit l'avorter avec `std::abort`.
 
+Le positionnement de ces options est pour l'instant volontairement prévu pour
+être laissé à la discrétion de chaque fournisseur de compilateur C++, et
+surtout pour ne pas pouvoir être piloté par du code C++.
+
+#### Limitations
+J'ai déjà évoqué les invariants qui sont repoussés à plus tard si la preuve de
+leur nécessité venait à être faite. Il en va de même pour les deux limitations
+qui suivent.
+
+Il est intéressant de noter que dans le cas où l'on voudrait modifier un
+paramètre, il n'est pas prévu pour l'instant de moyen de se souvenir d'une
+ancienne valeur en vue de spécifier des contrats. Ils proposent pour l'instant
+cette bidouille :
+
+```c++
+void incr(int & r)
+    [[expects: 0 < r]]
+{
+    int old = r;
+    ++r;
+    [[assert: r = old + 1]]; // faking a post-condition
+}
+```
+
+De même, ils ont considéré les implications du
+[LSP]({%post_url 2014-05-24-programmation-par-contrat-un-peu-de-theorie%}#LSP)
+(il doit être possible de relaxer une précondition sur une fonction
+spécialisée, ou de renforcer une postcondition), mais ils bottent en touche à
+nouveau dans l'immédiat.
+
+#### Et maintenant ?
+Tout d'abord, le C++17 est en cours de finalisation. Le comité de
+standardisation pourra ensuite s'occuper des contrats et des autres gros
+chantiers que sont les modules et les concepts.
+
+J'imagine qu'une fois que tout le monde sera d'accord sur une formulation on
+pourra voir l'implémentation de la bibliothèque standard spécifier dans le code
+les contrats documentés dans la norme.
+
+Et après ... plus qu'à attendre l'émergence d'outils de preuve formelle pour le
+C++. Il ne sera plus nécessaire de passer par une syntaxe dédiée comme c'est le
+cas aujourd'hui avec FRAMA-C.
 
 
 ## IV- <a id="VerificationsStatiques"></a>Invariants statiques
@@ -650,7 +697,7 @@ utilisable_. Concrètement, cela implique deux choses pour le développeur.
    l'on soit capable de lui donner valeur pertinente, et préférentiellement
    définitive.
 
-Un [nouveau point de la FAQ C++ de développez](http://cpp.developpez.com/faq/cpp/?page=Les-fonctions#Ou-dois-je-declarer-mes-variables-locales)
+Un [point de la FAQ C++ de développez](http://cpp.developpez.com/faq/cpp/?page=Les-fonctions#Ou-dois-je-declarer-mes-variables-locales)
 traite de cela plus en détails.
 
 #### Corolaire : préférez les constructeurs aux fonctions `init()` et autres _setters_
