@@ -13,7 +13,7 @@ language: fr
 
 Dans ce second billet sur la _Programmation par Contrat_, nous allons voir que
 faire des contrats une fois établis, et en particulier je vais vous présenter
-un outil dédié à la détection les erreurs de programmation : les _assertions_.
+un outil dédié à la détection des erreurs de programmation : les _assertions_.
 
 ## I- <a id="Documentation"></a>Documentation
 
@@ -268,7 +268,7 @@ Les assertions ne sont vérifiées que si `NDEBUG` n'est pas défini au moment d
 la précompilation. Généralement, sa définition accompagne le mode _Release_ de
 VC++ et de CMake. Ce qui veut dire qu'en mode _Release_ aucune assertion n'est
 vérifiée. Soit qu'en production, les assertions sont normalement ignorées. Le
-corolaire de tout cela est que les assertions sont un outil de vérification de
+corollaire de tout cela est que les assertions sont un outil de vérification de
 la logique applicative qui n'est utilisé qu'en phases de développement et de
 tests.
 
@@ -349,7 +349,7 @@ ni même _Polyspace_, ou _QA C++_.
 Dit autrement, je n'ai pas encore trouvé d'outil qui fasse de la preuve
 formelle en C++. A noter qu'il existe des efforts pour fournir à de tels outils
 des moyens simplifiés, et plus forts sémantiquement parlant, pour exprimer des
-contrats dans des codes C++. Le plus proche est FRAMA-C qui connait une
+contrats dans des codes C++. Le plus proche est FRAMA-C qui connaît une
 mouture en cours d'élaboration pour le C++: FRAMA-clang.
 
 
@@ -701,7 +701,7 @@ utilisable_. Concrètement, cela implique deux choses pour le développeur.
 Un [point de la FAQ C++ de développez](http://cpp.developpez.com/faq/cpp/?page=Les-fonctions#Ou-dois-je-declarer-mes-variables-locales)
 traite de cela plus en détails.
 
-#### Corolaire : préférez les constructeurs aux fonctions `init()` et autres _setters_
+#### Corollaire : préférez les constructeurs aux fonctions `init()` et autres _setters_
 Dans la continuité du point précédent, il faut éviter toute initialisation qui
 se produit après la construction d'un objet. En effet, si l'objet nécessite
 deux appels de fonction pour être correctement initialisé, il y a de grands
