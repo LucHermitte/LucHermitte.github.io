@@ -4,7 +4,7 @@
   <title><![CDATA[Luc Hermitte's Blog]]></title>
   <link href="http://LucHermitte.github.io/atom.xml" rel="self"/>
   <link href="http://LucHermitte.github.io/"/>
-  <updated>2017-02-20T18:22:36+01:00</updated>
+  <updated>2017-03-07T19:00:49+01:00</updated>
   <id>http://LucHermitte.github.io/</id>
   <author>
     <name><![CDATA[Luc Hermitte]]></name>
@@ -712,7 +712,7 @@ l'erreur de logique pour la relancer en <em>Debug</em>.</p>
     <id>http://LucHermitte.github.io/blog/2014/05/28/programmation-par-contrat-les-assertions</id>
     <content type="html"><![CDATA[<p>Dans ce second billet sur la <em>Programmation par Contrat</em>, nous allons voir que
 faire des contrats une fois établis, et en particulier je vais vous présenter
-un outil dédié à la détection les erreurs de programmation : les <em>assertions</em>.</p>
+un outil dédié à la détection des erreurs de programmation : les <em>assertions</em>.</p>
 
 <h2>I- <a id="Documentation"></a>Documentation</h2>
 
@@ -1050,7 +1050,7 @@ Les assertions pour leur part interviennent lors des phases 4. et 5.</p>
 la précompilation. Généralement, sa définition accompagne le mode <em>Release</em> de
 VC++ et de CMake. Ce qui veut dire qu'en mode <em>Release</em> aucune assertion n'est
 vérifiée. Soit qu'en production, les assertions sont normalement ignorées. Le
-corolaire de tout cela est que les assertions sont un outil de vérification de
+corollaire de tout cela est que les assertions sont un outil de vérification de
 la logique applicative qui n'est utilisé qu'en phases de développement et de
 tests.</p>
 
@@ -1147,7 +1147,7 @@ ni même <em>Polyspace</em>, ou <em>QA C++</em>.</p>
 <p>Dit autrement, je n'ai pas encore trouvé d'outil qui fasse de la preuve
 formelle en C++. A noter qu'il existe des efforts pour fournir à de tels outils
 des moyens simplifiés, et plus forts sémantiquement parlant, pour exprimer des
-contrats dans des codes C++. Le plus proche est FRAMA-C qui connait une
+contrats dans des codes C++. Le plus proche est FRAMA-C qui connaît une
 mouture en cours d'élaboration pour le C++: FRAMA-clang.</p>
 
 <h3>Option 4 : On utilise des Tests Unitaires (pour les postconditions)</h3>
@@ -1597,7 +1597,7 @@ définitive.</li>
 <p>Un <a href="http://cpp.developpez.com/faq/cpp/?page=Les-fonctions#Ou-dois-je-declarer-mes-variables-locales">point de la FAQ C++ de développez</a>
 traite de cela plus en détails.</p>
 
-<h4>Corolaire : préférez les constructeurs aux fonctions <code>init()</code> et autres <em>setters</em></h4>
+<h4>Corollaire : préférez les constructeurs aux fonctions <code>init()</code> et autres <em>setters</em></h4>
 
 <p>Dans la continuité du point précédent, il faut éviter toute initialisation qui
 se produit après la construction d'un objet. En effet, si l'objet nécessite
