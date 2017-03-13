@@ -587,6 +587,7 @@ Sébastien Dinot,
 Iradrille,
 Philippe Lacour,
 Cédric Poncet-Montange
+et également l'équipe de relecteurs de développez.
 
 ## VI- Références
 
