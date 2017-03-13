@@ -4,7 +4,7 @@
   <title><![CDATA[Luc Hermitte's Blog]]></title>
   <link href="http://LucHermitte.github.io/atom.xml" rel="self"/>
   <link href="http://LucHermitte.github.io/"/>
-  <updated>2017-03-07T19:00:49+01:00</updated>
+  <updated>2017-03-13T11:50:38+01:00</updated>
   <id>http://LucHermitte.github.io/</id>
   <author>
     <name><![CDATA[Luc Hermitte]]></name>
@@ -720,7 +720,7 @@ un outil dédié à la détection des erreurs de programmation : les <em>asserti
 <a href="http://LucHermitte.github.io/blog/2014/05/24/programmation-par-contrat-un-peu-de-theorie/">précédent billet</a>,
 la première chose que l'on peut faire à partir des contrats, c'est de les
 documenter clairement. Il s'agit probablement d'une des choses les plus
-importantes à documenter dans un code source. Et malheureusement trop souvent
+importantes à documenter dans un code source. Et malheureusement, trop souvent
 c'est négligé.</p>
 
 <p>L'outil <a href="http://doxygen.org">Doxygen</a> met à notre disposition les tags <code>@pre</code>,
@@ -749,10 +749,10 @@ série de billets est de combattre cette habitude.</p>
 <h3>Option 2 : on lance des exceptions dans la tradition de la programmation défensive</h3>
 
 <p>À l'opposé, on peut prendre la voie de la <em>Programmation Défensive</em> et vérifier
-chaque rupture potentielle de contrat pour lancer une exception. Au delà des
+chaque rupture potentielle de contrat pour lancer une exception. Au-delà des
 problèmes de conceptions et de déresponsabilisation évoqués dans le
 <a href="http://LucHermitte.github.io/blog/2014/05/24/programmation-par-contrat-un-peu-de-theorie/">billet précédent</a>,
-il y a un soucis technique.</p>
+il y a un souci technique.</p>
 
 <p>En effet, en temps normal avec une exception en C++, on ne peut rien avoir de
 mieux que des informations sur le lieu de la détection (<em>i.e.</em> :<code>__FILE__</code> et
@@ -771,7 +771,7 @@ au moment de la détection du problème.</p>
 
 <ul>
 <li>Un premier consiste à mettre des points d'arrêt sur les lancers ou les
-constructions d'exceptions, et à exécuter le programme depuis un débuggueur
+constructions d'exceptions, et à exécuter le programme depuis un débugueur
 &ndash; <em>cf.</em> <code>catch throw</code> dans gdb.</li>
 <li>Un second consiste à supprimer du code source tous les <code>catchs</code> qui sont
 compatibles avec l'erreur de logique.<br/>
@@ -785,9 +785,9 @@ billet.<br/>
 Le hic est que de nombreux <em>frameworks</em> font dériver leurs erreurs de
 <code>std::exception</code> et non de <code>std::runtime_error</code>, et de fait, on se retrouve
 vite à faire des <code>catch(std::exception const&amp;)</code> aux points d'interface
-(dialogue via API C, threads en C++03, <code>main()</code>&hellip;) quelque soit le mode de
+(dialogue via API C, threads en C++03, <code>main()</code>&hellip;) quel que soit le mode de
 compilation.<br/>
-Corolaire : ne faites pas comme ces <em>frameworks</em> et choisissez judicieusement
+Corollaire : ne faites pas comme ces <em>frameworks</em> et choisissez judicieusement
 votre exception standard racine.</li>
 </ul>
 
@@ -800,9 +800,9 @@ production. Ces options sont en revanche envisageables pour investiguer.</p>
 vérification des contrats, que cela soit en phase de tests comme en phase de
 production.  Et ce, même pour des morceaux de code où il est certain qu'il n'y
 a pas d'erreur de programmation.<br/>
-Par exemple, <code>sqrt(1-sin(x))</code> ne devrait poser aucun soucis. Une fonction sinus
+Par exemple, <code>sqrt(1-sin(x))</code> ne devrait poser aucun souci. Une fonction sinus
 renvoie en théorie un nombre entre -1 et 1, ce qui constitue une postcondition
-toute indiquée. De fait par construction, <code>1-sin(x)</code> est positif, et donc
+tout indiquée. De fait par construction, <code>1-sin(x)</code> est positif, et donc
 compatible avec le contrat de <code>sqrt</code>.</p>
 
 <p>En vérité, il existe une troisième façon de s'y prendre. Sous des systèmes
@@ -810,7 +810,7 @@ POSIX, on peut déclencher des <em>coredumps</em> par programmation et ce sans
 interrompre le cours de l'exécution. Cela peut être fait depuis les
 constructeurs de nos exceptions de logique (Voir
 <a href="http://stackoverflow.com/a/979297">ceci</a>, ou
-<a href="http://stackoverflow.com/a/18581317">celà</a>).</p>
+<a href="http://stackoverflow.com/a/18581317">cela</a>).</p>
 
 <h3>Option 3 : on formalise nos suppositions à l'aide d'assertions</h3>
 
@@ -819,7 +819,7 @@ les erreurs de programmation : les assertions.</p>
 
 <p>En effet, compilé sans la directive de précompilation <code>NDEBUG</code>, une assertion
 va arrêter un programme et créer un fichier <em>core</em>. Il est ensuite possible
-d'ouvrir le fichier <em>core</em> depuis le débuggueur pour pouvoir explorer l'état du
+d'ouvrir le fichier <em>core</em> depuis le débugueur pour pouvoir explorer l'état du
 programme au moment de la détection de l'erreur.</p>
 
 <h4>Exemple d'exploitation des assertions</h4>
@@ -1022,7 +1022,7 @@ donnée non constante, et on aurait peut-être passé un peu plus de temps à
 comprendre que la fonction fautive n'était pas <code>sin</code> mais ce que l'on faisait
 avec son résultat.</p>
 
-<p>N.B.: l'équivalent existe pour d'autres environnements comme VC++.</p>
+<p>N.B. L'équivalent existe pour d'autres environnements comme VC++.</p>
 
 <h4><a id="Phases"></a>Un outil pour les phases de développement et de tests &hellip;</h4>
 
@@ -1032,13 +1032,13 @@ que vous devez déjà connaitre. Concrètement, cela veut dire que l'on va
 préférer trouver nos erreurs, dans l'ordre :</p>
 
 <ol>
-<li>lors de la phase de conception,</li>
-<li>lors la compilation,</li>
-<li>lors de l'analyse statique du code</li>
-<li>lors des tests unitaires,</li>
-<li>lors des tests en <em>debug</em>,</li>
-<li>en pré-release/phase béta,</li>
-<li>en production.</li>
+<li>Lors de la phase de conception ;</li>
+<li>Lors la compilation ;</li>
+<li>Lors de l'analyse statique du code ;</li>
+<li>Lors des tests unitaires ;</li>
+<li>Lors des tests en <em>debug</em> ;</li>
+<li>En pré-release/phase béta ;</li>
+<li>En production.</li>
 </ol>
 
 
@@ -1071,7 +1071,7 @@ abondamment décrit.</p>
 définition. N'oublions pas que les assertions sont des macros dont le
 comportement exact dépend de la définition de <code>NDEBUG</code>.</p>
 
-<p>Une façon assez sale de faire serait p.ex.:</p>
+<p>Une façon assez sale de faire serait p.ex. :</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -1135,7 +1135,7 @@ postcondition de <code>my::sin</code> et la précondition de <code>my::sqrt</cod
 plutôt comme si les assertions étaient toujours vraies, c'est à dire comme si
 le code n'appelait jamais <code>my::sqrt</code> avec un nombre négatif.</p>
 
-<p>N.B.: Je généralise à partir de mon test avec <em>clang analyzer</em>. Peut-être que
+<p>N.B. Je généralise à partir de mon test avec <em>clang analyzer</em>. Peut-être que
 d'autres outils savent tirer parti des contrats déclarés à l'aide d'assertions,
 ou peut-être le sauront-ils demain.<br/>
 Pour information, je n'ai pas eu l'occasion de tester des outils comme <em>Code
@@ -1144,11 +1144,11 @@ Contract</em> (pour .NET qui semble justement s'attaquer à cette tâche), Ada20
 automatiquement des tests unitaires à partir des contrats exprimés),
 ni même <em>Polyspace</em>, ou <em>QA C++</em>.</p>
 
-<p>Dit autrement, je n'ai pas encore trouvé d'outil qui fasse de la preuve
-formelle en C++. A noter qu'il existe des efforts pour fournir à de tels outils
+<p>Dit autrement, je n'ai pas encore trouvé d'outils qui fassent de la preuve
+formelle en C++. À noter qu'il existe des efforts pour fournir à de tels outils
 des moyens simplifiés, et plus forts sémantiquement parlant, pour exprimer des
 contrats dans des codes C++. Le plus proche est FRAMA-C qui connaît une
-mouture en cours d'élaboration pour le C++: FRAMA-clang.</p>
+mouture en cours d'élaboration pour le C++ : FRAMA-clang.</p>
 
 <h3>Option 4 : On utilise des Tests Unitaires (pour les postconditions)</h3>
 
@@ -1162,7 +1162,7 @@ serait le prix (même en mode <em>Debug</em>) d'une telle vérification ?</p>
 <p>Lors de ses présentations sur le sujet, John Lakos rappelle une postcondition
 souvent négligée d'une fonction de tri : non seulement, les éléments produits
 doivent être triés, mais en plus il doit s'agir des mêmes éléments (ni plus, ni
-moins) que ceux qui ont été fournis à la fonction de tri. [N.B.: Cet exemple
+moins) que ceux qui ont été fournis à la fonction de tri. [N.B. Cet exemple
 semble venir de Kevlin Henney.]</p>
 
 <p>Au final, un consensus semble se dégager vers l'utilisation de tests unitaires
@@ -1204,8 +1204,8 @@ final voting on this second issue.</em></li>
 
 <p>Bref, les choses évoluent dans le bon sens.
 Certes, la PpC a moins de visibilité que les <em>modules</em> ou les <em>concepts</em> qui
-ont également été tous deux repoussés au delà du C++17.
-Toujours est-il que nous sommes bien au delà de la prise de conscience de
+ont également été tous deux repoussés au-delà du C++17.
+Toujours est-il que nous sommes bien au-delà de la prise de conscience de
 l'intérêt de la PpC dans le noyau de la communauté C++ qui fait le langage.</p>
 
 <p>Pour les curieux, dans les premières propositions émises par John Lakos, le
@@ -1235,7 +1235,7 @@ et à la spécification formelle
 <h4>Les contrats</h4>
 
 <p>En substance, ces documents proposent d'utiliser les attributs introduits avec le
-C++11 avec une syntaxe allégée (sans les parenthèses!) pour spécifier des
+C++11 avec une syntaxe allégée (sans les parenthèses !) pour spécifier des
 contrats :</p>
 
 <ul>
@@ -1252,7 +1252,7 @@ second temps.</p>
 
 <h4>Modes et options</h4>
 
-<p>De nouveau des modes sont prévus. D'un côté il y a les modes de vérification :</p>
+<p>De nouveau, des modes sont prévus. D'un côté, il y a les modes de vérification :</p>
 
 <ul>
 <li><code>default</code> (implicite), pour les vérifications qui ont un coût faible ;</li>
@@ -1279,10 +1279,10 @@ disposer de multiples versions d'une même bibliothèque, ont pesé lors des
 discussions.
 Je suis de fait assez surpris à la lecture de cette dernière proposition.</p>
 
-<p>D'autres problématiques ont également été abordées. P.ex. Comment permettre à
-une exception de s'échapper d'un contrat en échec depuis une fonction déclarée
-<code>noexcept</code> ? i.e. comment faire de la programmation défensive à l'intérieur de
-fonctions <code>noexcept</code> ?</p>
+<p>D'autres problématiques ont également été abordées. Par exemple, comment
+permettre à une exception de s'échapper d'un contrat en échec depuis une
+fonction déclarée <code>noexcept</code> ? C'est-à-dire comment faire de la programmation
+défensive à l'intérieur de fonctions <code>noexcept</code> ?</p>
 
 <p>Les dernières propositions évoquent un <em>violation handler</em> permettant de
 décider quoi faire en cas de violation de contrat. Par défaut, une violation de
@@ -1336,11 +1336,11 @@ nouveau dans l'immédiat.</p>
 standardisation pourra ensuite s'occuper des contrats et des autres gros
 chantiers que sont les modules et les concepts.</p>
 
-<p>J'imagine qu'une fois que tout le monde sera d'accord sur une formulation on
+<p>J'imagine qu'une fois que tout le monde sera d'accord sur une formulation, on
 pourra voir l'implémentation de la bibliothèque standard spécifier dans le code
 les contrats documentés dans la norme.</p>
 
-<p>Et après &hellip; plus qu'à attendre l'émergence d'outils de preuve formelle pour le
+<p>Et après&hellip; plus qu'à attendre l'émergence d'outils de preuve formelle pour le
 C++. Il ne sera plus nécessaire de passer par une syntaxe dédiée comme c'est le
 cas aujourd'hui avec FRAMA-C. Et qui sait, on peut rêver que les contrats
 soient absorbés à leur tour par la norme du C.</p>
@@ -1348,7 +1348,7 @@ soient absorbés à leur tour par la norme du C.</p>
 <h2>IV- <a id="VerificationsStatiques"></a>Invariants statiques</h2>
 
 <p>Pour conclure, il est important de remarquer que certains contrats peuvent être
-retranscrit de manière plus forte qu'une assertion qui ne sera vérifiée qu'en
+retranscrits de manière plus forte qu'une assertion qui ne sera vérifiée qu'en
 phase de tests.</p>
 
 <p>En effet, le compilateur peut en prendre certains à sa charge.</p>
@@ -1595,7 +1595,7 @@ définitive.</li>
 
 
 <p>Un <a href="http://cpp.developpez.com/faq/cpp/?page=Les-fonctions#Ou-dois-je-declarer-mes-variables-locales">point de la FAQ C++ de développez</a>
-traite de cela plus en détails.</p>
+traite de cela plus en détail.</p>
 
 <h4>Corollaire : préférez les constructeurs aux fonctions <code>init()</code> et autres <em>setters</em></h4>
 
@@ -1611,7 +1611,7 @@ constructeur, nous aurions à la place la garantie que soit l'objet existe et
 il est utilisable, soit l'objet n'existe pas et aucune question ne se pose,
 nulle part.</p>
 
-<p>N.B. : il existe des infractions à cette règle. Une des plus visible vient du
+<p>N.B. Il existe des infractions à cette règle. Une des plus visibles vient du
 <a href="http://google-styleguide.googlecode.com/svn/trunk/cppguide.xml?showone=Forward_Declarations#Doing_Work_in_Constructors">C++ Style Guide de Google</a>.
 Dans la mesure où les exceptions sont interdites dans leur base de code (car la
 quantité de vieux code sans exceptions est trop importante), il ne reste plus
@@ -1620,7 +1620,7 @@ il devient alors nécessaire de procéder à des initialisations en deux phases.
 Si vous n'avez pas de telle contrainte de <em>&ldquo;pas d'exceptions&rdquo;</em> sur vos projets,
 bannissez les fonctions <code>init()</code> de votre vocabulaire.</p>
 
-<p>Ceci dit, le recourt à des <em>factories</em> permet de retrouver un semblant
+<p>Ceci dit, le recours à des <em>factories</em> permet de retrouver un semblant
 d'invariant statique.</p>
 
 <h4>Choisir le bon type de pointeur</h4>
@@ -2310,7 +2310,8 @@ David Côme,
 Sébastien Dinot,
 Iradrille,
 Philippe Lacour,
-Cédric Poncet-Montange</p>
+Cédric Poncet-Montange
+et également l'équipe de relecteurs de développez.</p>
 
 <h2>VI- Références</h2>
 
