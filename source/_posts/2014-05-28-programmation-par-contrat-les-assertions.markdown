@@ -21,7 +21,7 @@ Comme je l'avais signalé dans le
 [précédent billet]({%post_url 2014-05-24-programmation-par-contrat-un-peu-de-theorie%}),
 la première chose que l'on peut faire à partir des contrats, c'est de les
 documenter clairement. Il s'agit probablement d'une des choses les plus
-importantes à documenter dans un code source. Et malheureusement trop souvent
+importantes à documenter dans un code source. Et malheureusement, trop souvent
 c'est négligé.
 
 L'outil [Doxygen](http://doxygen.org) met à notre disposition les tags `@pre`,
@@ -52,10 +52,10 @@ série de billets est de combattre cette habitude.
 ### Option 2 : on lance des exceptions dans la tradition de la programmation défensive
 
 À l'opposé, on peut prendre la voie de la _Programmation Défensive_ et vérifier
-chaque rupture potentielle de contrat pour lancer une exception. Au delà des
+chaque rupture potentielle de contrat pour lancer une exception. Au-delà des
 problèmes de conceptions et de déresponsabilisation évoqués dans le
 [billet précédent]({%post_url 2014-05-24-programmation-par-contrat-un-peu-de-theorie%}),
-il y a un soucis technique.
+il y a un souci technique.
 
 En effet, en temps normal avec une exception en C++, on ne peut rien avoir de
 mieux que des informations sur le lieu de la détection (_i.e._ :` __FILE__` et
@@ -73,7 +73,7 @@ au moment de la détection du problème.
 En vérité, il y existe des moyens peu ergonomiques pour y avoir accès. 
 
 * Un premier consiste à mettre des points d'arrêt sur les lancers ou les
-  constructions d'exceptions, et à exécuter le programme depuis un débuggueur
+  constructions d'exceptions, et à exécuter le programme depuis un débugueur
   -- _cf._ `catch throw` dans gdb.
 * Un second consiste à supprimer du code source tous les `catchs` qui sont
   compatibles avec l'erreur de logique.  
@@ -87,9 +87,9 @@ En vérité, il y existe des moyens peu ergonomiques pour y avoir accès.
   Le hic est que de nombreux _frameworks_ font dériver leurs erreurs de
   `std::exception` et non de `std::runtime_error`, et de fait, on se retrouve
   vite à faire des `catch(std::exception const&)` aux points d'interface
-  (dialogue via API C, threads en C++03, `main()`...) quelque soit le mode de
+  (dialogue via API C, threads en C++03, `main()`...) quel que soit le mode de
   compilation.  
-  Corolaire : ne faites pas comme ces _frameworks_ et choisissez judicieusement
+  Corollaire : ne faites pas comme ces _frameworks_ et choisissez judicieusement
   votre exception standard racine.
 
 Aucune de ces deux options n'est véritablement envisageable pour des tests
@@ -100,9 +100,9 @@ production. Ces options sont en revanche envisageables pour investiguer.
 vérification des contrats, que cela soit en phase de tests comme en phase de
 production.  Et ce, même pour des morceaux de code où il est certain qu'il n'y
 a pas d'erreur de programmation.  
-Par exemple, `sqrt(1-sin(x))` ne devrait poser aucun soucis. Une fonction sinus
+Par exemple, `sqrt(1-sin(x))` ne devrait poser aucun souci. Une fonction sinus
 renvoie en théorie un nombre entre -1 et 1, ce qui constitue une postcondition
-toute indiquée. De fait par construction, `1-sin(x)` est positif, et donc
+tout indiquée. De fait par construction, `1-sin(x)` est positif, et donc
 compatible avec le contrat de `sqrt`.
 
 En vérité, il existe une troisième façon de s'y prendre. Sous des systèmes
@@ -110,7 +110,7 @@ POSIX, on peut déclencher des _coredumps_ par programmation et ce sans
 interrompre le cours de l'exécution. Cela peut être fait depuis les
 constructeurs de nos exceptions de logique (Voir
 [ceci](http://stackoverflow.com/a/979297), ou
-[celà](http://stackoverflow.com/a/18581317)).
+[cela](http://stackoverflow.com/a/18581317)).
 
 
 ### Option 3 : on formalise nos suppositions à l'aide d'assertions
@@ -120,7 +120,7 @@ les erreurs de programmation : les assertions.
 
 En effet, compilé sans la directive de précompilation `NDEBUG`, une assertion
 va arrêter un programme et créer un fichier _core_. Il est ensuite possible
-d'ouvrir le fichier _core_ depuis le débuggueur pour pouvoir explorer l'état du
+d'ouvrir le fichier _core_ depuis le débugueur pour pouvoir explorer l'état du
 programme au moment de la détection de l'erreur.
 
 #### Exemple d'exploitation des assertions
@@ -243,7 +243,7 @@ comprendre que la fonction fautive n'était pas `sin` mais ce que l'on faisait
 avec son résultat.
 
 
-N.B.: l'équivalent existe pour d'autres environnements comme VC++.
+N.B. L'équivalent existe pour d'autres environnements comme VC++.
 
 #### <a id="Phases"></a>Un outil pour les phases de développement et de tests ...
 
@@ -252,13 +252,13 @@ Je vais paraphraser [[Wilson2006] §1.1.]({%post_url 2014-05-24-programmation-pa
 que vous devez déjà connaitre. Concrètement, cela veut dire que l'on va
 préférer trouver nos erreurs, dans l'ordre :
 
-1. lors de la phase de conception,
-2. lors la compilation,
-3. lors de l'analyse statique du code
-4. lors des tests unitaires,
-5. lors des tests en _debug_,
-6. en pré-release/phase béta,
-7. en production.
+1. Lors de la phase de conception ;
+2. Lors la compilation ;
+3. Lors de l'analyse statique du code ;
+4. Lors des tests unitaires ;
+5. Lors des tests en _debug_ ;
+6. En pré-release/phase béta ;
+7. En production.
 
 Je traiterai rapidement de la phase 2. de compilation en
 [fin de ce billet](#VerificationsStatiques).  
@@ -289,7 +289,7 @@ Comment peut-on détourner les assertions ? Tout simplement en détournant leur
 définition. N'oublions pas que les assertions sont des macros dont le
 comportement exact dépend de la définition de `NDEBUG`.
 
-Une façon assez sale de faire serait p.ex.:
+Une façon assez sale de faire serait p.ex. :
 
 ```c++
 #if defined(NDEBUG)
@@ -337,7 +337,7 @@ postcondition de `my::sin` et la précondition de `my::sqrt`, mais feront
 plutôt comme si les assertions étaient toujours vraies, c'est à dire comme si
 le code n'appelait jamais `my::sqrt` avec un nombre négatif.
 
-N.B.: Je généralise à partir de mon test avec _clang analyzer_. Peut-être que
+N.B. Je généralise à partir de mon test avec _clang analyzer_. Peut-être que
 d'autres outils savent tirer parti des contrats déclarés à l'aide d'assertions,
 ou peut-être le sauront-ils demain.  
 Pour information, je n'ai pas eu l'occasion de tester des outils comme _Code
@@ -346,11 +346,11 @@ Contract_ (pour .NET qui semble justement s'attaquer à cette tâche), Ada2012
 automatiquement des tests unitaires à partir des contrats exprimés),
 ni même _Polyspace_, ou _QA C++_.
 
-Dit autrement, je n'ai pas encore trouvé d'outil qui fasse de la preuve
-formelle en C++. A noter qu'il existe des efforts pour fournir à de tels outils
+Dit autrement, je n'ai pas encore trouvé d'outils qui fassent de la preuve
+formelle en C++. À noter qu'il existe des efforts pour fournir à de tels outils
 des moyens simplifiés, et plus forts sémantiquement parlant, pour exprimer des
 contrats dans des codes C++. Le plus proche est FRAMA-C qui connaît une
-mouture en cours d'élaboration pour le C++: FRAMA-clang.
+mouture en cours d'élaboration pour le C++ : FRAMA-clang.
 
 
 ### Option 4 : On utilise des Tests Unitaires (pour les postconditions)
@@ -365,7 +365,7 @@ serait le prix (même en mode _Debug_) d'une telle vérification ?
 Lors de ses présentations sur le sujet, John Lakos rappelle une postcondition
 souvent négligée d'une fonction de tri : non seulement, les éléments produits
 doivent être triés, mais en plus il doit s'agir des mêmes éléments (ni plus, ni
-moins) que ceux qui ont été fournis à la fonction de tri. [N.B.: Cet exemple
+moins) que ceux qui ont été fournis à la fonction de tri. [N.B. Cet exemple
 semble venir de Kevlin Henney.]
 
 Au final, un consensus semble se dégager vers l'utilisation de tests unitaires
@@ -405,8 +405,8 @@ meeting à Urbana) :
 
 Bref, les choses évoluent dans le bon sens.
 Certes, la PpC a moins de visibilité que les _modules_ ou les _concepts_ qui
-ont également été tous deux repoussés au delà du C++17. 
-Toujours est-il que nous sommes bien au delà de la prise de conscience de
+ont également été tous deux repoussés au-delà du C++17. 
+Toujours est-il que nous sommes bien au-delà de la prise de conscience de
 l'intérêt de la PpC dans le noyau de la communauté C++ qui fait le langage.
 
 
@@ -437,7 +437,7 @@ et à la spécification formelle
 #### Les contrats
 
 En substance, ces documents proposent d'utiliser les attributs introduits avec le
-C++11 avec une syntaxe allégée (sans les parenthèses!) pour spécifier des
+C++11 avec une syntaxe allégée (sans les parenthèses !) pour spécifier des
 contrats :
 
  * préconditions : `[[expects: x >= 0]]`
@@ -451,7 +451,7 @@ second temps.
 
 #### Modes et options
 
-De nouveau des modes sont prévus. D'un côté il y a les modes de vérification :
+De nouveau, des modes sont prévus. D'un côté, il y a les modes de vérification :
 
  * `default` (implicite), pour les vérifications qui ont un coût faible ;
  * `audit`, pour les vérifications qui ont un coût élevé ;
@@ -472,10 +472,10 @@ disposer de multiples versions d'une même bibliothèque, ont pesé lors des
 discussions.
 Je suis de fait assez surpris à la lecture de cette dernière proposition.
 
-D'autres problématiques ont également été abordées. P.ex. Comment permettre à
-une exception de s'échapper d'un contrat en échec depuis une fonction déclarée
-`noexcept` ? i.e. comment faire de la programmation défensive à l'intérieur de
-fonctions `noexcept` ?
+D'autres problématiques ont également été abordées. Par exemple, comment
+permettre à une exception de s'échapper d'un contrat en échec depuis une
+fonction déclarée `noexcept` ? C'est-à-dire comment faire de la programmation
+défensive à l'intérieur de fonctions `noexcept` ?
 
 Les dernières propositions évoquent un _violation handler_ permettant de
 décider quoi faire en cas de violation de contrat. Par défaut, une violation de
@@ -520,11 +520,11 @@ Tout d'abord, le C++17 est en cours de finalisation. Le comité de
 standardisation pourra ensuite s'occuper des contrats et des autres gros
 chantiers que sont les modules et les concepts.
 
-J'imagine qu'une fois que tout le monde sera d'accord sur une formulation on
+J'imagine qu'une fois que tout le monde sera d'accord sur une formulation, on
 pourra voir l'implémentation de la bibliothèque standard spécifier dans le code
 les contrats documentés dans la norme.
 
-Et après ... plus qu'à attendre l'émergence d'outils de preuve formelle pour le
+Et après... plus qu'à attendre l'émergence d'outils de preuve formelle pour le
 C++. Il ne sera plus nécessaire de passer par une syntaxe dédiée comme c'est le
 cas aujourd'hui avec FRAMA-C. Et qui sait, on peut rêver que les contrats
 soient absorbés à leur tour par la norme du C.
@@ -533,7 +533,7 @@ soient absorbés à leur tour par la norme du C.
 ## IV- <a id="VerificationsStatiques"></a>Invariants statiques
 
 Pour conclure, il est important de remarquer que certains contrats peuvent être
-retranscrit de manière plus forte qu'une assertion qui ne sera vérifiée qu'en
+retranscrits de manière plus forte qu'une assertion qui ne sera vérifiée qu'en
 phase de tests.
 
 En effet, le compilateur peut en prendre certains à sa charge.
@@ -699,7 +699,7 @@ utilisable_. Concrètement, cela implique deux choses pour le développeur.
    définitive.
 
 Un [point de la FAQ C++ de développez](http://cpp.developpez.com/faq/cpp/?page=Les-fonctions#Ou-dois-je-declarer-mes-variables-locales)
-traite de cela plus en détails.
+traite de cela plus en détail.
 
 #### Corollaire : préférez les constructeurs aux fonctions `init()` et autres _setters_
 Dans la continuité du point précédent, il faut éviter toute initialisation qui
@@ -714,7 +714,7 @@ constructeur, nous aurions à la place la garantie que soit l'objet existe et
 il est utilisable, soit l'objet n'existe pas et aucune question ne se pose,
 nulle part. 
 
-N.B. : il existe des infractions à cette règle. Une des plus visible vient du
+N.B. Il existe des infractions à cette règle. Une des plus visibles vient du
 [C++ Style Guide de Google](http://google-styleguide.googlecode.com/svn/trunk/cppguide.xml?showone=Forward_Declarations#Doing_Work_in_Constructors).
 Dans la mesure où les exceptions sont interdites dans leur base de code (car la
 quantité de vieux code sans exceptions est trop importante), il ne reste plus
@@ -723,7 +723,7 @@ il devient alors nécessaire de procéder à des initialisations en deux phases.
 Si vous n'avez pas de telle contrainte de _"pas d'exceptions"_ sur vos projets,
 bannissez les fonctions `init()` de votre vocabulaire.
 
-Ceci dit, le recourt à des _factories_ permet de retrouver un semblant
+Ceci dit, le recours à des _factories_ permet de retrouver un semblant
 d'invariant statique.
 
 #### Choisir le bon type de pointeur
