@@ -347,7 +347,7 @@ void my::process(boost::filesystem::path const& file) {
     boost::ifstream f(file);
     if (!f) throw std::runtime_error("Cannot open "+file.string());
     double d;
-    while (f >> d) {
+    for (std::size_t l = 1 ; f >> d ; ++l) {
         double sq = 0;
         try {
             sq = my::sqrt(d);
