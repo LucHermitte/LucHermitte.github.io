@@ -4,7 +4,7 @@
   <title><![CDATA[Category: C++ | Luc Hermitte's Blog]]></title>
   <link href="http://LucHermitte.github.io/blog/categories/c-plus-plus/atom.xml" rel="self"/>
   <link href="http://LucHermitte.github.io/"/>
-  <updated>2017-03-13T11:50:38+01:00</updated>
+  <updated>2017-04-06T12:31:23+02:00</updated>
   <id>http://LucHermitte.github.io/</id>
   <author>
     <name><![CDATA[Luc Hermitte]]></name>
@@ -1675,7 +1675,7 @@ encadre l'appel à <code>my::sqrt</code> pour remonter plus d'informations.</p>
     boost::ifstream f(file);
     if (!f) throw std::runtime_error("Cannot open "+file.string());
     double d;
-    while (f &gt;&gt; d) {
+    for (std::size_t l = 1 ; f &gt;&gt; d ; ++l) {
         double sq = 0;
         try {
             sq = my::sqrt(d);
