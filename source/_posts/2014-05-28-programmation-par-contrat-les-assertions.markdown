@@ -661,7 +661,7 @@ double interrogeES();
 double metier() {
    auto i = interrogeES();
    if (i < 0) {
-       throw std::range_error("Cannot work on a negative number. Please start again`.")`
+       throw std::range_error("Cannot work on a negative number. Please start again.")
    }
    return sqrt(positive_number(i));
 }
